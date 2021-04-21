@@ -1,0 +1,131 @@
+[gd_scene load_steps=13 format=2]
+
+[ext_resource path="res://scripts/AICharacter.cs" type="Script" id=1]
+[ext_resource path="res://textures/shadow.png" type="Texture" id=2]
+[ext_resource path="res://textures/temp.png" type="Texture" id=3]
+[ext_resource path="res://materials/M_Character.tres" type="Material" id=4]
+[ext_resource path="res://font/standard_font.tres" type="DynamicFont" id=5]
+[ext_resource path="res://textures/bone.png" type="Texture" id=6]
+[ext_resource path="res://particle/BoneExplode.tres" type="Material" id=7]
+[ext_resource path="res://textures/exclaimation.png" type="Texture" id=8]
+
+[sub_resource type="AtlasTexture" id=1]
+atlas = ExtResource( 3 )
+region = Rect2( 0, 0, 16, 16 )
+
+[sub_resource type="SpriteFrames" id=2]
+animations = [ {
+"frames": [ SubResource( 1 ) ],
+"loop": true,
+"name": "default",
+"speed": 3.75
+} ]
+
+[sub_resource type="CapsuleShape2D" id=3]
+radius = 1.5
+height = 1.5
+
+[sub_resource type="Animation" id=4]
+length = 0.3
+step = 0.025
+tracks/0/type = "value"
+tracks/0/path = NodePath("CharSprite:material:shader_param/colour_override")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.075, 0.15, 0.3 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 1 ), Color( 1, 0, 0, 1 ), Color( 1, 1, 1, 1 ), Color( 1, 0, 0, 1 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("CharSprite:material:shader_param/override_lerp")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.075, 0.3 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ 0.0, 1.0, 0.0 ]
+}
+
+[node name="AICharacter" type="KinematicBody2D"]
+script = ExtResource( 1 )
+_hitboxPath = NodePath("Hitbox")
+_upDownColliderPath = NodePath("Hitbox/UpDown")
+_rightLeftColliderPath = NodePath("Hitbox/LeftRight")
+_charSpritePath = NodePath("CharSprite")
+_shadowSpritePath = NodePath("shadow")
+_animationPlayerPath = NodePath("AnimationPlayer")
+maxHealth = 1
+_animDown = "default"
+_animLeftRight = "default"
+_animUp = "default"
+_animDeath = "default"
+_deathParticlesPath = NodePath("DeathParticles")
+_tweenPath = NodePath("Tween")
+_detectionNotifierPath = NodePath("DetectionNotifier")
+maxMovementSpeed = 24.0
+
+[node name="DeathParticles" type="Particles2D" parent="."]
+emitting = false
+amount = 16
+lifetime = 30.0
+one_shot = true
+explosiveness = 1.0
+randomness = 1.0
+visibility_rect = Rect2( -48, -48, 96, 96 )
+local_coords = false
+process_material = ExtResource( 7 )
+texture = ExtResource( 6 )
+
+[node name="shadow" type="Sprite" parent="."]
+texture = ExtResource( 2 )
+
+[node name="CharSprite" type="AnimatedSprite" parent="."]
+material = ExtResource( 4 )
+frames = SubResource( 2 )
+offset = Vector2( 0, -8 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 0, -1.5 )
+rotation = 1.5708
+shape = SubResource( 3 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/DamageFlash = SubResource( 4 )
+
+[node name="debugLabel" type="Label" parent="."]
+visible = false
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -20.0
+margin_right = 20.0
+margin_bottom = 14.0
+custom_fonts/font = ExtResource( 5 )
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Hitbox" type="KinematicBody2D" parent="."]
+visible = false
+collision_layer = 8
+collision_mask = 8
+
+[node name="UpDown" type="CollisionPolygon2D" parent="Hitbox"]
+polygon = PoolVector2Array( -8, 0, -8, -16, 8, -16, 8, 0 )
+
+[node name="LeftRight" type="CollisionPolygon2D" parent="Hitbox"]
+polygon = PoolVector2Array( -2, 0, -2, -16, 2, -16, 2, 0 )
+
+[node name="DetectionNotifier" type="Sprite" parent="."]
+position = Vector2( 0, -30 )
+scale = Vector2( 1e-05, 1 )
+texture = ExtResource( 8 )
+
+[node name="Tween" type="Tween" parent="."]

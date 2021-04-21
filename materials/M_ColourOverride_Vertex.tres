@@ -1,0 +1,20 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+uniform vec4 default_colour : hint_color;
+uniform vec4 colour_override : hint_color;
+uniform float override_lerp: hint_range(0, 1) = 0f;
+
+void vertex()
+{
+	COLOR = mix(COLOR, colour_override, override_lerp);
+}"
+
+[resource]
+resource_local_to_scene = true
+shader = SubResource( 1 )
+shader_param/default_colour = Color( 0.45098, 0.454902, 0.258824, 1 )
+shader_param/colour_override = Color( 1, 1, 1, 1 )
+shader_param/override_lerp = 0.0

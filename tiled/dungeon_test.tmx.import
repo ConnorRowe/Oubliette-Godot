@@ -1,0 +1,22 @@
+[remap]
+
+importer="vnen.tiled_importer"
+type="PackedScene"
+path="res://.import/dungeon_test.tmx-c31565a424f17ad5925c8681d9c99e80.scn"
+
+[deps]
+
+source_file="res://tiled/dungeon_test.tmx"
+dest_files=[ "res://.import/dungeon_test.tmx-c31565a424f17ad5925c8681d9c99e80.scn" ]
+
+[params]
+
+custom_properties=true
+tile_metadata=false
+uv_clip=true
+image_flags=3
+collision_layer=1
+embed_internal_images=false
+save_tiled_properties=false
+add_background=true
+post_import_script="res://tiled/tilemap_postimport.gd"

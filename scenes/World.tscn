@@ -1,0 +1,189 @@
+[gd_scene load_steps=31 format=2]
+
+[ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=1]
+[ext_resource path="res://scripts/World.cs" type="Script" id=2]
+[ext_resource path="res://tiled/dungeon_test.tmx" type="PackedScene" id=3]
+[ext_resource path="res://scripts/DebugOverlay.cs" type="Script" id=4]
+[ext_resource path="res://scenes/Slime.tscn" type="PackedScene" id=5]
+[ext_resource path="res://font/tiny_font.tres" type="DynamicFont" id=6]
+[ext_resource path="res://scenes/HealthContainer.tscn" type="PackedScene" id=7]
+[ext_resource path="res://scenes/MajykaContainer.tscn" type="PackedScene" id=8]
+[ext_resource path="res://textures/Fish_in_pool1_edit.png" type="Texture" id=9]
+[ext_resource path="res://scenes/Imp.tscn" type="PackedScene" id=10]
+[ext_resource path="res://scenes/AICharacterWithWeapon.tscn" type="PackedScene" id=11]
+[ext_resource path="res://scenes/SkeletonMage.tscn" type="PackedScene" id=12]
+
+[sub_resource type="AtlasTexture" id=1]
+atlas = ExtResource( 9 )
+region = Rect2( 0, 0, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=2]
+atlas = ExtResource( 9 )
+region = Rect2( 85, 0, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=3]
+atlas = ExtResource( 9 )
+region = Rect2( 170, 0, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=4]
+atlas = ExtResource( 9 )
+region = Rect2( 255, 0, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=5]
+atlas = ExtResource( 9 )
+region = Rect2( 340, 0, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=6]
+atlas = ExtResource( 9 )
+region = Rect2( 0, 26, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=7]
+atlas = ExtResource( 9 )
+region = Rect2( 85, 26, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=8]
+atlas = ExtResource( 9 )
+region = Rect2( 170, 26, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=9]
+atlas = ExtResource( 9 )
+region = Rect2( 255, 26, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=10]
+atlas = ExtResource( 9 )
+region = Rect2( 340, 26, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=11]
+atlas = ExtResource( 9 )
+region = Rect2( 0, 52, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=12]
+atlas = ExtResource( 9 )
+region = Rect2( 85, 52, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=13]
+atlas = ExtResource( 9 )
+region = Rect2( 170, 52, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=14]
+atlas = ExtResource( 9 )
+region = Rect2( 255, 52, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=15]
+atlas = ExtResource( 9 )
+region = Rect2( 340, 52, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=16]
+atlas = ExtResource( 9 )
+region = Rect2( 0, 78, 85, 26 )
+
+[sub_resource type="AtlasTexture" id=17]
+atlas = ExtResource( 9 )
+region = Rect2( 85, 78, 85, 26 )
+
+[sub_resource type="SpriteFrames" id=18]
+animations = [ {
+"frames": [ SubResource( 1 ), SubResource( 2 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ), SubResource( 6 ), SubResource( 7 ), SubResource( 8 ), SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ), SubResource( 14 ), SubResource( 15 ), SubResource( 16 ), SubResource( 17 ) ],
+"loop": true,
+"name": "default",
+"speed": 8.0
+} ]
+
+[node name="World" type="YSort"]
+script = ExtResource( 2 )
+_linePath = NodePath("Line2D")
+_basicAIPath = NodePath("")
+_levelPath = NodePath("dungeon_test")
+_debugOverlayPath = NodePath("CanvasLayer/DebugOverlay")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color( 0.47, 0.47, 0.47, 1 )
+
+[node name="dungeon_test" parent="." instance=ExtResource( 3 )]
+
+[node name="Line2D" type="Line2D" parent="."]
+visible = false
+z_index = 2
+points = PoolVector2Array( 397.098, 689.985 )
+width = 2.0
+default_color = Color( 1, 0, 0, 0.796078 )
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="Player" parent="." instance=ExtResource( 1 )]
+position = Vector2( 215, 159 )
+maxHealth = 8
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+scale = Vector2( 2, 2 )
+transform = Transform2D( 2, 0, 0, 2, 0, 0 )
+
+[node name="DebugOverlay" type="Node2D" parent="CanvasLayer"]
+position = Vector2( 508, 7 )
+script = ExtResource( 4 )
+_debugFont = ExtResource( 6 )
+
+[node name="HealthContainer" parent="CanvasLayer" instance=ExtResource( 7 )]
+position = Vector2( 4, 12 )
+
+[node name="MajykaContainer" parent="CanvasLayer" instance=ExtResource( 8 )]
+position = Vector2( 4, 4 )
+
+[node name="fishy" type="AnimatedSprite" parent="."]
+visible = false
+modulate = Color( 0.341176, 0.678431, 0.709804, 1 )
+position = Vector2( 448, 581 )
+frames = SubResource( 18 )
+frame = 14
+playing = true
+
+[node name="Imp" parent="." instance=ExtResource( 10 )]
+position = Vector2( 516, 129 )
+
+[node name="Slime" parent="." instance=ExtResource( 5 )]
+position = Vector2( 252, 354 )
+
+[node name="AICharacterWithWeapon" parent="." instance=ExtResource( 11 )]
+position = Vector2( 114, 98 )
+weaponOriginsString = {
+"down": Vector2( -4, -8 ),
+"left": Vector2( 0.5, -8 ),
+"right": Vector2( 0.5, -8 ),
+"up": Vector2( 4, -8 )
+}
+armOriginsString = {
+"down": Vector2( -2.5, -12 ),
+"left": Vector2( 0.5, -12 ),
+"right": Vector2( 0.5, -12 ),
+"up": Vector2( 2.5, -12 )
+}
+
+[node name="Slime2" parent="." instance=ExtResource( 5 )]
+position = Vector2( 488, 38 )
+
+[node name="Imp2" parent="." instance=ExtResource( 10 )]
+position = Vector2( 484, 244 )
+
+[node name="SkeletonMage" parent="." instance=ExtResource( 12 )]
+position = Vector2( 193, 343 )
+_hitboxPath = NodePath("Hitbox")
+_upDownColliderPath = NodePath("Hitbox/UpDown")
+_rightLeftColliderPath = NodePath("Hitbox/LeftRight")
+_charSpritePath = NodePath("CharSprite")
+_shadowSpritePath = NodePath("shadow")
+_animationPlayerPath = NodePath("AnimationPlayer")
+_deathParticlesPath = NodePath("DeathParticles")
+_tweenPath = NodePath("Tween")
+_detectionNotifierPath = NodePath("DetectionNotifier")
+weaponOriginsString = {
+"down": Vector2( -4, -8 ),
+"left": Vector2( 0.5, -8 ),
+"right": Vector2( 0.5, -8 ),
+"up": Vector2( 4, -8 )
+}
+armOriginsString = {
+"down": Vector2( -2.5, -12 ),
+"left": Vector2( 0.5, -12 ),
+"right": Vector2( 0.5, -12 ),
+"up": Vector2( 2.5, -12 )
+}

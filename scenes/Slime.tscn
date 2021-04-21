@@ -1,0 +1,146 @@
+[gd_scene load_steps=26 format=2]
+
+[ext_resource path="res://scenes/AICharacter.tscn" type="PackedScene" id=1]
+[ext_resource path="res://textures/slime_death.png" type="Texture" id=2]
+[ext_resource path="res://textures/slime_chunk.png" type="Texture" id=3]
+[ext_resource path="res://textures/slime.png" type="Texture" id=4]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+uniform vec4 colour_override : hint_color;
+uniform float override_lerp: hint_range(0, 1) = 0f;
+uniform vec4 outline_colour : hint_color = vec4(1.0);
+uniform float outline_width : hint_range(0, 1) = 0f;
+
+void fragment()
+{
+	vec4 tex = texture(TEXTURE, UV);
+	vec4 base_colour = mix(tex, vec4(colour_override.rgb, tex.a * colour_override.a), override_lerp);
+	
+	float w = outline_width * 1.0 / float(textureSize(TEXTURE, 0).x);
+	float h = outline_width * 1.0 / float(textureSize(TEXTURE, 0).y);
+	
+	float alpha = -4.0 * base_colour.a;
+	alpha += texture(TEXTURE, UV + vec2(w, 0.0)).a;
+	alpha += texture(TEXTURE, UV + vec2(-w, 0.0)).a;
+	alpha += texture(TEXTURE, UV + vec2(0.0, h)).a;
+	alpha += texture(TEXTURE, UV + vec2(0.0, -h)).a;
+	
+	vec4 finalColour = mix(base_colour, outline_colour, clamp(alpha, 0.0, 1.0));
+	COLOR = vec4(finalColour.rgb, clamp(abs(alpha) + base_colour.a, 0.0, 1.0));
+}"
+
+[sub_resource type="ShaderMaterial" id=2]
+resource_local_to_scene = true
+shader = SubResource( 1 )
+shader_param/colour_override = Color( 1, 1, 1, 1 )
+shader_param/override_lerp = 0.0
+shader_param/outline_colour = Color( 1, 1, 1, 1 )
+shader_param/outline_width = 0.0
+
+[sub_resource type="AtlasTexture" id=3]
+atlas = ExtResource( 4 )
+region = Rect2( 0, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=4]
+atlas = ExtResource( 4 )
+region = Rect2( 16, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=5]
+atlas = ExtResource( 2 )
+region = Rect2( 0, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=6]
+atlas = ExtResource( 2 )
+region = Rect2( 16, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=7]
+atlas = ExtResource( 2 )
+region = Rect2( 32, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=8]
+atlas = ExtResource( 2 )
+region = Rect2( 48, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=9]
+atlas = ExtResource( 2 )
+region = Rect2( 64, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=10]
+atlas = ExtResource( 2 )
+region = Rect2( 80, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=11]
+atlas = ExtResource( 2 )
+region = Rect2( 96, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=12]
+atlas = ExtResource( 2 )
+region = Rect2( 112, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=13]
+atlas = ExtResource( 2 )
+region = Rect2( 128, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=14]
+atlas = ExtResource( 2 )
+region = Rect2( 144, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=15]
+atlas = ExtResource( 2 )
+region = Rect2( 160, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=16]
+atlas = ExtResource( 2 )
+region = Rect2( 176, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=17]
+atlas = ExtResource( 2 )
+region = Rect2( 192, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=18]
+atlas = ExtResource( 2 )
+region = Rect2( 208, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=19]
+atlas = ExtResource( 2 )
+region = Rect2( 224, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=20]
+atlas = ExtResource( 2 )
+region = Rect2( 240, 0, 16, 16 )
+
+[sub_resource type="SpriteFrames" id=21]
+animations = [ {
+"frames": [ SubResource( 3 ), SubResource( 4 ) ],
+"loop": true,
+"name": "default",
+"speed": 3.75
+}, {
+"frames": [ SubResource( 5 ), SubResource( 6 ), SubResource( 7 ), SubResource( 8 ), SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ), SubResource( 14 ), SubResource( 15 ), SubResource( 16 ), SubResource( 17 ), SubResource( 18 ), SubResource( 19 ), SubResource( 20 ) ],
+"loop": false,
+"name": "die",
+"speed": 7.5
+} ]
+
+[node name="Slime" instance=ExtResource( 1 )]
+maxHealth = 2
+_animDeath = "die"
+
+[node name="DeathParticles" parent="." index="0"]
+texture = ExtResource( 3 )
+
+[node name="CharSprite" parent="." index="2"]
+material = SubResource( 2 )
+frames = SubResource( 21 )
+animation = "die"
+
+[node name="Hitbox" parent="." index="6"]
+visible = true
+
+[node name="UpDown" parent="Hitbox" index="0"]
+polygon = PoolVector2Array( -6, 0, -6, -3, -3, -7, 0, -8, 3, -7, 6, -3, 6, 0 )
+
+[node name="LeftRight" parent="Hitbox" index="1"]
+polygon = PoolVector2Array( -6, 0, -6, -3, -3, -7, 0, -8, 3, -7, 6, -3, 6, 0 )
