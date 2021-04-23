@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/yuh.wav-3dcaf458b868f07206192f3a7a80349b.sample"
+
+[deps]
+
+source_file="res://sound/phonetic/yuh.wav"
+dest_files=[ "res://.import/yuh.wav-3dcaf458b868f07206192f3a7a80349b.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

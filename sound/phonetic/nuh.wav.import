@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/nuh.wav-7e4df88795b8ca8c3deccc3e181c6adb.sample"
+
+[deps]
+
+source_file="res://sound/phonetic/nuh.wav"
+dest_files=[ "res://.import/nuh.wav-7e4df88795b8ca8c3deccc3e181c6adb.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

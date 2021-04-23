@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=2]
+[gd_scene load_steps=32 format=2]
 
 [ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://scripts/World.cs" type="Script" id=2]
@@ -12,6 +12,7 @@
 [ext_resource path="res://scenes/Imp.tscn" type="PackedScene" id=10]
 [ext_resource path="res://scenes/AICharacterWithWeapon.tscn" type="PackedScene" id=11]
 [ext_resource path="res://scenes/SkeletonMage.tscn" type="PackedScene" id=12]
+[ext_resource path="res://scenes/DialogueBox.tscn" type="PackedScene" id=13]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 9 )
@@ -129,6 +130,12 @@ position = Vector2( 4, 12 )
 [node name="MajykaContainer" parent="CanvasLayer" instance=ExtResource( 8 )]
 position = Vector2( 4, 4 )
 
+[node name="DialogueBox" parent="CanvasLayer" instance=ExtResource( 13 )]
+margin_left = 14.0
+margin_top = 217.0
+margin_right = -525.0
+margin_bottom = -304.0
+
 [node name="fishy" type="AnimatedSprite" parent="."]
 visible = false
 modulate = Color( 0.341176, 0.678431, 0.709804, 1 )
@@ -166,15 +173,6 @@ position = Vector2( 484, 244 )
 
 [node name="SkeletonMage" parent="." instance=ExtResource( 12 )]
 position = Vector2( 193, 343 )
-_hitboxPath = NodePath("Hitbox")
-_upDownColliderPath = NodePath("Hitbox/UpDown")
-_rightLeftColliderPath = NodePath("Hitbox/LeftRight")
-_charSpritePath = NodePath("CharSprite")
-_shadowSpritePath = NodePath("shadow")
-_animationPlayerPath = NodePath("AnimationPlayer")
-_deathParticlesPath = NodePath("DeathParticles")
-_tweenPath = NodePath("Tween")
-_detectionNotifierPath = NodePath("DetectionNotifier")
 weaponOriginsString = {
 "down": Vector2( -4, -8 ),
 "left": Vector2( 0.5, -8 ),

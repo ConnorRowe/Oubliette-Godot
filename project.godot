@@ -14,6 +14,10 @@ config/name="Oubliette"
 run/main_scene="res://scenes/World.tscn"
 config/icon="res://icon.png"
 
+[audio]
+
+default_bus_layout="res://sound/default_bus_layout.tres"
+
 [autoload]
 
 Spells="*res://scripts/singletons/Spells.cs"

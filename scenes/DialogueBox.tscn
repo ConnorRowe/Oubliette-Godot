@@ -1,0 +1,116 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://default_theme.tres" type="Theme" id=1]
+[ext_resource path="res://textures/dialogue_nineslice.png" type="Texture" id=2]
+[ext_resource path="res://scripts/DialogueBox.cs" type="Script" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[node name="DialogueBox" type="VBoxContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = -377.0
+margin_bottom = -521.0
+rect_pivot_offset = Vector2( 0.5, 0.5 )
+custom_constants/separation = 0
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+_namePath = NodePath("PanelContainer/MarginContainer/MarginContainer/Name")
+_dialoguePath = NodePath("Text/MarginContainer/Dialogue")
+_audioPlayerPath = NodePath("AudioPlayer")
+_tweenPath = NodePath("Tween")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+margin_right = 137.0
+margin_bottom = 14.0
+size_flags_horizontal = 0
+custom_styles/panel = SubResource( 1 )
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+margin_right = 137.0
+margin_bottom = 14.0
+custom_constants/margin_top = 0
+custom_constants/margin_left = 13
+
+[node name="NinePatchRect" type="NinePatchRect" parent="PanelContainer/MarginContainer"]
+margin_left = 13.0
+margin_right = 137.0
+margin_bottom = 14.0
+texture = ExtResource( 2 )
+region_rect = Rect2( 0, 0, 16, 8 )
+patch_margin_left = 7
+patch_margin_top = 8
+patch_margin_right = 7
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer"]
+margin_left = 13.0
+margin_right = 137.0
+margin_bottom = 14.0
+custom_constants/margin_right = 4
+custom_constants/margin_top = -2
+custom_constants/margin_left = 4
+custom_constants/margin_bottom = -4
+
+[node name="Name" type="Label" parent="PanelContainer/MarginContainer/MarginContainer"]
+margin_left = 4.0
+margin_top = -2.0
+margin_right = 120.0
+margin_bottom = 18.0
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.0
+theme = ExtResource( 1 )
+text = "Character Name:"
+
+[node name="Text" type="PanelContainer" parent="."]
+margin_top = 14.0
+margin_right = 647.0
+margin_bottom = 79.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_styles/panel = SubResource( 1 )
+
+[node name="NinePatchRect" type="NinePatchRect" parent="Text"]
+margin_right = 647.0
+margin_bottom = 65.0
+texture = ExtResource( 2 )
+patch_margin_left = 7
+patch_margin_top = 7
+patch_margin_right = 7
+patch_margin_bottom = 7
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="Text"]
+margin_right = 647.0
+margin_bottom = 65.0
+custom_constants/margin_right = 8
+custom_constants/margin_top = 4
+custom_constants/margin_left = 5
+custom_constants/margin_bottom = 5
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Dialogue" type="RichTextLabel" parent="Text/MarginContainer"]
+margin_left = 5.0
+margin_top = 4.0
+margin_right = 639.0
+margin_bottom = 60.0
+theme = ExtResource( 1 )
+bbcode_enabled = true
+bbcode_text = " Lorem ipsum dolor sit amet, [shake rate=10 level=8]consectetur adipiscing elit.[/shake] Vivamus tincidunt leo id dapibus sagittis. Donec cursus convallis varius. Pellentesque consectetur, libero at tempus vestibulum, orci neque condimentum purus, sed ullamcorper nisl lectus sed purus."
+text = " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tincidunt leo id dapibus sagittis. Donec cursus convallis varius. Pellentesque consectetur, libero at tempus vestibulum, orci neque condimentum purus, sed ullamcorper nisl lectus sed purus."
+scroll_active = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
+pitch_scale = 1.6
+bus = "Voice"
+
+[node name="Tween" type="Tween" parent="."]
