@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class DebugOverlay : Node2D
 {
@@ -19,7 +20,10 @@ public class DebugOverlay : Node2D
         }
     }
 
-    private System.Collections.Generic.List<TrackedStat> _trackedStats = new System.Collections.Generic.List<TrackedStat>();
+    private List<TrackedStat> _trackedStats = new List<TrackedStat>();
+    private int _maxTrackedLines = 8;
+    private List<Vector2[]> _trackedLines = new List<Vector2[]>(8);
+    public World world;
 
     // Exports
     [Export]
@@ -93,6 +97,19 @@ public class DebugOverlay : Node2D
     public void TrackFunc(string funcName, Godot.Object objectRef, string nameOverride = "")
     {
         _trackedStats.Add(new TrackedStat(funcName, WeakRef(objectRef), true, nameOverride));
+    }
+
+    public void TrackLine(Vector2[] line)
+    {
+        if (_trackedLines.Count == _maxTrackedLines)
+        {
+            _trackedLines.RemoveAt(_maxTrackedLines - 1);
+        }
+
+        _trackedLines.Insert(0, line);
+
+        world.debugLines = _trackedLines;
+        world.Update();
     }
 
     private void DrawRightAlignShadowedString(string str, int idx, Vector2 offset = new Vector2())

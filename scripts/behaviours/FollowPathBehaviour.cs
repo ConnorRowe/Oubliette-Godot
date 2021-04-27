@@ -37,10 +37,13 @@ public class FollowPathBehaviour : MovementBehaviour
 
     public void UpdatePath()
     {
-        path = new Godot.Collections.Array<Vector2>(getPath());
+        Vector2[] pathArray = getPath();
+        path = new Godot.Collections.Array<Vector2>(pathArray);
 
         timer = mgr.owner.GetTree().CreateTimer(0.5f);
         timer.Connect("timeout", this, nameof(UpdatePath));
+
+        // mgr.world.GetDebugOverlay().TrackLine(pathArray);
     }
 
 

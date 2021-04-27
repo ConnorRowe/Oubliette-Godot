@@ -25,7 +25,7 @@ public class Player : Character
     }
 
     // Nodes
-    private Camera2D camera;
+    public Camera2D camera;
     private Spells _Spells;
     private Particles2D spellParticle;
     private MajykaContainer majykaBar;
@@ -69,8 +69,6 @@ public class Player : Character
         armOutline = GetNode<Line2D>("CharSprite/ArmOutline");
         staffLight = GetNode<Light2D>("CharSprite/staff/StaffLight");
         spellSpawnPoint = GetNode<Node2D>("CharSprite/staff/SpellSpawnPoint");
-
-        world.GetDebugOverlay().TrackProperty(nameof(staffRot), this, "Staff Rot");
 
         activeSpell = _Spells.Ice_Skin;
     }

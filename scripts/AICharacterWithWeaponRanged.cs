@@ -21,30 +21,34 @@ public class AICharacterWithWeaponRanged : AICharacterWithWeapon
 
         ProjectileBehaviour projBehaviour = new ProjectileBehaviour(aIManager, projectile, 200.0f, () => { return weaponParticles.GlobalPosition; }, (proj) => { ((ParticlesMaterial)proj.particles.ProcessMaterial).HueVariation = this.projHueAdjust; }, new Func<AIBehaviour.TransitionTestResult>[] {
             
-            // attack -> follow_target
+            // attack_target -> follow_target
             () => {
-                // If player is too far away but still visible
+                return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) > attackRange, "follow_target");
+            },
+            // attack_target -> path_to_last_pos
+            () => {
+                // If target is not visible
                 Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-                return new AIBehaviour.TransitionTestResult(!isCharging && GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) > attackRange && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}), "follow_target");
+                return new AIBehaviour.TransitionTestResult(!AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}), "path_to_last_pos");
             },
 
-            // attack -> path_to_last_pos
-            () => {
-                // If player is not visible or projectile has no LoS
-                Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-                return new AIBehaviour.TransitionTestResult(!isCharging && (!AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}) || !AIManager.TraceToTarget(weaponParticles.GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this})), "path_to_last_pos");
-            },
+            // // attack -> path_to_last_pos
+            // () => {
+            //     // If player is not visible or projectile has no LoS
+            //     Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
+            //     return new AIBehaviour.TransitionTestResult(!isCharging && (!AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}) || !AIManager.TraceToTarget(weaponParticles.GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this})), "path_to_last_pos");
+            // },
 
-            // attack -> wander
-            () => {
-                // If player is too far away or player is not visible
-                Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-                return new AIBehaviour.TransitionTestResult(!isCharging && GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) > attackRange || !AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}), "wander");
-            }
+            // // attack -> wander
+            // () => {
+            //     // If player is too far away or player is not visible
+            //     Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
+            //     return new AIBehaviour.TransitionTestResult(!isCharging && GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) > attackRange || !AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}), "wander");
+            // }
         });
 
-        aIManager.RemoveBehaviour("attack");
-        aIManager.AddBehaviour("attack", projBehaviour);
+        aIManager.RemoveBehaviour("attack_target");
+        aIManager.AddBehaviour("attack_target", projBehaviour);
 
         aIManager.Connect(nameof(AIManager.BehaviourChanged), this, nameof(BehaviourChanged));
     }
@@ -53,7 +57,7 @@ public class AICharacterWithWeaponRanged : AICharacterWithWeapon
     {
         base._Process(delta);
 
-        if (aIManager.CurrentBehaviour == "attack")
+        if (aIManager.CurrentBehaviour == "attack_target")
         {
             dir = GlobalPosition.DirectionTo(aIManager.lastTarget.GlobalPosition);
         }
@@ -61,7 +65,7 @@ public class AICharacterWithWeaponRanged : AICharacterWithWeapon
 
     private void BehaviourChanged(string behaviour)
     {
-        if (!isCharging && behaviour == "attack")
+        if (!isCharging && behaviour == "attack_target")
         {
             ChargeSpell();
         }
@@ -73,7 +77,7 @@ public class AICharacterWithWeaponRanged : AICharacterWithWeapon
     {
         tween.Remove(this, nameof(SetShownParticles));
         tween.Remove(this, nameof(Fire));
-        
+
         tween.InterpolateMethod(this, nameof(SetShownParticles), 0, 32, this.attackSpeed, Tween.TransitionType.Quad);
         tween.InterpolateCallback(this, this.attackSpeed, nameof(Fire));
         tween.Start();
@@ -91,7 +95,7 @@ public class AICharacterWithWeaponRanged : AICharacterWithWeapon
 
         aIManager.TryTransition();
 
-        if (aIManager.CurrentBehaviour == "attack")
+        if (aIManager.CurrentBehaviour == "attack_target")
         {
             ChargeSpell();
         }

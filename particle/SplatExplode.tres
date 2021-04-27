@@ -1,0 +1,44 @@
+[gd_resource type="ParticlesMaterial" load_steps=9 format=2]
+
+[ext_resource path="res://particle/DampCurve.tres" type="Curve" id=1]
+[ext_resource path="res://particle/AngleCurve.tres" type="Curve" id=2]
+
+[sub_resource type="CurveTexture" id=1]
+curve = ExtResource( 2 )
+
+[sub_resource type="Curve" id=2]
+bake_resolution = 200
+_data = [ Vector2( 0, 0 ), 0.0, 0.0, 0, 0, Vector2( 0.0382653, 1 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=3]
+curve = SubResource( 2 )
+
+[sub_resource type="Gradient" id=4]
+offsets = PoolRealArray( 0, 0.971714, 0.998336 )
+colors = PoolColorArray( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 )
+
+[sub_resource type="GradientTexture" id=5]
+gradient = SubResource( 4 )
+
+[sub_resource type="CurveTexture" id=6]
+width = 3072
+curve = ExtResource( 1 )
+
+[resource]
+emission_shape = 1
+emission_sphere_radius = 2.0
+flag_align_y = true
+flag_disable_z = true
+direction = Vector3( 0, -1, 0 )
+spread = 8.0
+gravity = Vector3( 0, 392, 0 )
+initial_velocity = 168.0
+initial_velocity_random = 0.16
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+damping_curve = SubResource( 6 )
+angle = -80.5
+angle_random = 1.0
+angle_curve = SubResource( 1 )
+color_ramp = SubResource( 5 )
+anim_offset_curve = SubResource( 3 )

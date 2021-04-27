@@ -21,7 +21,7 @@ public class MeleeAttackBehaviour : AIBehaviour
     public override void Process(float delta) { }
     public override void OnBehaviourEnd()
     {
-        if(timer.IsConnected("timeout", this, nameof(TryAttack)))
+        if(timer != null && timer.IsConnected("timeout", this, nameof(TryAttack)))
             timer.Disconnect("timeout", this, nameof(TryAttack));
     }
 

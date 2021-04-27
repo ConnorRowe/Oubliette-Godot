@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=2]
+[gd_scene load_steps=30 format=2]
 
 [ext_resource path="res://scripts/AICharacterWithWeapon.cs" type="Script" id=1]
 [ext_resource path="res://scenes/AICharacter.tscn" type="PackedScene" id=2]
@@ -6,6 +6,8 @@
 [ext_resource path="res://textures/thin_sword.png" type="Texture" id=4]
 [ext_resource path="res://textures/Skel_noarm_walk_down.png" type="Texture" id=5]
 [ext_resource path="res://textures/Skel_noarm_walk_up.png" type="Texture" id=6]
+[ext_resource path="res://textures/bone.png" type="Texture" id=7]
+[ext_resource path="res://particle/ObjectExplode.tres" type="Material" id=8]
 
 [sub_resource type="Shader" id=1]
 code = "shader_type canvas_item;
@@ -138,7 +140,7 @@ _animDown = "down"
 _animLeftRight = "leftright"
 _animUp = "up"
 _animDeath = ""
-maxMovementSpeed = 32.0
+maxMovementSpeed = 20.0
 _weaponPath = NodePath("Weapon")
 _armPath = NodePath("Arm")
 weaponRotOffset = -1.22
@@ -155,6 +157,13 @@ armOriginsString = {
 "right": Vector2( 0.5, -12 ),
 "up": Vector2( 2.5, -12 )
 }
+
+[node name="DeathParticles" parent="." index="0"]
+modulate = Color( 1, 1, 1, 1 )
+material = null
+amount = 10
+process_material = ExtResource( 8 )
+texture = ExtResource( 7 )
 
 [node name="shadow" parent="." index="1"]
 modulate = Color( 1, 1, 1, 0.603922 )

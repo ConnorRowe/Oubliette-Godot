@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public abstract class AIBehaviour : Godot.Object
+public abstract class AIBehaviour : Godot.Reference
 {
     public struct TransitionTestResult
     {

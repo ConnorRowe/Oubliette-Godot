@@ -1,19 +1,16 @@
 using Godot;
-using System;
+using System.Collections.Generic;
 
 public class World : Node2D
 {
     //Nodes
     private Navigation2D navigation;
-    private Line2D line;
     private Camera2D camera;
     private Node2D level;
     private DebugOverlay debugOverlay;
     private Player player;
     private HealthContainer healthContainer;
 
-    [Export]
-    private NodePath _linePath;
     [Export]
     private NodePath _basicAIPath;
     [Export]
@@ -24,15 +21,17 @@ public class World : Node2D
     //Assets
     private Texture debugPoint;
 
-    // Called when the node enters the scene tree for the first time.
+    //Other
+    public List<Vector2[]> debugLines = new List<Vector2[]>();
+
     public override void _Ready()   
     {
-        line = GetNodeOrNull<Line2D>(_linePath);
         debugPoint = GD.Load<Texture>("res://textures/2x2_white.png");
         camera = GetNode<Player>("Player").GetNode<Camera2D>("Camera2D");
-        level = GetNode<Node2D>(_levelPath);
+        level = GetNodeOrNull<Node2D>(_levelPath);
         navigation = level.GetNode<Navigation2D>("Navigation2D");
         debugOverlay = GetNode<DebugOverlay>(_debugOverlayPath);
+        debugOverlay.world = this;
         player = GetNode<Player>("Player");
         healthContainer = GetNode<HealthContainer>("CanvasLayer/HealthContainer");
 
@@ -80,6 +79,20 @@ public class World : Node2D
                 {
                     // healthContainer.ChangeHealth(-1);
                 }
+            }
+        }
+    }
+
+    public override void _Draw()
+    {
+        base._Draw();
+
+        // Draw debug lines
+        foreach(Vector2[] line in debugLines)
+        {
+            for(int i = 0; i < line.Length - 1; ++i)
+            {
+                DrawLine(line[i], line[i+1], Colors.Magenta, 10.0f);
             }
         }
     }

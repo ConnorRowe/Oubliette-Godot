@@ -1,31 +1,37 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://scripts/AICharacter.cs" type="Script" id=1]
 [ext_resource path="res://textures/shadow.png" type="Texture" id=2]
 [ext_resource path="res://textures/temp.png" type="Texture" id=3]
 [ext_resource path="res://materials/M_Character.tres" type="Material" id=4]
 [ext_resource path="res://font/standard_font.tres" type="DynamicFont" id=5]
-[ext_resource path="res://textures/bone.png" type="Texture" id=6]
-[ext_resource path="res://particle/BoneExplode.tres" type="Material" id=7]
+[ext_resource path="res://textures/splat_anim_particle.png" type="Texture" id=6]
+[ext_resource path="res://particle/SplatExplode.tres" type="Material" id=7]
 [ext_resource path="res://textures/exclaimation.png" type="Texture" id=8]
 
-[sub_resource type="AtlasTexture" id=1]
+[sub_resource type="CanvasItemMaterial" id=1]
+particles_animation = true
+particles_anim_h_frames = 3
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="AtlasTexture" id=2]
 atlas = ExtResource( 3 )
 region = Rect2( 0, 0, 16, 16 )
 
-[sub_resource type="SpriteFrames" id=2]
+[sub_resource type="SpriteFrames" id=3]
 animations = [ {
-"frames": [ SubResource( 1 ) ],
+"frames": [ SubResource( 2 ) ],
 "loop": true,
 "name": "default",
 "speed": 3.75
 } ]
 
-[sub_resource type="CapsuleShape2D" id=3]
+[sub_resource type="CapsuleShape2D" id=4]
 radius = 1.5
 height = 1.5
 
-[sub_resource type="Animation" id=4]
+[sub_resource type="Animation" id=5]
 length = 0.3
 step = 0.025
 tracks/0/type = "value"
@@ -72,8 +78,10 @@ _detectionNotifierPath = NodePath("DetectionNotifier")
 maxMovementSpeed = 24.0
 
 [node name="DeathParticles" type="Particles2D" parent="."]
+modulate = Color( 0.74902, 0, 0, 0.901961 )
+material = SubResource( 1 )
 emitting = false
-amount = 16
+amount = 5
 lifetime = 30.0
 one_shot = true
 explosiveness = 1.0
@@ -88,16 +96,16 @@ texture = ExtResource( 2 )
 
 [node name="CharSprite" type="AnimatedSprite" parent="."]
 material = ExtResource( 4 )
-frames = SubResource( 2 )
+frames = SubResource( 3 )
 offset = Vector2( 0, -8 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( 0, -1.5 )
 rotation = 1.5708
-shape = SubResource( 3 )
+shape = SubResource( 4 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-anims/DamageFlash = SubResource( 4 )
+anims/DamageFlash = SubResource( 5 )
 
 [node name="debugLabel" type="Label" parent="."]
 visible = false

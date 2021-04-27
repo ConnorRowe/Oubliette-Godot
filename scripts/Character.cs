@@ -1,5 +1,5 @@
 using Godot;
-using System;
+using System.Drawing;
 
 public enum Direction
 {
@@ -10,6 +10,7 @@ public enum Direction
 }
 static class DirectionExt
 {
+    private static readonly Direction[] directions = new Direction[4] { Direction.Up, Direction.Right, Direction.Down, Direction.Left };
     public static Direction FromString(string str)
     {
         switch (str)
@@ -42,6 +43,40 @@ static class DirectionExt
         }
 
         return "error";
+    }
+
+    public static Vector2 AsVector(this Direction d)
+    {
+        switch (d)
+        {
+            case Direction.Up:
+                return Vector2.Up;
+            case Direction.Right:
+                return Vector2.Right;
+            case Direction.Down:
+                return Vector2.Down;
+            case Direction.Left:
+                return Vector2.Left;
+        }
+
+        return Vector2.Zero;
+    }
+
+    public static Point AsPoint(this Direction d)
+    {
+        switch (d)
+        {
+            case Direction.Up:
+                return new Point(0, -1);
+            case Direction.Right:
+                return new Point(1, 0);
+            case Direction.Down:
+                return new Point(0, 1);
+            case Direction.Left:
+                return new Point(-1, 0);
+        }
+
+        return Point.Empty;
     }
 
     public static Direction Opposite(this Direction d)
@@ -89,6 +124,28 @@ static class DirectionExt
         }
 
         return Direction.Down;
+    }
+
+    public static Direction FromInt(int i)
+    {
+        switch (i)
+        {
+            case 0:
+                return Direction.Down;
+            case 1:
+                return Direction.Left;
+            case 2:
+                return Direction.Up;
+            case 3:
+                return Direction.Right;
+        }
+
+        return Direction.Down;
+    }
+
+    public static Direction[] Directions()
+    {
+        return directions;
     }
 }
 

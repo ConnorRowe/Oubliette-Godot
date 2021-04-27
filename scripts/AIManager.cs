@@ -9,7 +9,7 @@ public class AIManager : Godot.Object
     public readonly World world;
     public readonly Character owner;
     public Godot.Collections.Dictionary<string, AIBehaviour> Behaviours = new Godot.Collections.Dictionary<string, AIBehaviour>();
-    public Func<AIBehaviour.TransitionTestResult>[] globalTransitions;
+    public Func<AIBehaviour.TransitionTestResult>[] globalTransitions = new Func<AIBehaviour.TransitionTestResult>[] {};
 
     public string CurrentBehaviour = "";
     public Character lastTarget;
@@ -28,7 +28,7 @@ public class AIManager : Godot.Object
     {
         this.owner = owner;
         this.world = world;
-        
+
         transitionTimer = owner.GetTree().CreateTimer(0.5f);
         transitionTimer.Connect("timeout", this, nameof(TryTransition));
 
@@ -37,6 +37,9 @@ public class AIManager : Godot.Object
 
     public void TryTransition()
     {
+        if(CurrentBehaviour.Empty())
+            return;
+
         transitionTimer = owner.GetTree().CreateTimer(0.5f);
         transitionTimer.Connect("timeout", this, nameof(TryTransition));
 
@@ -77,7 +80,10 @@ public class AIManager : Godot.Object
         }
 
         CurrentBehaviour = behaviour;
-        Behaviours[CurrentBehaviour].OnBehaviourStart();
+        if (!CurrentBehaviour.Empty())
+        {
+            Behaviours[CurrentBehaviour].OnBehaviourStart();
+        }
 
         EmitSignal(nameof(BehaviourChanged), CurrentBehaviour);
     }
@@ -143,4 +149,16 @@ public class AIManager : Godot.Object
         return los.Count <= 0; //|| (los.Contains("collider") && (los["collider"] as Node).Owner != target);
     }
 
+    public static Vector2[] GetNavPathGlobal(Vector2 pointA, Vector2 pointB, Navigation2D navigation)
+    {
+        Vector2 localA = navigation.ToLocal(pointA);
+        Vector2 localB = navigation.ToLocal(pointB);
+        Vector2[] navpath = navigation.GetSimplePath(localA, localB, optimize: true);
+        Vector2 roomPos = navigation.GetParent<Room>().Position;
+        for(int i = 0; i < navpath.Length; ++i)
+        {
+            navpath[i] = navigation.ToGlobal(navpath[i]);
+        }
+        return navpath;
+    }
 }

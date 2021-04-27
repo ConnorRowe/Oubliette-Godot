@@ -136,7 +136,7 @@ public class DialogueBox : Control
 
     public void ToggleDisplay(bool hide)
     {
-        tween.InterpolateProperty(this, "rect_scale", hide? new Vector2(1, 1) : new Vector2(0, 1), hide? new Vector2(0,1) : new Vector2(1, 1), 0.8f, Tween.TransitionType.Elastic);
+        tween.InterpolateProperty(this, "rect_scale", hide? new Vector2(1, 1) : new Vector2(0, 1), hide? new Vector2(0,1) : new Vector2(1, 1), 0.8f, Tween.TransitionType.Bounce);
 
         if(hide)
             tween.InterpolateProperty(this, "visible", true, false, 0.01f, delay: 0.8f);
