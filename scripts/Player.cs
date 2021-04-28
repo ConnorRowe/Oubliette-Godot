@@ -5,8 +5,10 @@ public class Player : Character
 {
     private float jumpPower = 175f;
     private float scrollScale = 1.0f;
-    public Spells.Spell activeSpell;
+    public Spells.Spell secondarySpell;
     private float spellTimer = -1.0f;
+    private float primarySpellCooldown = 0.0f;
+    public float maxPrimarySpellCooldown = 0.5f;
     private bool isSpellActive = false;
     private float maxMajyka = 100.0f;
     private float currentMajyka = 100.0f;
@@ -70,16 +72,16 @@ public class Player : Character
         staffLight = GetNode<Light2D>("CharSprite/staff/StaffLight");
         spellSpawnPoint = GetNode<Node2D>("CharSprite/staff/SpellSpawnPoint");
 
-        activeSpell = _Spells.Ice_Skin;
+        secondarySpell = _Spells.Ice_Skin;
     }
 
     public override void _Input(InputEvent evt)
     {
         base._Input(evt);
 
-        if (evt.IsActionPressed("g_cast_active_spell"))
+        if (evt.IsActionPressed("g_cast_secondary_spell"))
         {
-            CastActiveSpell();
+            CastSecondarySpell();
         }
 
         if (evt is InputEventKey keyEvt)
@@ -142,19 +144,6 @@ public class Player : Character
         {
             if (emb.IsPressed())
             {
-                if (emb.ButtonIndex == (int)ButtonList.Left && currentMajyka >= 25.0f)
-                {
-                    // fireball
-                    Projectile proj = projectile.Instance<Projectile>();
-                    world.AddChild(proj);
-                    proj.GlobalPosition = spellSpawnPoint.GlobalPosition;
-                    proj.velocity = facingDir * 100.0f;
-                    proj.source = this;
-
-                    currentMajyka -= 25.0f;
-                    UpdateMajykaBar();
-
-                }
                 if (emb.ButtonIndex == (int)ButtonList.WheelUp)
                 {
                     scrollScale += 0.1f;
@@ -201,6 +190,15 @@ public class Player : Character
     public override void _Process(float delta)
     {
         base._Process(delta);
+
+        if(primarySpellCooldown > 0.0f)
+        {
+            primarySpellCooldown -= delta;
+        }
+
+        if(primarySpellCooldown < 0.0f)
+            primarySpellCooldown = 0.0f;
+
         Direction fDir = GetFacingDirection();
 
         staff.Rotation = staffRot;
@@ -224,6 +222,25 @@ public class Player : Character
 
         if (currentMajyka < maxMajyka)
             RegenMajyka(delta);
+
+        if (Input.IsActionPressed("g_cast_primary_spell"))
+        {
+            if (currentMajyka >= 25.0f && primarySpellCooldown == 0.0f)
+                {
+                    // fireball
+                    Projectile proj = projectile.Instance<Projectile>();
+                    world.AddChild(proj);
+                    proj.GlobalPosition = spellSpawnPoint.GlobalPosition;
+                    proj.velocity = facingDir * 100.0f;
+                    proj.source = this;
+
+                    currentMajyka -= 25.0f;
+                    UpdateMajykaBar();
+
+                    primarySpellCooldown = maxPrimarySpellCooldown;
+
+                }
+        }
     }
 
     public override void _PhysicsProcess(float delta)
@@ -317,30 +334,30 @@ public class Player : Character
         return false;
     }
 
-    public void CastActiveSpell()
+    public void CastSecondarySpell()
     {
-        if (activeSpell.IsValid() && currentMajyka >= activeSpell.cost)
+        if (secondarySpell.IsValid() && currentMajyka >= secondarySpell.cost)
         {
-            spellTimer = activeSpell.duration;
+            spellTimer = secondarySpell.duration;
 
             ShaderMaterial mat = (ShaderMaterial)charSprite.Material;
 
             mat.SetShaderParam("outline_width", 1.0f);
-            mat.SetShaderParam("outline_colour", activeSpell.outlineColour);
+            mat.SetShaderParam("outline_colour", secondarySpell.outlineColour);
             armOutline.Visible = true;
-            armOutline.DefaultColor = activeSpell.outlineColour;
+            armOutline.DefaultColor = secondarySpell.outlineColour;
 
             ShaderMaterial pMat = (ShaderMaterial)spellParticle.Material;
 
-            pMat.Shader = activeSpell.particleShader;
-            pMat.SetShaderParam("base_colour", activeSpell.outlineColour);
+            pMat.Shader = secondarySpell.particleShader;
+            pMat.SetShaderParam("base_colour", secondarySpell.outlineColour);
             spellParticle.Emitting = true;
 
             isSpellActive = true;
 
-            activeSpell.onCast(this, activeSpell);
+            secondarySpell.onCast(this, secondarySpell);
 
-            currentMajyka -= activeSpell.cost;
+            currentMajyka -= secondarySpell.cost;
             UpdateMajykaBar();
         }
     }
@@ -361,7 +378,7 @@ public class Player : Character
     {
         if (isSpellActive)
         {
-            damage = activeSpell.onTakeDamage(this, damage, source);
+            damage = secondarySpell.onTakeDamage(this, damage, source);
         }
 
         base.TakeDamage(damage, source);

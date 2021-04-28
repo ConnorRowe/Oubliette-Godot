@@ -1,0 +1,67 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://font/tiny_font.tres" type="DynamicFont" id=1]
+[ext_resource path="res://scripts/World.cs" type="Script" id=2]
+[ext_resource path="res://scripts/DebugOverlay.cs" type="Script" id=3]
+[ext_resource path="res://scenes/MajykaContainer.tscn" type="PackedScene" id=4]
+[ext_resource path="res://scenes/level_generation/LevelGenerator.tscn" type="PackedScene" id=5]
+[ext_resource path="res://scenes/HealthContainer.tscn" type="PackedScene" id=6]
+[ext_resource path="res://scenes/DialogueBox.tscn" type="PackedScene" id=7]
+[ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=8]
+
+[node name="LevelGenWorld" type="YSort"]
+script = ExtResource( 2 )
+_levelPath = NodePath(".")
+_debugOverlayPath = NodePath("CanvasLayer/DebugOverlay")
+_globalLightingPath = NodePath("CanvasModulate")
+_tweenPath = NodePath("Tween")
+defaultGlobalLighting = Color( 0.08, 0.0736, 0.0736, 1 )
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+
+[node name="Player" parent="." instance=ExtResource( 8 )]
+maxHealth = 8
+
+[node name="Background" type="ParallaxBackground" parent="."]
+scroll_ignore_camera_zoom = true
+
+[node name="BackgroundLayer" type="ParallaxLayer" parent="Background"]
+motion_mirroring = Vector2( 1024, 600 )
+
+[node name="BackgroundColor" type="ColorRect" parent="Background/BackgroundLayer"]
+margin_right = 1024.0
+margin_bottom = 600.0
+rect_min_size = Vector2( 1024, 600 )
+color = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="LevelGenerator" parent="." instance=ExtResource( 5 )]
+position = Vector2( 67.8056, 54.0326 )
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2( 2, 2 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+scale = Vector2( 2, 2 )
+transform = Transform2D( 2, 0, 0, 2, 0, 0 )
+
+[node name="DebugOverlay" type="Node2D" parent="CanvasLayer"]
+position = Vector2( 508, 7 )
+script = ExtResource( 3 )
+_debugFont = ExtResource( 1 )
+
+[node name="HealthContainer" parent="CanvasLayer" instance=ExtResource( 6 )]
+position = Vector2( 4, 12 )
+
+[node name="MajykaContainer" parent="CanvasLayer" instance=ExtResource( 4 )]
+position = Vector2( 4, 4 )
+
+[node name="DialogueBox" parent="CanvasLayer" instance=ExtResource( 7 )]
+margin_left = 14.0
+margin_top = 217.0
+margin_right = -525.0
+margin_bottom = -304.0
+
+[node name="Tween" type="Tween" parent="."]

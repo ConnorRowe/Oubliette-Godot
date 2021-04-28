@@ -4,12 +4,13 @@ using System.Collections.Generic;
 public class World : Node2D
 {
     //Nodes
-    private Navigation2D navigation;
     private Camera2D camera;
     private Node2D level;
     private DebugOverlay debugOverlay;
     private Player player;
     private HealthContainer healthContainer;
+    private CanvasModulate globalLighting;
+    private Tween tween;
 
     [Export]
     private NodePath _basicAIPath;
@@ -17,6 +18,12 @@ public class World : Node2D
     private NodePath _levelPath;
     [Export]
     private NodePath _debugOverlayPath;
+    [Export]
+    private NodePath _globalLightingPath;
+    [Export]
+    private NodePath _tweenPath;
+    [Export]
+    private Color defaultGlobalLighting = new Color(0.15f, 0.15f, 0.15f, 1);
 
     //Assets
     private Texture debugPoint;
@@ -29,16 +36,19 @@ public class World : Node2D
         debugPoint = GD.Load<Texture>("res://textures/2x2_white.png");
         camera = GetNode<Player>("Player").GetNode<Camera2D>("Camera2D");
         level = GetNodeOrNull<Node2D>(_levelPath);
-        navigation = level.GetNode<Navigation2D>("Navigation2D");
         debugOverlay = GetNode<DebugOverlay>(_debugOverlayPath);
         debugOverlay.world = this;
         player = GetNode<Player>("Player");
         healthContainer = GetNode<HealthContainer>("CanvasLayer/HealthContainer");
+        globalLighting = GetNode<CanvasModulate>(_globalLightingPath);
+        tween = GetNode<Tween>(_tweenPath);
 
         player.Connect(nameof(Player.HealthChanged), this, nameof(UpdateHealthUI));
         UpdateHealthUI(player.currentHealth, player.maxHealth);
 
         debugOverlay.TrackProperty("CurrentMajyka", player);
+
+        globalLighting.Color = defaultGlobalLighting;
     }
 
     public DebugOverlay GetDebugOverlay()
@@ -112,7 +122,8 @@ public class World : Node2D
 
     public Vector2[] GetNavPath(Vector2 pointA, Vector2 pointB)
     {
-        return navigation.GetSimplePath(pointA, pointB, optimize: true);
+        // return navigation.GetSimplePath(pointA, pointB, optimize: true);
+        return null;
     }
 
     private void UpdateHealthUI(int currentHealth, int maxHealth)
