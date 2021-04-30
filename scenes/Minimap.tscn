@@ -1,0 +1,17 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://scripts/Minimap.cs" type="Script" id=1]
+[ext_resource path="res://textures/current_room_overlay.png" type="Texture" id=2]
+[ext_resource path="res://textures/room_icons.png" type="Texture" id=3]
+[ext_resource path="res://textures/minimap_border.png" type="Texture" id=4]
+
+[node name="Minimap" type="Node2D"]
+modulate = Color( 1, 1, 1, 0.666667 )
+script = ExtResource( 1 )
+size = Vector2( 77, 63 )
+backgroundColour = Color( 0, 0, 0, 0.721569 )
+minimapBorder = ExtResource( 4 )
+currentRoomOverlay = ExtResource( 2 )
+roomIcons = ExtResource( 3 )
+roomIconsHCount = 2
+roomIconsVCount = 1

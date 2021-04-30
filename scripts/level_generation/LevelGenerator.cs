@@ -10,9 +10,10 @@ public class LevelGenerator : Node, IProvidesNav
     private RandomNumberGenerator rng = new RandomNumberGenerator();
     private Player player;
     private Point currentRoom = Point.Empty;
+    public Point CurrentRoom { get { return currentRoom; } }
 
     private List<PackedScene> possibleRooms = new List<PackedScene>();
-    private Dictionary<Point, Room> generatedRooms = new Dictionary<Point, Room>();
+    public Dictionary<Point, Room> generatedRooms = new Dictionary<Point, Room>();
     private int roomsToGen = 12;
     private readonly Point[] pointDirections = new Point[4] { new Point(0, 1), new Point(1, 0), new Point(0, -1), new Point(-1, 0) };
     private int gridWidth = 8;
@@ -22,6 +23,11 @@ public class LevelGenerator : Node, IProvidesNav
     private string rooms_directory = "res://scenes/level_generation/rooms/";
     [Export]
     private Godot.Collections.Array<PackedScene> possibleEnemies = new Godot.Collections.Array<PackedScene>();
+
+    [Signal]
+    public delegate void RoomChanged(LevelGenerator levelGen);
+    [Signal]
+    public delegate void RoomCleared(int x, int y);
 
     public override void _Ready()
     {
@@ -228,13 +234,20 @@ public class LevelGenerator : Node, IProvidesNav
                     newEnemy.Connect(nameof(AICharacter.Died), room.Value, nameof(Room.EnemyDied));
                 }
             }
+
+            // Connect cleared signal
+            room.Value.Connect(nameof(Room.Cleared), this, nameof(RoomWasCleared));
         }
 
         // Put player in a room
         currentRoom = generatedRooms.First().Key;
         player.Position = generatedRooms[currentRoom].Position + new Vector2(8 * 16, 4 * 16);
         generatedRooms[currentRoom].Visible = true;
-        generatedRooms[currentRoom].firstRoom = true;
+        generatedRooms[currentRoom].firstRoom = true;   
+
+        // Update minimap
+        EmitSignal(nameof(RoomChanged), this);
+        EmitSignal(nameof(RoomCleared), currentRoom.X, currentRoom.Y);
     }
 
     private Room RandomRoomInstance()
@@ -263,6 +276,8 @@ public class LevelGenerator : Node, IProvidesNav
         {
             enemy.TargetPlayer(player);
         }
+
+        EmitSignal(nameof(RoomChanged), this);
     }
 
     private void DoorHit(Direction dir)
@@ -273,5 +288,11 @@ public class LevelGenerator : Node, IProvidesNav
     public Navigation2D GetNavigation()
     {
         return generatedRooms[currentRoom].Navigation;
+    }
+
+    private void RoomWasCleared(Room room)
+    {
+        Point roomKey = generatedRooms.First(x => x.Value.Position == room.Position).Key;
+        EmitSignal(nameof(RoomCleared), roomKey.X, roomKey.Y);
     }
 }

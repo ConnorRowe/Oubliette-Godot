@@ -5,6 +5,8 @@ public class Room : Node2D
 {
     [Signal]
     public delegate void DoorHit(Direction dir);
+    [Signal]
+    public delegate void Cleared(Room room);
 
     private TileMap tileMap;
     public bool firstRoom = false;
@@ -92,6 +94,8 @@ public class Room : Node2D
         if(enemyCounter <= 0)
         {
             UnlockDoors();
+
+            EmitSignal(nameof(Cleared), this);
         }
     }
 

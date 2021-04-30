@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://font/tiny_font.tres" type="DynamicFont" id=1]
 [ext_resource path="res://scripts/World.cs" type="Script" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://scenes/HealthContainer.tscn" type="PackedScene" id=6]
 [ext_resource path="res://scenes/DialogueBox.tscn" type="PackedScene" id=7]
 [ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=8]
+[ext_resource path="res://scenes/Minimap.tscn" type="PackedScene" id=9]
 
 [node name="LevelGenWorld" type="YSort"]
 script = ExtResource( 2 )
@@ -37,17 +38,12 @@ __meta__ = {
 "_edit_use_anchors_": true
 }
 
-[node name="LevelGenerator" parent="." instance=ExtResource( 5 )]
-position = Vector2( 67.8056, 54.0326 )
-
-[node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2( 2, 2 )
-
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 scale = Vector2( 2, 2 )
 transform = Transform2D( 2, 0, 0, 2, 0, 0 )
 
 [node name="DebugOverlay" type="Node2D" parent="CanvasLayer"]
+visible = false
 position = Vector2( 508, 7 )
 script = ExtResource( 3 )
 _debugFont = ExtResource( 1 )
@@ -63,5 +59,15 @@ margin_left = 14.0
 margin_top = 217.0
 margin_right = -525.0
 margin_bottom = -304.0
+
+[node name="Minimap" parent="CanvasLayer" instance=ExtResource( 9 )]
+position = Vector2( 218, 0 )
+backgroundColour = Color( 0, 0, 0, 0.74902 )
+
+[node name="LevelGenerator" parent="." instance=ExtResource( 5 )]
+position = Vector2( 67.8056, 54.0326 )
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2( 2, 2 )
 
 [node name="Tween" type="Tween" parent="."]
