@@ -12,6 +12,7 @@ config_version=4
 
 config/name="Oubliette"
 run/main_scene="res://scenes/level_generation/LevelGenWorld.tscn"
+boot_splash/use_filter=false
 config/icon="res://icon.png"
 
 [audio]
@@ -24,6 +25,7 @@ Spells="*res://scripts/singletons/Spells.cs"
 
 [display]
 
+window/dpi/allow_hidpi=true
 window/stretch/mode="2d"
 window/stretch/aspect="keep"
 

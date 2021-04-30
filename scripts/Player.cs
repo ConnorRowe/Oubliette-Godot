@@ -1,8 +1,22 @@
 using Godot;
-using System;
+using System.Collections.Generic;
 
 public class Player : Character
 {
+    public enum PlayerStat
+    {
+        Damage,
+        DamageMultiplier,
+        Cooldown,
+        CooldownMultplier,
+        RangeMultiplier,
+        KnockbackMultiplier,
+        SpellSpeedMultiplier,
+        MoveSpeedMultiplier,
+        MagykaCost,
+        MagykaCostMultiplier
+    }
+
     private float jumpPower = 175f;
     private float scrollScale = 1.0f;
     public Spells.Spell secondarySpell;
@@ -18,13 +32,20 @@ public class Player : Character
     private Godot.Collections.Dictionary<Direction, Vector2> staffOrigins = new Godot.Collections.Dictionary<Direction, Vector2>() { { Direction.Up, new Vector2(4.0f, -10.0f) }, { Direction.Right, new Vector2(0.0f, -8.0f) }, { Direction.Down, new Vector2(-4.0f, -10.0f) }, { Direction.Left, new Vector2(0.0f, -10.0f) } };
     private Godot.Collections.Dictionary<Direction, Vector2> armOrigins = new Godot.Collections.Dictionary<Direction, Vector2>() { { Direction.Up, new Vector2(2.5f, -11.0f) }, { Direction.Right, new Vector2(-0.5f, -11.0f) }, { Direction.Down, new Vector2(-2.5f, -11.0f) }, { Direction.Left, new Vector2(0.5f, -11.0f) } };
 
-    public float CurrentMajyka
-    {
-        get
-        {
-            return currentMajyka;
-        }
-    }
+
+    // Default stats
+    public Dictionary<PlayerStat, float> Stats = new Dictionary<PlayerStat, float>() {
+        { PlayerStat.Damage, 0.0f },
+        { PlayerStat.DamageMultiplier, 1.0f },
+        { PlayerStat.Cooldown, 0.0f },
+        { PlayerStat.CooldownMultplier, 1.0f },
+        { PlayerStat.RangeMultiplier, 1.0f },
+        { PlayerStat.KnockbackMultiplier, 1.0f },
+        { PlayerStat.SpellSpeedMultiplier, 1.0f },
+        { PlayerStat.MoveSpeedMultiplier, 1.0f },
+        { PlayerStat.MagykaCost, 0.0f },
+        { PlayerStat.MagykaCostMultiplier, 1.0f },
+        };
 
     // Nodes
     public Camera2D camera;
@@ -73,6 +94,13 @@ public class Player : Character
         spellSpawnPoint = GetNode<Node2D>("CharSprite/staff/SpellSpawnPoint");
 
         secondarySpell = _Spells.Ice_Skin;
+
+        DebugOverlay debug = world.GetDebugOverlay();
+        debug.TrackFunc(nameof(GetSpellDamage), this, "Spell dmg: ");
+        debug.TrackFunc(nameof(GetSpellSpeed), this, "Spell speed: ");
+        debug.TrackFunc(nameof(GetSpellKnockback), this, "Knockback: ");
+        debug.TrackFunc(nameof(GetSpellRange), this, "Range: ");
+        debug.TrackFunc(nameof(GetMaxSpeed), this, "Move speed: ");
     }
 
     public override void _Input(InputEvent evt)
@@ -191,12 +219,12 @@ public class Player : Character
     {
         base._Process(delta);
 
-        if(primarySpellCooldown > 0.0f)
+        if (primarySpellCooldown > 0.0f)
         {
             primarySpellCooldown -= delta;
         }
 
-        if(primarySpellCooldown < 0.0f)
+        if (primarySpellCooldown < 0.0f)
             primarySpellCooldown = 0.0f;
 
         Direction fDir = GetFacingDirection();
@@ -226,20 +254,21 @@ public class Player : Character
         if (Input.IsActionPressed("g_cast_primary_spell"))
         {
             if (currentMajyka >= 25.0f && primarySpellCooldown == 0.0f)
-                {
-                    // fireball
-                    Projectile proj = projectile.Instance<Projectile>();
-                    world.AddChild(proj);
-                    proj.GlobalPosition = spellSpawnPoint.GlobalPosition;
-                    proj.velocity = facingDir * 100.0f;
-                    proj.source = this;
+            {
+                // fireball
+                Projectile proj = projectile.Instance<Projectile>();
+                world.AddChild(proj);
+                proj.GlobalPosition = spellSpawnPoint.GlobalPosition;
+                proj.direction = facingDir;
+                proj.source = this;
+                proj.SetSpellStats(GetSpellDamage(), GetSpellRange(), GetSpellKnockback(), GetSpellSpeed());
 
-                    currentMajyka -= 25.0f;
-                    UpdateMajykaBar();
+                currentMajyka -= 25.0f;
+                UpdateMajykaBar();
 
-                    primarySpellCooldown = maxPrimarySpellCooldown;
+                primarySpellCooldown = (maxPrimarySpellCooldown + Stats[PlayerStat.Cooldown]) * Stats[PlayerStat.CooldownMultplier];
 
-                }
+            }
         }
     }
 
@@ -334,9 +363,14 @@ public class Player : Character
         return false;
     }
 
+    public float GetSpellCost(float baseCost)
+    {
+        return (baseCost + Stats[PlayerStat.MagykaCost]) * Stats[PlayerStat.MagykaCostMultiplier];
+    }
+
     public void CastSecondarySpell()
     {
-        if (secondarySpell.IsValid() && currentMajyka >= secondarySpell.cost)
+        if (secondarySpell.IsValid() && currentMajyka >= GetSpellCost(secondarySpell.cost))
         {
             spellTimer = secondarySpell.duration;
 
@@ -357,7 +391,7 @@ public class Player : Character
 
             secondarySpell.onCast(this, secondarySpell);
 
-            currentMajyka -= secondarySpell.cost;
+            currentMajyka -= GetSpellCost(secondarySpell.cost);
             UpdateMajykaBar();
         }
     }
@@ -407,5 +441,30 @@ public class Player : Character
     public override Direction GetFacingDirection()
     {
         return GetDirection(facingDir);
+    }
+
+    public override float GetMaxSpeed()
+    {
+        return base.GetMaxSpeed() * Stats[PlayerStat.MoveSpeedMultiplier];
+    }
+
+    private int GetSpellDamage()
+    {
+        return Mathf.RoundToInt((1 + Stats[PlayerStat.Damage]) * Stats[PlayerStat.DamageMultiplier]);
+    }
+
+    private float GetSpellRange()
+    {
+        return 128.0f * Stats[PlayerStat.RangeMultiplier];
+    }
+
+    private float GetSpellKnockback()
+    {
+        return 100.0f * Stats[PlayerStat.KnockbackMultiplier];
+    }
+
+    private float GetSpellSpeed()
+    {
+        return 100.0f * Stats[PlayerStat.SpellSpeedMultiplier];
     }
 }

@@ -41,8 +41,9 @@ public class ProjectileBehaviour : AIBehaviour
         Projectile proj = projectile.Instance<Projectile>();
         mgr.world.AddChild(proj);
         proj.GlobalPosition = getProjStartPos();
-        proj.velocity = mgr.owner.dir * projSpeed;
+        proj.direction = mgr.owner.dir;
         proj.source = mgr.owner;
+        proj.SetSpellStats(1, 999, 100.0f, projSpeed);
         modifyProj(proj);
     }
 }

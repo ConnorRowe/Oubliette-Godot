@@ -46,8 +46,6 @@ public class World : Node2D
         player.Connect(nameof(Player.HealthChanged), this, nameof(UpdateHealthUI));
         UpdateHealthUI(player.currentHealth, player.maxHealth);
 
-        debugOverlay.TrackProperty("CurrentMajyka", player);
-
         globalLighting.Color = defaultGlobalLighting;
     }
 

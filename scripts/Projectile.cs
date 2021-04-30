@@ -3,8 +3,14 @@ using System;
 
 public class Projectile : KinematicBody2D
 {
+    private int damage = 0;
+    private float range = 0;
+    private float knockback = 0;
+    private float speed = 0;
+
+    private float rangeCounter = 0;
     private bool deactivated = false;
-    public Vector2 velocity = new Vector2(100,0);
+    public Vector2 direction = new Vector2(0, 0);
     public Character source = null;
 
     public Light2D light;
@@ -27,27 +33,42 @@ public class Projectile : KinematicBody2D
     {
         base._PhysicsProcess(delta);
 
-        KinematicCollision2D collide = MoveAndCollide(velocity*delta);
-        if(collide != null)
+        Vector2 move = direction * speed * delta;
+
+        KinematicCollision2D collide = MoveAndCollide(move);
+
+        rangeCounter += move.Length();
+
+        if (collide != null)
         {
             Hit(collide.Collider as Node);
+        }
+        else if (rangeCounter >= range)
+        {
+            Explode();
         }
     }
 
     private void Hit(Node node)
     {
-        if(deactivated || node.Owner == source || node is Projectile)
+        if (deactivated || node.Owner == source || node is Projectile)
             return;
 
-        if(node.Owner is Character)
+        if (node.Owner is Character)
         {
-            (node.Owner as Character).TakeDamage(source: source);
-            (node.Owner as Character).ApplyKnockBack(velocity.Normalized() * 100.0f);
+            (node.Owner as Character).TakeDamage(damage, source);
+            (node.Owner as Character).ApplyKnockBack(direction * knockback);
         }
 
-        deactivated = true;
+        Explode();
+    }
 
-        velocity = Vector2.Zero;
+    private void Explode()
+    {
+        deactivated = true;
+        SetPhysicsProcess(false);
+
+        direction = Vector2.Zero;
         particles.OneShot = true;
         particles.Explosiveness = 1.0f;
         particles.ProcessMaterial = explodeParticleMaterial;
@@ -63,5 +84,13 @@ public class Projectile : KinematicBody2D
     private void Die()
     {
         QueueFree();
+    }
+
+    public void SetSpellStats(int damage, float range, float knockback, float speed)
+    {
+        this.damage = damage;
+        this.range = range;
+        this.knockback = knockback;
+        this.speed = speed;
     }
 }

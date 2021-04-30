@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=2]
 
-[ext_resource path="res://font/tiny_font.tres" type="DynamicFont" id=1]
+[ext_resource path="res://font/small_font.tres" type="DynamicFont" id=1]
 [ext_resource path="res://scripts/World.cs" type="Script" id=2]
 [ext_resource path="res://scripts/DebugOverlay.cs" type="Script" id=3]
 [ext_resource path="res://scenes/MajykaContainer.tscn" type="PackedScene" id=4]
@@ -43,10 +43,11 @@ scale = Vector2( 2, 2 )
 transform = Transform2D( 2, 0, 0, 2, 0, 0 )
 
 [node name="DebugOverlay" type="Node2D" parent="CanvasLayer"]
-visible = false
-position = Vector2( 508, 7 )
+position = Vector2( 508, 70 )
 script = ExtResource( 3 )
 _debugFont = ExtResource( 1 )
+ShowMemory = false
+VerticalSpacer = 10
 
 [node name="HealthContainer" parent="CanvasLayer" instance=ExtResource( 6 )]
 position = Vector2( 4, 12 )
