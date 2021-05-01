@@ -43,12 +43,14 @@ public class MajykaContainer : Node2D
     [Export]
     private NodePath _fillPath;
     private Node2D fill;
+    private ProgressBar spellCooldownBar;
 
     public override void _Ready()
     {
         base._Ready();
 
         fill = GetNode<Node2D>(_fillPath);
+        spellCooldownBar = GetNode<ProgressBar>("SpellCooldownBar");
     }
 
     private void UpdateBar()
@@ -57,6 +59,11 @@ public class MajykaContainer : Node2D
         {
             shader.SetShaderParam("fill_percent", ((float)_currentMajyka) / ((float)_maxMajyka));
         }
+    }
+
+    public void UpdateSpellCooldown(float fillPercent)
+    {
+        spellCooldownBar.Value = fillPercent;
     }
 
     // [Export(PropertyHint.ResourceType, "Texture")]

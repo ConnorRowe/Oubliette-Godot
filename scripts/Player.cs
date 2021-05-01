@@ -266,10 +266,16 @@ public class Player : Character
                 currentMajyka -= 25.0f;
                 UpdateMajykaBar();
 
-                primarySpellCooldown = (maxPrimarySpellCooldown + Stats[PlayerStat.Cooldown]) * Stats[PlayerStat.CooldownMultplier];
+                primarySpellCooldown = GetMaxPrimarySpellCooldown();
 
             }
         }
+
+        float primarySpellCDPercent = primarySpellCooldown / GetMaxPrimarySpellCooldown();
+        if(primarySpellCDPercent < 1.0f)
+            majykaBar.UpdateSpellCooldown(primarySpellCDPercent);
+        else
+            majykaBar.UpdateSpellCooldown(0.0f);
     }
 
     public override void _PhysicsProcess(float delta)
@@ -466,5 +472,10 @@ public class Player : Character
     private float GetSpellSpeed()
     {
         return 100.0f * Stats[PlayerStat.SpellSpeedMultiplier];
+    }
+
+    private float GetMaxPrimarySpellCooldown()
+    {
+        return (maxPrimarySpellCooldown + Stats[PlayerStat.Cooldown]) * Stats[PlayerStat.CooldownMultplier];
     }
 }
