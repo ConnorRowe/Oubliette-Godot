@@ -3,17 +3,11 @@ using System;
 
 public class ProjectileBehaviour : AIBehaviour
 {
-    PackedScene projectile;
-    private float projSpeed;
-    Func<Vector2> getProjStartPos;
-    Action<Projectile> modifyProj;
+    ProjectileSpell projectileSpell;
 
-    public ProjectileBehaviour(AIManager manager, PackedScene projectile, float projSpeed, Func<Vector2> getProjStartPos, Action<Projectile> modifyProj, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
+    public ProjectileBehaviour(AIManager manager, ProjectileSpell projectileSpell, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
     {
-        this.projectile = projectile;
-        this.projSpeed = projSpeed;
-        this.getProjStartPos = getProjStartPos;
-        this.modifyProj = modifyProj;
+        this.projectileSpell = projectileSpell;
 
         mgr.Connect(nameof(AIManager.Fire), this, nameof(FireProjectile));
     }
@@ -38,12 +32,6 @@ public class ProjectileBehaviour : AIBehaviour
 
     private void FireProjectile()
     {
-        Projectile proj = projectile.Instance<Projectile>();
-        mgr.world.AddChild(proj);
-        proj.GlobalPosition = getProjStartPos();
-        proj.direction = mgr.owner.dir;
-        proj.source = mgr.owner;
-        proj.SetSpellStats(1, 999, 100.0f, projSpeed);
-        modifyProj(proj);
+        projectileSpell.Cast(mgr.owner as ICastsSpells);
     }
 }

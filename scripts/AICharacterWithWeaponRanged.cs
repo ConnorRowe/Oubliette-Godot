@@ -5,11 +5,10 @@ public class AICharacterWithWeaponRanged : AICharacterWithWeapon
 {
     private bool isCharging = false;
     private Particles2D weaponParticles;
+    private BaseSpell currentSpell;
 
     [Export]
     private NodePath _weaponParticlesPath;
-    [Export]
-    private PackedScene projectile;
     [Export]
     private float projHueAdjust = 0.0f;
 
@@ -17,9 +16,11 @@ public class AICharacterWithWeaponRanged : AICharacterWithWeapon
     {
         base._Ready();
 
+        currentSpell = GetNode<Spells>("/root/Spells").Shadowbolt;
+
         weaponParticles = GetNode<Particles2D>(_weaponParticlesPath);
 
-        ProjectileBehaviour projBehaviour = new ProjectileBehaviour(aIManager, projectile, 200.0f, () => { return weaponParticles.GlobalPosition; }, (proj) => { ((ParticlesMaterial)proj.particles.ProcessMaterial).HueVariation = this.projHueAdjust; }, new Func<AIBehaviour.TransitionTestResult>[] {
+        ProjectileBehaviour projBehaviour = new ProjectileBehaviour(aIManager, currentSpell as ProjectileSpell, new Func<AIBehaviour.TransitionTestResult>[] {
             
             // attack_target -> follow_target
             () => {
@@ -104,5 +105,15 @@ public class AICharacterWithWeaponRanged : AICharacterWithWeapon
     private void SetShownParticles(int num)
     {
         (weaponParticles.ProcessMaterial as ShaderMaterial).SetShaderParam("number_particles_shown", num);
+    }
+
+    public override Vector2 GetSpellSpawnPos()
+    {
+        return weaponParticles.GlobalPosition;
+    }
+
+    public override float GetSpellRange(float baseRange)
+    {
+        return 999.0f;
     }
 }

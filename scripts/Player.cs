@@ -1,26 +1,14 @@
 using Godot;
 using System.Collections.Generic;
+using Stats;
 
-public class Player : Character
+public class Player : Character, ICastsSpells
 {
-    public enum PlayerStat
-    {
-        Damage,
-        DamageMultiplier,
-        Cooldown,
-        CooldownMultplier,
-        RangeMultiplier,
-        KnockbackMultiplier,
-        SpellSpeedMultiplier,
-        MoveSpeedMultiplier,
-        MagykaCost,
-        MagykaCostMultiplier
-    }
-
     private float jumpPower = 175f;
     private float scrollScale = 1.0f;
-    public Spells.Spell secondarySpell;
-    private float spellTimer = -1.0f;
+    public BaseSpell primarySpell;
+    public BaseSpell secondarySpell;
+    private SceneTreeTimer spellEffectTimer;
     private float primarySpellCooldown = 0.0f;
     public float maxPrimarySpellCooldown = 0.5f;
     private bool isSpellActive = false;
@@ -31,21 +19,6 @@ public class Player : Character
     private Vector2 facingDir = Vector2.Zero;
     private Godot.Collections.Dictionary<Direction, Vector2> staffOrigins = new Godot.Collections.Dictionary<Direction, Vector2>() { { Direction.Up, new Vector2(4.0f, -10.0f) }, { Direction.Right, new Vector2(0.0f, -8.0f) }, { Direction.Down, new Vector2(-4.0f, -10.0f) }, { Direction.Left, new Vector2(0.0f, -10.0f) } };
     private Godot.Collections.Dictionary<Direction, Vector2> armOrigins = new Godot.Collections.Dictionary<Direction, Vector2>() { { Direction.Up, new Vector2(2.5f, -11.0f) }, { Direction.Right, new Vector2(-0.5f, -11.0f) }, { Direction.Down, new Vector2(-2.5f, -11.0f) }, { Direction.Left, new Vector2(0.5f, -11.0f) } };
-
-
-    // Default stats
-    public Dictionary<PlayerStat, float> Stats = new Dictionary<PlayerStat, float>() {
-        { PlayerStat.Damage, 0.0f },
-        { PlayerStat.DamageMultiplier, 1.0f },
-        { PlayerStat.Cooldown, 0.0f },
-        { PlayerStat.CooldownMultplier, 1.0f },
-        { PlayerStat.RangeMultiplier, 1.0f },
-        { PlayerStat.KnockbackMultiplier, 1.0f },
-        { PlayerStat.SpellSpeedMultiplier, 1.0f },
-        { PlayerStat.MoveSpeedMultiplier, 1.0f },
-        { PlayerStat.MagykaCost, 0.0f },
-        { PlayerStat.MagykaCostMultiplier, 1.0f },
-        };
 
     // Nodes
     public Camera2D camera;
@@ -93,7 +66,8 @@ public class Player : Character
         staffLight = GetNode<Light2D>("CharSprite/staff/StaffLight");
         spellSpawnPoint = GetNode<Node2D>("CharSprite/staff/SpellSpawnPoint");
 
-        secondarySpell = _Spells.Ice_Skin;
+        primarySpell = _Spells.FireBall;
+        secondarySpell = _Spells.IceSkin;
 
         DebugOverlay debug = world.GetDebugOverlay();
         debug.TrackFunc(nameof(GetSpellDamage), this, "Spell dmg: ");
@@ -237,33 +211,17 @@ public class Player : Character
 
         staff.ShowBehindParent = fDir == Direction.Up;
 
-        if (isSpellActive)
-        {
-            spellTimer -= delta;
-
-            if (spellTimer <= 0.0f)
-            {
-                DispelActiveSpell();
-                spellTimer = -1.0f;
-            }
-        }
-
         if (currentMajyka < maxMajyka)
             RegenMajyka(delta);
 
         if (Input.IsActionPressed("g_cast_primary_spell"))
         {
-            if (currentMajyka >= 25.0f && primarySpellCooldown == 0.0f)
+            if (currentMajyka >= primarySpell.majykaCost && primarySpellCooldown == 0.0f)
             {
-                // fireball
-                Projectile proj = projectile.Instance<Projectile>();
-                world.AddChild(proj);
-                proj.GlobalPosition = spellSpawnPoint.GlobalPosition;
-                proj.direction = facingDir;
-                proj.source = this;
-                proj.SetSpellStats(GetSpellDamage(), GetSpellRange(), GetSpellKnockback(), GetSpellSpeed());
+                // Cast primary spell
+                primarySpell.Cast(this);
 
-                currentMajyka -= 25.0f;
+                currentMajyka -= primarySpell.majykaCost;
                 UpdateMajykaBar();
 
                 primarySpellCooldown = GetMaxPrimarySpellCooldown();
@@ -272,7 +230,7 @@ public class Player : Character
         }
 
         float primarySpellCDPercent = primarySpellCooldown / GetMaxPrimarySpellCooldown();
-        if(primarySpellCDPercent < 1.0f)
+        if (primarySpellCDPercent < 1.0f)
             majykaBar.UpdateSpellCooldown(primarySpellCDPercent);
         else
             majykaBar.UpdateSpellCooldown(0.0f);
@@ -371,62 +329,18 @@ public class Player : Character
 
     public float GetSpellCost(float baseCost)
     {
-        return (baseCost + Stats[PlayerStat.MagykaCost]) * Stats[PlayerStat.MagykaCostMultiplier];
+        return (baseCost + currentStats[Stat.MagykaCostFlat]) * currentStats[Stat.MagykaCostMultiplier];
     }
 
     public void CastSecondarySpell()
     {
-        if (secondarySpell.IsValid() && currentMajyka >= GetSpellCost(secondarySpell.cost))
+        if (currentMajyka >= GetSpellCost(secondarySpell.majykaCost))
         {
-            spellTimer = secondarySpell.duration;
+            secondarySpell.Cast(this);
 
-            ShaderMaterial mat = (ShaderMaterial)charSprite.Material;
-
-            mat.SetShaderParam("outline_width", 1.0f);
-            mat.SetShaderParam("outline_colour", secondarySpell.outlineColour);
-            armOutline.Visible = true;
-            armOutline.DefaultColor = secondarySpell.outlineColour;
-
-            ShaderMaterial pMat = (ShaderMaterial)spellParticle.Material;
-
-            pMat.Shader = secondarySpell.particleShader;
-            pMat.SetShaderParam("base_colour", secondarySpell.outlineColour);
-            spellParticle.Emitting = true;
-
-            isSpellActive = true;
-
-            secondarySpell.onCast(this, secondarySpell);
-
-            currentMajyka -= GetSpellCost(secondarySpell.cost);
+            currentMajyka -= GetSpellCost(secondarySpell.majykaCost);
             UpdateMajykaBar();
         }
-    }
-
-    public void DispelActiveSpell()
-    {
-        ShaderMaterial mat = (ShaderMaterial)charSprite.Material;
-
-        mat.SetShaderParam("outline_width", 0.0f);
-        armOutline.Visible = false;
-
-        spellParticle.Emitting = false;
-
-        isSpellActive = false;
-    }
-
-    public override void TakeDamage(int damage = 1, Character source = null)
-    {
-        if (isSpellActive)
-        {
-            damage = secondarySpell.onTakeDamage(this, damage, source);
-        }
-
-        base.TakeDamage(damage, source);
-    }
-
-    public void ReduceSpellTimer(float time)
-    {
-        spellTimer -= time;
     }
 
     private void RegenMajyka(float delta)
@@ -451,31 +365,71 @@ public class Player : Character
 
     public override float GetMaxSpeed()
     {
-        return base.GetMaxSpeed() * Stats[PlayerStat.MoveSpeedMultiplier];
+        return base.GetMaxSpeed() * currentStats[Stat.MoveSpeedMultiplier];
     }
 
-    private int GetSpellDamage()
+    public void UpdatePlayerSpellEffects(Shader effectShader, Color outlineColour, float duration)
     {
-        return Mathf.RoundToInt((1 + Stats[PlayerStat.Damage]) * Stats[PlayerStat.DamageMultiplier]);
+        ShaderMaterial mat = (ShaderMaterial)charSprite.Material;
+
+        mat.SetShaderParam("outline_width", 1.0f);
+        mat.SetShaderParam("outline_colour", outlineColour);
+        armOutline.Visible = true;
+        armOutline.DefaultColor = outlineColour;
+
+        ShaderMaterial pMat = (ShaderMaterial)spellParticle.Material;
+
+        pMat.Shader = effectShader;
+        pMat.SetShaderParam("base_colour", outlineColour);
+        spellParticle.Emitting = true;
+
+        spellEffectTimer?.Disconnect("timeout", this, nameof(DispelPlayerSpellEffects));
+        spellEffectTimer = GetTree().CreateTimer(duration);
+        spellEffectTimer.Connect("timeout", this, nameof(DispelPlayerSpellEffects));
     }
 
-    private float GetSpellRange()
+    public void DispelPlayerSpellEffects()
     {
-        return 128.0f * Stats[PlayerStat.RangeMultiplier];
+        ShaderMaterial mat = (ShaderMaterial)charSprite.Material;
+
+        mat.SetShaderParam("outline_width", 0.0f);
+        armOutline.Visible = false;
+
+        spellParticle.Emitting = false;
     }
 
-    private float GetSpellKnockback()
+    public Vector2 GetSpellDirection()
     {
-        return 100.0f * Stats[PlayerStat.KnockbackMultiplier];
+        return facingDir;
     }
 
-    private float GetSpellSpeed()
+    public Vector2 GetSpellSpawnPos()
     {
-        return 100.0f * Stats[PlayerStat.SpellSpeedMultiplier];
+        return spellSpawnPoint.GlobalPosition;
+    }
+
+    public int GetSpellDamage(int baseDamage)
+    {
+        return Mathf.RoundToInt((baseDamage + currentStats[Stat.DamageFlat]) * currentStats[Stat.DamageMultiplier]);
+    }
+
+    public float GetSpellRange(float baseRange)
+    {
+        return baseRange * currentStats[Stat.RangeMultiplier];
+    }
+
+    public float GetSpellKnockback(float baseKnockback)
+    {
+        return baseKnockback * currentStats[Stat.KnockbackMultiplier];
+    }
+
+    public float GetSpellSpeed(float baseSpeed)
+    {
+        return baseSpeed * currentStats[Stat.SpellSpeedMultiplier];
     }
 
     private float GetMaxPrimarySpellCooldown()
     {
-        return (maxPrimarySpellCooldown + Stats[PlayerStat.Cooldown]) * Stats[PlayerStat.CooldownMultplier];
+        return (maxPrimarySpellCooldown + currentStats[Stat.CooldownFlat]) * currentStats[Stat.CooldownMultplier];
     }
 }

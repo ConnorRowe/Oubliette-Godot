@@ -1,5 +1,7 @@
 using Godot;
 using System.Drawing;
+using System.Collections.Generic;
+using Stats;
 
 public enum Direction
 {
@@ -151,6 +153,9 @@ static class DirectionExt
 
 public abstract class Character : KinematicBody2D
 {
+    private Dictionary<Stat, float> baseStats = Stats.Buffs.DefaultStats();
+    public Dictionary<Stat, float> currentStats = Stats.Buffs.DefaultStats();
+
     public float maxSpeed = 64f;
     protected float speed = 0f;
     protected float acceleration = 5f;
@@ -159,6 +164,8 @@ public abstract class Character : KinematicBody2D
     protected float jumpVelocity = 0f;
     public int currentHealth = 0;
     public bool isDead = false;
+
+    public HashSet<Buff> Buffs = new HashSet<Buff>();
 
     public virtual float GetMaxSpeed() { return maxSpeed; }
 
@@ -286,6 +293,21 @@ public abstract class Character : KinematicBody2D
                     rightLeftCollider.Scale = new Vector2(-1, 1);
                     break;
                 }
+        }
+
+        // Remove expired buffs
+        uint time = OS.GetTicksMsec();
+        foreach (Buff buff in Buffs)
+        {
+            if (buff.startTime + buff.duration >= time)
+            {
+                buff.notifyExpired?.BuffExpired();
+            }
+        }
+        int removedBuffCount = Buffs.RemoveWhere((Buff buff) => { return buff.startTime + buff.duration >= time; });
+        if (removedBuffCount > 0)
+        {
+            RecalcStats();
         }
     }
 
@@ -456,6 +478,13 @@ public abstract class Character : KinematicBody2D
 
     public virtual void TakeDamage(int damage = 1, Character source = null)
     {
+        // Resist damage
+        damage = damage - Mathf.RoundToInt(currentStats[Stat.ResistDamageFlat]);
+
+        // Reflect damage
+        if (source != null && source != this && currentStats[Stat.ReflectDamageFlat] > 0.0f)
+            source.TakeDamage(Mathf.RoundToInt(currentStats[Stat.ReflectDamageFlat]), null);
+
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
@@ -491,5 +520,49 @@ public abstract class Character : KinematicBody2D
     public void ApplyKnockBack(Vector2 vel)
     {
         externalVelocity += vel;
+    }
+
+    public void ApplyBuff(Buff buff)
+    {
+        bool containsBuff = false;
+        foreach (Buff b in Buffs)
+        {
+            if (b.name == buff.name)
+            {
+                containsBuff = true;
+                break;
+            }
+        }
+
+        if (containsBuff)
+        {
+            Buffs.RemoveWhere((b) => { return b.name == buff.name; });
+        }
+
+        Buffs.Add(buff);
+
+        RecalcStats();
+    }
+
+    public void ApplyBuffs(Buff[] buffs)
+    {
+        foreach (Buff buff in buffs)
+        {
+            ApplyBuff(buff);
+        }
+
+        RecalcStats();
+    }
+
+    public void RecalcStats()
+    {
+        currentStats = new Dictionary<Stat, float>(baseStats);
+        foreach (Buff buff in Buffs)
+        {
+            foreach ((Stat stat, float amount) in buff.stats)
+            {
+                currentStats[stat] = currentStats[stat] + amount;
+            }
+        }
     }
 }

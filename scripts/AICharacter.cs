@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class AICharacter : Character
+public class AICharacter : Character, ICastsSpells
 {
     protected AIManager aIManager;
     protected Particles2D deathParticles;
@@ -337,5 +337,65 @@ public class AICharacter : Character
         aIManager.lastTarget = player;
 
         aIManager.TryTransition();
+    }
+
+    Vector2 ICastsSpells.GetSpellDirection()
+    {
+        return GetSpellDirection();
+    }
+
+    protected virtual Vector2 GetSpellDirection()
+    {
+        return dir;
+    }
+
+    Vector2 ICastsSpells.GetSpellSpawnPos()
+    {
+        return GetSpellSpawnPos();
+    }
+
+    public virtual Vector2 GetSpellSpawnPos()
+    {
+        return GlobalPosition;
+    }
+
+    int ICastsSpells.GetSpellDamage(int baseDamge)
+    {
+        return GetSpellDamage(baseDamge);
+    }
+
+    public virtual int GetSpellDamage(int baseDamge)
+    {
+        return baseDamge;
+    }
+
+    float ICastsSpells.GetSpellRange(float baseRange)
+    {
+        return GetSpellRange(baseRange);
+    }
+
+    public virtual float GetSpellRange(float baseRange)
+    {
+        return baseRange;
+    }
+
+    float ICastsSpells.GetSpellKnockback(float baseKnockback)
+    {
+        return GetSpellKnockback(baseKnockback);
+    }
+
+    public virtual float GetSpellKnockback(float baseKnockback)
+    {
+        return baseKnockback;
+    }
+
+    float ICastsSpells.GetSpellSpeed(float baseSpeed)
+    {
+        return GetSpellSpeed(baseSpeed);
+    }
+
+    public virtual float GetSpellSpeed(float baseSpeed)
+    {
+        return baseSpeed;
     }
 }

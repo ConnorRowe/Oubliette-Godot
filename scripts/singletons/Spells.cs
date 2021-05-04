@@ -1,47 +1,19 @@
 using Godot;
-using System;
+using System.Collections.Generic;
+using Stats;
 
 public class Spells : Node
 {
-    public delegate void OnSpellCast(Player player, Spell spell);
-    // Returns damage to deal to player
-    public delegate int PlayerTakesDamage(Player player, int damage, Character source);
+    public static Dictionary<string, BaseSpell> RegisteredSpells = new Dictionary<string, BaseSpell>();
 
-    public struct Spell
+    public static T RegisterSpell<T>(string name, T spell) where T : BaseSpell
     {
-        public readonly string name;
-        public readonly string description;
-        public readonly int cost;
-        public readonly int damage;
-        public readonly float duration;
-        public readonly Shader particleShader;
-        public readonly OnSpellCast onCast;
-        public readonly PlayerTakesDamage onTakeDamage;
-        public readonly Color outlineColour;
+        RegisteredSpells.Add(name, spell);
 
-        public Spell(string name, string description, int cost, int damage, float duration, Shader particleShader, OnSpellCast onCast, PlayerTakesDamage onTakeDamage, Color outlineColour)
-        {
-            this.name = name;
-            this.description = description;
-            this.cost = cost;
-            this.damage = damage;
-            this.duration = duration;
-            this.particleShader = particleShader;
-            this.onCast = onCast;
-            this.onTakeDamage = onTakeDamage;
-            this.outlineColour = outlineColour;
-        }
-
-        public bool IsValid()
-        {
-            return !name.Empty() && onCast != null;
-        }
+        return spell;
     }
 
-    public Spell Ice_Skin = new Spell("Ice Skin", "", 10, 1, 5.0f, GD.Load<Shader>("res://particle/Shedding.shader"), (Player player, Spell spell) => { GD.Print("Casting " + spell.name); }, (Player player, int damage, Character source) => { source?.TakeDamage(1); player.ReduceSpellTimer(damage); return 0; }, Colors.AliceBlue);
-
-    public override void _Ready()
-    {
-
-    }
+    public readonly ProjectileSpell FireBall = RegisterSpell<ProjectileSpell>("fireball", new ProjectileSpell(0.0f, 1, 128.0f, 100.0f, 100.0f, 25.0f));
+    public readonly ProjectileSpell Shadowbolt = RegisterSpell<ProjectileSpell>("shadowbolt", new ProjectileSpell(0.81f, 1, 128.0f, 100.0f, 200.0f, 25.0f));
+    public readonly BuffSpell IceSkin = RegisterSpell<BuffSpell>("ice_skin", new BuffSpell("ice_skin", 5.0f, 25.0f, new (Stat stat, float amount)[] { (Stat.ResistDamageFlat, 1.0f), (Stat.ReflectDamageFlat, 1.0f) }, GD.Load<Shader>("res://particle/Shedding.shader"), Colors.AliceBlue));
 }
