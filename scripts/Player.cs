@@ -70,11 +70,8 @@ public class Player : Character, ICastsSpells
         secondarySpell = _Spells.IceSkin;
 
         DebugOverlay debug = world.GetDebugOverlay();
-        debug.TrackFunc(nameof(GetSpellDamage), this, "Spell dmg: ");
-        debug.TrackFunc(nameof(GetSpellSpeed), this, "Spell speed: ");
-        debug.TrackFunc(nameof(GetSpellKnockback), this, "Knockback: ");
-        debug.TrackFunc(nameof(GetSpellRange), this, "Range: ");
-        debug.TrackFunc(nameof(GetMaxSpeed), this, "Move speed: ");
+        debug.TrackFunc(nameof(GetStatValue), this, "Dmg Res", Stat.ResistDamageFlat);
+        debug.TrackFunc(nameof(GetStatValue), this, "Dmg Refl", Stat.ReflectDamageFlat);
     }
 
     public override void _Input(InputEvent evt)

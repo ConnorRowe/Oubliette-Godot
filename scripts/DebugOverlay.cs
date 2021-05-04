@@ -10,13 +10,15 @@ public class DebugOverlay : Node2D
         public WeakRef objectRef;
         public bool isFunc;
         public string nameOverride;
+        public object[] args;
 
-        public TrackedStat(string propertyName, WeakRef objectRef, bool isFunc = false, string nameOverride = "")
+        public TrackedStat(string propertyName, WeakRef objectRef, object[] args, bool isFunc = false, string nameOverride = "")
         {
             this.propertyName = propertyName;
             this.objectRef = objectRef;
             this.isFunc = isFunc;
             this.nameOverride = nameOverride;
+            this.args = args;
         }
     }
 
@@ -66,22 +68,22 @@ public class DebugOverlay : Node2D
         {
             if (stat.objectRef.GetRef() is Godot.Object statObj)
             {
-                if ((stat.isFunc ? statObj.Call(stat.propertyName) : statObj.Get(stat.propertyName)) != null)
+                if ((stat.isFunc ? statObj.Call(stat.propertyName, stat.args) : statObj.Get(stat.propertyName)) != null)
                 {
-                    if ((stat.isFunc ? statObj.Call(stat.propertyName) : statObj.Get(stat.propertyName)) is Color color)
+                    if ((stat.isFunc ? statObj.Call(stat.propertyName, stat.args) : statObj.Get(stat.propertyName)) is Color color)
                     {
                         DrawColourProperty((stat.nameOverride == "" ? stat.propertyName : stat.nameOverride) + ": ", ind, color);
                     }
                     else
-                        DrawRightAlignShadowedString((stat.nameOverride == "" ? stat.propertyName : stat.nameOverride) + ": " + (stat.isFunc ? statObj.Call(stat.propertyName).ToString() : statObj.Get(stat.propertyName).ToString()), ind);
+                        DrawRightAlignShadowedString((stat.nameOverride == "" ? stat.propertyName : stat.nameOverride) + ": " + (stat.isFunc ? statObj.Call(stat.propertyName, stat.args).ToString() : statObj.Get(stat.propertyName).ToString()), ind);
 
                     ind++;
                 }
                 else    // helps with the godot c# problem where some methods like Call and Get use snake_case for builtin names
                 {
-                    if ((stat.isFunc ? statObj.Call(stat.propertyName.ToLower()) : statObj.Get(stat.propertyName.ToLower())) != null)
+                    if ((stat.isFunc ? statObj.Call(stat.propertyName.ToLower(), stat.args) : statObj.Get(stat.propertyName.ToLower())) != null)
                     {
-                        DrawRightAlignShadowedString((stat.nameOverride == "" ? stat.propertyName : stat.nameOverride) + ": " + (stat.isFunc ? statObj.Call(stat.propertyName.ToLower()).ToString() : statObj.Get(stat.propertyName.ToLower().ToString())), ind);
+                        DrawRightAlignShadowedString((stat.nameOverride == "" ? stat.propertyName : stat.nameOverride) + ": " + (stat.isFunc ? statObj.Call(stat.propertyName.ToLower(), stat.args).ToString() : statObj.Get(stat.propertyName.ToLower().ToString())), ind);
                         ind++;
                     }
                 }
@@ -91,12 +93,12 @@ public class DebugOverlay : Node2D
 
     public void TrackProperty(string propertyName, Godot.Object objectRef, string nameOverride = "")
     {
-        _trackedStats.Add(new TrackedStat(propertyName, WeakRef(objectRef), false, nameOverride));
+        _trackedStats.Add(new TrackedStat(propertyName, WeakRef(objectRef), new object[] { }, false, nameOverride));
     }
 
-    public void TrackFunc(string funcName, Godot.Object objectRef, string nameOverride = "")
+    public void TrackFunc(string funcName, Godot.Object objectRef, string nameOverride = "", params object[] args)
     {
-        _trackedStats.Add(new TrackedStat(funcName, WeakRef(objectRef), true, nameOverride));
+        _trackedStats.Add(new TrackedStat(funcName, WeakRef(objectRef), args, true, nameOverride));
     }
 
     public void TrackLine(Vector2[] line)

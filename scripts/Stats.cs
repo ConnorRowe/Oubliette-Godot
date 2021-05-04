@@ -54,7 +54,7 @@ namespace Stats
                 name = name,
                 stats = stats,
                 startTime = OS.GetTicksMsec(),
-                duration = (uint)Mathf.RoundToInt(duration / 1000.0f),
+                duration = (uint)Mathf.RoundToInt(duration * 1000.0f),
                 notifyExpired = notifyExpired,
             };
         }
