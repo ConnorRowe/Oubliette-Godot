@@ -8,9 +8,9 @@ public class ProjectileSpell : BaseSpell
 
     public ProjectileSpell() { }
 
-    public ProjectileSpell(float hueAdjust, int damage, float range, float knockback, float speed, float majykaCost) : base(damage, range, knockback, speed, majykaCost)
+    public ProjectileSpell(float hueAdjust, int damage, float range, float knockback, float speed, float majykaCost, NodePath projectilePath) : base(damage, range, knockback, speed, majykaCost)
     {
-        projectileScene = GD.Load<PackedScene>("res://scenes/Projectile.tscn");
+        projectileScene = GD.Load<PackedScene>(projectilePath);
         this.hueAdjust = hueAdjust;
     }
     public override void Cast(ICastsSpells source)
