@@ -66,7 +66,7 @@ public class Player : Character, ICastsSpells
         staffLight = GetNode<Light2D>("CharSprite/staff/StaffLight");
         spellSpawnPoint = GetNode<Node2D>("CharSprite/staff/SpellSpawnPoint");
 
-        primarySpell = _Spells.FireBall;
+        primarySpell = _Spells.MagicMissile;
         secondarySpell = _Spells.IceSkin;
 
         DebugOverlay debug = world.GetDebugOverlay();

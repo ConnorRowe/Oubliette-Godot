@@ -68,10 +68,13 @@ public class Projectile : KinematicBody2D
         deactivated = true;
         SetPhysicsProcess(false);
 
+        float hueCache = ((ParticlesMaterial)particles.ProcessMaterial).HueVariation;
+
         direction = Vector2.Zero;
         particles.OneShot = true;
         particles.Explosiveness = 1.0f;
         particles.ProcessMaterial = explodeParticleMaterial;
+        ((ParticlesMaterial)particles.ProcessMaterial).HueVariation = hueCache;
         particles.Restart();
 
         tween.InterpolateProperty(light, "energy", light.Energy, 0.0f, 0.5f, Tween.TransitionType.Quad);
