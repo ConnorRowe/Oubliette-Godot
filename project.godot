@@ -111,9 +111,10 @@ g_cast_secondary_spell={
 [layer_names]
 
 2d_physics/layer_1="Tiles"
-2d_physics/layer_2="Objects"
+2d_physics/layer_2="InteractableObjects"
 2d_physics/layer_3="LineOfSight"
 2d_physics/layer_4="Projectile"
+2d_physics/layer_5="Hazards"
 2d_physics/layer_10="EnemyDetectable"
 
 [physics]

@@ -9,6 +9,10 @@ public class Player : Character, ICastsSpells
     public BaseSpell primarySpell;
     public BaseSpell secondarySpell;
     private SceneTreeTimer spellEffectTimer;
+    private SceneTreeTimer takeDmgTimer;
+    private SceneTreeTimer spillageDmgTimer;
+    private int spillageCount = 0;
+    private bool canTakeDamage = true;
     private float primarySpellCooldown = 0.0f;
     public float maxPrimarySpellCooldown = 0.5f;
     private bool isSpellActive = false;
@@ -50,6 +54,10 @@ public class Player : Character, ICastsSpells
     public override void _Ready()
     {
         base._Ready();
+
+        Area2D feetArea = GetNode<Area2D>("FeetArea");
+        feetArea.Connect("area_entered", this, nameof(OnAreaEntered));
+        feetArea.Connect("area_exited", this, nameof(OnAreaExited));
 
         debugPoint = GD.Load<Texture>("res://textures/2x2_white.png");
         projectile = GD.Load<PackedScene>("res://scenes/Projectile.tscn");
@@ -355,6 +363,22 @@ public class Player : Character, ICastsSpells
         majykaBar.CurrentMajyka = Mathf.RoundToInt((currentMajyka / maxMajyka) * 100.0f);
     }
 
+    private void ResetCanTakeDamage()
+    {
+        canTakeDamage = true;
+    }
+
+    public override void TakeDamage(int damage = 1, Character source = null)
+    {
+        if (canTakeDamage)
+        {
+            base.TakeDamage(damage, source);
+            canTakeDamage = false;
+            takeDmgTimer = GetTree().CreateTimer(0.25f, false);
+            takeDmgTimer.Connect("timeout", this, nameof(ResetCanTakeDamage));
+        }
+    }
+
     public override Direction GetFacingDirection()
     {
         return GetDirection(facingDir);
@@ -428,5 +452,40 @@ public class Player : Character, ICastsSpells
     private float GetMaxPrimarySpellCooldown()
     {
         return (maxPrimarySpellCooldown + currentStats[Stat.CooldownFlat]) * currentStats[Stat.CooldownMultplier];
+    }
+
+    public void OnAreaEntered(Area2D area)
+    {
+        if (area is SpillageHazard)
+        {
+            spillageCount++;
+
+            if(spillageCount == 1)
+            {
+                if(spillageDmgTimer != null && spillageDmgTimer.TimeLeft > 0.0f)
+                    return;
+
+                SpillageDamage();
+            }
+        }
+    }
+
+    public void OnAreaExited(Area2D area)
+    {
+        if (area is SpillageHazard)
+        {
+            spillageCount--;
+        }
+    }
+
+    private void SpillageDamage()
+    {
+        if (spillageCount > 0)
+        {
+            TakeDamage();
+
+            spillageDmgTimer = GetTree().CreateTimer(1.0f, false);
+            spillageDmgTimer.Connect("timeout", this, nameof(SpillageDamage));
+        }
     }
 }
