@@ -1,11 +1,6 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://scenes/level_generation/BaseRoom.tscn" type="PackedScene" id=1]
-
-[sub_resource type="NavigationPolygon" id=1]
-vertices = PoolVector2Array( 320, 97.7228, 320, 266, 242, 176, 242, 158, 224, 98, 240, 156, 222, 96, 128, 156, 128, 98, 130, 95.918, 240, 178, 32, 266, 128, 178, 32, 98.1499, 126, 176, 126, 158, 222, 78, 130, 78, 32, 75.8626, 32, 32, 320, 32, 128.047, 75.9973, 224, 76, 320, 75.9645 )
-polygons = [ PoolIntArray( 0, 1, 2, 3 ), PoolIntArray( 4, 0, 3, 5 ), PoolIntArray( 6, 4, 5, 7, 8, 9 ), PoolIntArray( 10, 2, 1 ), PoolIntArray( 10, 1, 11, 12 ), PoolIntArray( 12, 11, 13, 14 ), PoolIntArray( 15, 14, 13 ), PoolIntArray( 15, 13, 8, 7 ), PoolIntArray( 16, 6, 9, 17 ), PoolIntArray( 18, 19, 20, 21 ), PoolIntArray( 17, 21, 20, 22 ), PoolIntArray( 20, 23, 22 ), PoolIntArray( 17, 22, 16 ) ]
-outlines = [ PoolVector2Array( 32, 32, 320, 32, 320, 75.9645, 224, 76, 222, 78, 222, 96, 224, 98, 320, 97.7228, 320, 266, 32, 266, 32, 98.1499, 128, 98, 130, 95.918, 130, 78, 128.047, 75.9973, 32, 75.8626 ), PoolVector2Array( 128, 178, 126, 176, 126, 158, 128, 156, 240, 156, 242, 158, 242, 176, 240, 178 ) ]
 
 [sub_resource type="RectangleShape2D" id=2]
 extents = Vector2( 48, 3 )
@@ -39,10 +34,7 @@ __meta__ = {
 "_gizmo_extents_": 8.0
 }
 
-[node name="NavigationPolygonInstance" parent="Navigation" index="0"]
-navpoly = SubResource( 1 )
-
-[node name="ProjectileCollision" parent="." index="6"]
+[node name="ProjectileCollision" parent="." index="5"]
 z_index = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ProjectileCollision" index="1"]

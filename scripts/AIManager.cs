@@ -9,7 +9,7 @@ public class AIManager : Godot.Object
     public readonly World world;
     public readonly Character owner;
     public Godot.Collections.Dictionary<string, AIBehaviour> Behaviours = new Godot.Collections.Dictionary<string, AIBehaviour>();
-    public Func<AIBehaviour.TransitionTestResult>[] globalTransitions = new Func<AIBehaviour.TransitionTestResult>[] {};
+    public Func<AIBehaviour.TransitionTestResult>[] globalTransitions = new Func<AIBehaviour.TransitionTestResult>[] { };
 
     public string CurrentBehaviour = "";
     public Character lastTarget;
@@ -37,7 +37,7 @@ public class AIManager : Godot.Object
 
     public void TryTransition()
     {
-        if(CurrentBehaviour.Empty())
+        if (CurrentBehaviour.Empty())
             return;
 
         transitionTimer = owner.GetTree().CreateTimer(0.5f);
@@ -154,8 +154,7 @@ public class AIManager : Godot.Object
         Vector2 localA = navigation.ToLocal(pointA);
         Vector2 localB = navigation.ToLocal(pointB);
         Vector2[] navpath = navigation.GetSimplePath(localA, localB, optimize: true);
-        Vector2 roomPos = navigation.GetParent<Room>().Position;
-        for(int i = 0; i < navpath.Length; ++i)
+        for (int i = 0; i < navpath.Length; ++i)
         {
             navpath[i] = navigation.ToGlobal(navpath[i]);
         }

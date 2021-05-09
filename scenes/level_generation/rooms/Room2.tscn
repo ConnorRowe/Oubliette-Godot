@@ -1,12 +1,7 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://scenes/level_generation/BaseRoom.tscn" type="PackedScene" id=1]
 [ext_resource path="res://scenes/Torch.tscn" type="PackedScene" id=2]
-
-[sub_resource type="NavigationPolygon" id=1]
-vertices = PoolVector2Array( 226, 160, 288, 114, 288, 188, 240, 188, 224, 162, 320, 97.7228, 320, 266, 290, 224, 290, 190, 290, 112, 290, 78, 320, 75.9645, 240, 114, 226, 142, 224, 140, 238, 112, 288, 226, 32, 266, 240, 226, 238, 224, 112, 226, 114, 112, 114, 78, 238, 78, 128, 140, 114, 224, 238, 190, 114, 190, 128, 162, 32, 32, 320, 32, 288, 76, 240, 76, 112, 114, 126, 142, 126, 160, 112, 188, 64, 114, 64, 188, 112, 76, 64, 76, 62, 78, 62, 112, 62, 190, 62, 224, 64, 226 )
-polygons = [ PoolIntArray( 0, 1, 2, 3, 4 ), PoolIntArray( 5, 6, 7, 8 ), PoolIntArray( 1, 9, 5, 8, 2 ), PoolIntArray( 5, 9, 10, 11 ), PoolIntArray( 12, 1, 0, 13 ), PoolIntArray( 12, 13, 14, 15 ), PoolIntArray( 16, 7, 6 ), PoolIntArray( 16, 6, 17, 18 ), PoolIntArray( 19, 18, 17, 20 ), PoolIntArray( 21, 22, 23, 15, 14, 24 ), PoolIntArray( 25, 26, 19, 20 ), PoolIntArray( 26, 25, 27, 28, 4, 3 ), PoolIntArray( 29, 30, 11, 31, 32 ), PoolIntArray( 33, 21, 24, 34 ), PoolIntArray( 35, 28, 27, 36, 37 ), PoolIntArray( 37, 33, 34, 35 ), PoolIntArray( 37, 36, 38 ), PoolIntArray( 11, 10, 31 ), PoolIntArray( 29, 32, 23, 39 ), PoolIntArray( 23, 22, 39 ), PoolIntArray( 29, 39, 40 ), PoolIntArray( 29, 40, 41 ), PoolIntArray( 17, 29, 41, 42 ), PoolIntArray( 17, 42, 37, 43 ), PoolIntArray( 37, 38, 43 ), PoolIntArray( 17, 43, 44 ), PoolIntArray( 17, 44, 45 ), PoolIntArray( 17, 45, 20 ) ]
-outlines = [ PoolVector2Array( 32, 32, 320, 32, 320, 75.9645, 320, 97.7228, 320, 266, 32, 266 ), PoolVector2Array( 64, 114, 62, 112, 62, 78, 64, 76, 112, 76, 114, 78, 114, 112, 112, 114 ), PoolVector2Array( 128, 162, 126, 160, 126, 142, 128, 140, 224, 140, 226, 142, 226, 160, 224, 162 ), PoolVector2Array( 240, 114, 238, 112, 238, 78, 240, 76, 288, 76, 290, 78, 290, 112, 288, 114 ), PoolVector2Array( 240, 226, 238, 224, 238, 190, 240, 188, 288, 188, 290, 190, 290, 224, 288, 226 ), PoolVector2Array( 64, 226, 62, 224, 62, 190, 64, 188, 112, 188, 114, 190, 114, 224, 112, 226 ) ]
 
 [sub_resource type="RectangleShape2D" id=2]
 extents = Vector2( 24, 11 )
@@ -37,10 +32,7 @@ __meta__ = {
 "_gizmo_extents_": 8.0
 }
 
-[node name="NavigationPolygonInstance" parent="Navigation" index="0"]
-navpoly = SubResource( 1 )
-
-[node name="ProjectileCollision" parent="." index="6"]
+[node name="ProjectileCollision" parent="." index="5"]
 z_index = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ProjectileCollision" index="1"]

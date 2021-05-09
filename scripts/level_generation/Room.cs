@@ -8,17 +8,41 @@ public class Room : Node2D
     [Signal]
     public delegate void Cleared(Room room);
 
-    private TileMap tileMap;
+    private TileMap wallTiles;
+    private TileMap floorTiles;
+
+    public TileMap WallTiles
+    {
+        get
+        {
+            if (wallTiles == null)
+            {
+                wallTiles = GetNode<TileMap>(_wallTileMapPath);
+            }
+            return wallTiles;
+        }
+    }
+    public TileMap FloorTiles
+    {
+        get
+        {
+            if (floorTiles == null)
+            {
+                floorTiles = GetNode<TileMap>(_floorTileMapPath);
+            }
+            return floorTiles;
+        }
+    }
+
     public bool firstRoom = false;
     public int enemyCounter;
-    public Navigation2D Navigation { get; set; }
     public Dictionary<Direction, AnimatedSprite> doors = new Dictionary<Direction, AnimatedSprite>();
     public List<AICharacter> enemies = new List<AICharacter>();
 
     [Export]
-    private NodePath _tileMapPath;
+    private NodePath _wallTileMapPath;
     [Export]
-    private NodePath _navigationPath;
+    private NodePath _floorTileMapPath;
     [Export]
     public uint Width;
     [Export]
@@ -30,9 +54,6 @@ public class Room : Node2D
     public override void _Ready()
     {
         base._Ready();
-
-        tileMap = GetNode<TileMap>(_tileMapPath);
-        Navigation = GetNode<Navigation2D>(_navigationPath);
 
         doors.Add(Direction.Up, GetNode<AnimatedSprite>("Doors/Up"));
         doors.Add(Direction.Right, GetNode<AnimatedSprite>("Doors/Right"));
@@ -50,16 +71,6 @@ public class Room : Node2D
 
         // Lock doors if not first room
         UnlockDoors(firstRoom);
-    }
-
-    private TileMap GetTileMap()
-    {
-        if (tileMap == null)
-        {
-            tileMap = GetNode<TileMap>("TileMap");
-        }
-
-        return tileMap;
     }
 
     public Rect2 AsRect()
@@ -91,7 +102,7 @@ public class Room : Node2D
     {
         enemyCounter--;
 
-        if(enemyCounter <= 0)
+        if (enemyCounter <= 0)
         {
             UnlockDoors();
 
@@ -101,7 +112,7 @@ public class Room : Node2D
 
     public void UnlockDoors(bool unlock = true)
     {
-        foreach(var door in doors)
+        foreach (var door in doors)
         {
             door.Value.Frame = unlock ? 1 : 0;
             door.Value.GetChild<Area2D>(0).Monitorable = unlock;

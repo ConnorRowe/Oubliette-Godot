@@ -18,11 +18,21 @@ public class LevelGenerator : Node, IProvidesNav
     private readonly Point[] pointDirections = new Point[4] { new Point(0, 1), new Point(1, 0), new Point(0, -1), new Point(-1, 0) };
     private int gridWidth = 8;
     private int gridHeight = 8;
+    private Sprite roomBorder;
+    private TileMap wallTiles;
+    private TileMap floorTiles;
+    public Navigation2D NavMesh { get; set; }
 
     [Export]
     private string rooms_directory = "res://scenes/level_generation/rooms/";
     [Export]
     private Godot.Collections.Array<PackedScene> possibleEnemies = new Godot.Collections.Array<PackedScene>();
+    [Export(hintString: "The tilemap to add wall tiles to.")]
+    private NodePath _wallTileMapPath;
+    [Export(hintString: "The tilemap to add floor tiles to.")]
+    private NodePath _floorTileMapPath;
+    [Export]
+    private NodePath _navigationPath;
 
     [Signal]
     public delegate void RoomChanged(LevelGenerator levelGen);
@@ -35,6 +45,10 @@ public class LevelGenerator : Node, IProvidesNav
 
         camera = GetParent().GetNode<Camera2D>("Camera2D");
         player = GetParent().GetNode<Player>("Player");
+        roomBorder = GetNode<Sprite>("RoomBorder");
+        wallTiles = GetNode<TileMap>(_wallTileMapPath);
+        floorTiles = GetNode<TileMap>(_floorTileMapPath);
+        NavMesh = GetNode<Navigation2D>(_navigationPath);
 
         Directory directory = new Directory();
         directory.Open(rooms_directory);
@@ -47,7 +61,8 @@ public class LevelGenerator : Node, IProvidesNav
             file = directory.GetNext();
         } while (!file.Empty());
 
-        GenerateLevel();
+        // Generate level
+        CallDeferred(nameof(GenerateLevel));
     }
 
     public override void _Input(InputEvent evt)
@@ -211,7 +226,7 @@ public class LevelGenerator : Node, IProvidesNav
                 }
             }
 
-            room.Value.Visible = false;
+            // room.Value.Visible = false;
 
             // Connect door collision
             room.Value.Connect(nameof(Room.DoorHit), this, nameof(DoorHit));
@@ -237,13 +252,32 @@ public class LevelGenerator : Node, IProvidesNav
 
             // Connect cleared signal
             room.Value.Connect(nameof(Room.Cleared), this, nameof(RoomWasCleared));
+
+            // Unify TileMaps by copying each tile from each room into the level generator's tilemaps
+            foreach (Vector2 tile in room.Value.WallTiles.GetUsedCells())
+            {
+                wallTiles.SetCellv((room.Value.Position / 16) + tile, 0);
+            }
+            foreach (Vector2 tile in room.Value.FloorTiles.GetUsedCells())
+            {
+                floorTiles.SetCellv((room.Value.Position / 16) + tile, 0);
+            }
+
+            room.Value.WallTiles.CallDeferred("queue_free");
+            room.Value.FloorTiles.CallDeferred("queue_free");
         }
+
+        wallTiles.UpdateBitmaskRegion();
+        wallTiles.UpdateDirtyQuadrants();
+        floorTiles.UpdateBitmaskRegion();
+        floorTiles.UpdateDirtyQuadrants();
 
         // Put player in a room
         currentRoom = generatedRooms.First().Key;
         player.Position = generatedRooms[currentRoom].Position + new Vector2(8 * 16, 4 * 16);
         generatedRooms[currentRoom].Visible = true;
-        generatedRooms[currentRoom].firstRoom = true;   
+        generatedRooms[currentRoom].firstRoom = true;
+        roomBorder.Position = generatedRooms[currentRoom].Position + new Vector2(176, 144);
 
         // Update minimap
         EmitSignal(nameof(RoomChanged), this);
@@ -277,6 +311,8 @@ public class LevelGenerator : Node, IProvidesNav
             enemy.TargetPlayer(player);
         }
 
+        roomBorder.Position = generatedRooms[currentRoom].Position + new Vector2(176, 144);
+
         EmitSignal(nameof(RoomChanged), this);
     }
 
@@ -287,7 +323,7 @@ public class LevelGenerator : Node, IProvidesNav
 
     public Navigation2D GetNavigation()
     {
-        return generatedRooms[currentRoom].Navigation;
+        return NavMesh;
     }
 
     private void RoomWasCleared(Room room)
