@@ -64,6 +64,9 @@ script = ExtResource( 1 )
 _hitboxPath = NodePath("Hitbox")
 _upDownColliderPath = NodePath("Hitbox/UpDown")
 _rightLeftColliderPath = NodePath("Hitbox/LeftRight")
+_hitAreaPath = NodePath("HitArea")
+_upDownHitAreaPolyPath = NodePath("HitArea/UpDown")
+_rightLeftHitAreaPolyPath = NodePath("HitArea/LeftRight")
 _charSpritePath = NodePath("CharSprite")
 _shadowSpritePath = NodePath("shadow")
 _animationPlayerPath = NodePath("AnimationPlayer")
@@ -137,3 +140,13 @@ scale = Vector2( 1e-05, 1 )
 texture = ExtResource( 8 )
 
 [node name="Tween" type="Tween" parent="."]
+
+[node name="HitArea" type="Area2D" parent="."]
+collision_layer = 512
+collision_mask = 512
+
+[node name="UpDown" type="CollisionPolygon2D" parent="HitArea"]
+polygon = PoolVector2Array( -8, 0, -8, -16, 8, -16, 8, 0 )
+
+[node name="LeftRight" type="CollisionPolygon2D" parent="HitArea"]
+polygon = PoolVector2Array( -2, 0, -2, -16, 2, -16, 2, 0 )

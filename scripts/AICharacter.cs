@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class AICharacter : Character, ICastsSpells
+public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
 {
     protected AIManager aIManager;
     protected Particles2D deathParticles;
@@ -9,7 +9,7 @@ public class AICharacter : Character, ICastsSpells
     protected Label debugLabel;
     protected Tween tween;
     protected Sprite detectionNotifier;
-    private bool hasTarget = false;
+    protected bool hasTarget = false;
 
     public Physics2DShapeQueryParameters shapeQuery;
     public World world;
@@ -39,6 +39,9 @@ public class AICharacter : Character, ICastsSpells
     // Signals
     [Signal]
     public delegate void Died();
+    [Signal]
+    public delegate void PlayerIntersected(Player player);
+
 
     public override void _Ready()
     {
@@ -397,5 +400,15 @@ public class AICharacter : Character, ICastsSpells
     public virtual float GetSpellSpeed(float baseSpeed)
     {
         return baseSpeed;
+    }
+
+    void IIntersectsPlayerHitArea.PlayerHit(Player player)
+    {
+        PlayerHit(player);
+    }
+
+    public virtual void PlayerHit(Player player)
+    {
+        EmitSignal(nameof(PlayerIntersected), player);
     }
 }

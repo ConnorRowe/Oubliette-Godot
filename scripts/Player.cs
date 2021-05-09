@@ -23,6 +23,8 @@ public class Player : Character, ICastsSpells
     private Vector2 facingDir = Vector2.Zero;
     private Godot.Collections.Dictionary<Direction, Vector2> staffOrigins = new Godot.Collections.Dictionary<Direction, Vector2>() { { Direction.Up, new Vector2(4.0f, -10.0f) }, { Direction.Right, new Vector2(0.0f, -8.0f) }, { Direction.Down, new Vector2(-4.0f, -10.0f) }, { Direction.Left, new Vector2(0.0f, -10.0f) } };
     private Godot.Collections.Dictionary<Direction, Vector2> armOrigins = new Godot.Collections.Dictionary<Direction, Vector2>() { { Direction.Up, new Vector2(2.5f, -11.0f) }, { Direction.Right, new Vector2(-0.5f, -11.0f) }, { Direction.Down, new Vector2(-2.5f, -11.0f) }, { Direction.Left, new Vector2(0.5f, -11.0f) } };
+    private Physics2DShapeQueryParameters hitAreaShapeQuery;
+    private HashSet<Area2D> intersectedAreas = new HashSet<Area2D>();
 
     // Nodes
     public Camera2D camera;
@@ -49,6 +51,8 @@ public class Player : Character, ICastsSpells
     // Export
     [Export]
     private NodePath _cameraPath;
+    [Export]
+    private Shape2D hitBoxTraceShape;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -80,6 +84,13 @@ public class Player : Character, ICastsSpells
         DebugOverlay debug = world.GetDebugOverlay();
         debug.TrackFunc(nameof(GetStatValue), this, "Dmg Res", Stat.ResistDamageFlat);
         debug.TrackFunc(nameof(GetStatValue), this, "Dmg Refl", Stat.ReflectDamageFlat);
+
+        hitAreaShapeQuery = new Physics2DShapeQueryParameters();
+        hitAreaShapeQuery.SetShape(hitBoxTraceShape);
+        hitAreaShapeQuery.Transform = new Transform2D(0.0f, GlobalPosition + new Vector2(0, -9.0f));
+        hitAreaShapeQuery.CollideWithAreas = true;
+        hitAreaShapeQuery.CollisionLayer = 512;
+        hitAreaShapeQuery.Exclude = new Godot.Collections.Array() { this, HitArea };
     }
 
     public override void _Input(InputEvent evt)
@@ -247,7 +258,6 @@ public class Player : Character, ICastsSpells
 
 
         var spaceState = GetWorld2d().DirectSpaceState;
-        // var result = spaceState.IntersectPoint(lightArea.GlobalPosition, collideWithAreas:true, collisionLayer: 0b0001);
         var result = spaceState.IntersectRay(staffLight.GlobalPosition, staffLight.GlobalPosition + (facingDir * 4.0f), new Godot.Collections.Array() { this }, collisionLayer: 0b0001, collideWithAreas: true);
 
         if (result.Count > 0)
@@ -259,6 +269,34 @@ public class Player : Character, ICastsSpells
         {
             staffLight.Position = staffLight.Position.LinearInterpolate(new Vector2(6, 0), delta * 2.0f);
         }
+
+        // Custom area hit detection because godot's is unreliable
+
+        hitAreaShapeQuery.Transform = new Transform2D(0.0f, GlobalPosition + new Vector2(0, -8.0f));
+        Godot.Collections.Array hitResult = spaceState.IntersectShape(hitAreaShapeQuery);
+        HashSet<Area2D> hitAreas = new HashSet<Area2D>();
+
+        foreach (Godot.Collections.Dictionary hit in hitResult)
+        {
+            Area2D hitArea = ((Area2D)hit["collider"]);
+            hitAreas.Add(hitArea);
+
+            if (!intersectedAreas.Contains(hitArea))
+            {
+                intersectedAreas.Add(hitArea);
+                if (hitArea is IIntersectsPlayerHitArea hitable)
+                {
+                    hitable.PlayerHit(this);
+                }
+                else if (hitArea.GetParent() is IIntersectsPlayerHitArea parentHitable)
+                {
+                    parentHitable.PlayerHit(this);
+                }
+            }
+        }
+
+        // remove intersections that no longer exist
+        intersectedAreas.RemoveWhere((Area2D area) => { return !hitAreas.Contains(area); });
     }
 
     private bool TryInteract()
@@ -460,9 +498,9 @@ public class Player : Character, ICastsSpells
         {
             spillageCount++;
 
-            if(spillageCount == 1)
+            if (spillageCount == 1)
             {
-                if(spillageDmgTimer != null && spillageDmgTimer.TimeLeft > 0.0f)
+                if (spillageDmgTimer != null && spillageDmgTimer.TimeLeft > 0.0f)
                     return;
 
                 SpillageDamage();

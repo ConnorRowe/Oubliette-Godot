@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=2]
+[gd_scene load_steps=36 format=2]
 
 [ext_resource path="res://scripts/Player.cs" type="Script" id=1]
 [ext_resource path="res://textures/Player_run_right.png" type="Texture" id=2]
@@ -13,97 +13,100 @@
 [ext_resource path="res://textures/staff.png" type="Texture" id=11]
 [ext_resource path="res://materials/M_ColourOverride_Vertex.tres" type="Material" id=12]
 
-[sub_resource type="AtlasTexture" id=1]
-atlas = ExtResource( 4 )
-region = Rect2( 0, 0, 16, 20 )
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 2, 9 )
 
 [sub_resource type="AtlasTexture" id=2]
 atlas = ExtResource( 4 )
-region = Rect2( 16, 0, 16, 20 )
+region = Rect2( 0, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=3]
 atlas = ExtResource( 4 )
-region = Rect2( 32, 0, 16, 20 )
+region = Rect2( 16, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=4]
 atlas = ExtResource( 4 )
-region = Rect2( 48, 0, 16, 20 )
+region = Rect2( 32, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=5]
 atlas = ExtResource( 4 )
-region = Rect2( 64, 0, 16, 20 )
+region = Rect2( 48, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=6]
 atlas = ExtResource( 4 )
-region = Rect2( 80, 0, 16, 20 )
+region = Rect2( 64, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=7]
-atlas = ExtResource( 2 )
-region = Rect2( 0, 0, 16, 20 )
+atlas = ExtResource( 4 )
+region = Rect2( 80, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=8]
 atlas = ExtResource( 2 )
-region = Rect2( 16, 0, 16, 20 )
+region = Rect2( 0, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=9]
 atlas = ExtResource( 2 )
-region = Rect2( 32, 0, 16, 20 )
+region = Rect2( 16, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=10]
 atlas = ExtResource( 2 )
-region = Rect2( 48, 0, 16, 20 )
+region = Rect2( 32, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=11]
 atlas = ExtResource( 2 )
-region = Rect2( 64, 0, 16, 20 )
+region = Rect2( 48, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=12]
 atlas = ExtResource( 2 )
-region = Rect2( 80, 0, 16, 20 )
+region = Rect2( 64, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=13]
-atlas = ExtResource( 3 )
-region = Rect2( 0, 0, 16, 20 )
+atlas = ExtResource( 2 )
+region = Rect2( 80, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=14]
 atlas = ExtResource( 3 )
-region = Rect2( 16, 0, 16, 20 )
+region = Rect2( 0, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=15]
 atlas = ExtResource( 3 )
-region = Rect2( 32, 0, 16, 20 )
+region = Rect2( 16, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=16]
 atlas = ExtResource( 3 )
-region = Rect2( 48, 0, 16, 20 )
+region = Rect2( 32, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=17]
 atlas = ExtResource( 3 )
-region = Rect2( 64, 0, 16, 20 )
+region = Rect2( 48, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=18]
 atlas = ExtResource( 3 )
+region = Rect2( 64, 0, 16, 20 )
+
+[sub_resource type="AtlasTexture" id=19]
+atlas = ExtResource( 3 )
 region = Rect2( 80, 0, 16, 20 )
 
-[sub_resource type="SpriteFrames" id=19]
+[sub_resource type="SpriteFrames" id=20]
 animations = [ {
-"frames": [ SubResource( 1 ), SubResource( 2 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ), SubResource( 6 ) ],
+"frames": [ SubResource( 2 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ), SubResource( 6 ), SubResource( 7 ) ],
 "loop": true,
 "name": "up",
 "speed": 8.0
 }, {
-"frames": [ SubResource( 7 ), SubResource( 8 ), SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), SubResource( 12 ) ],
+"frames": [ SubResource( 8 ), SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ) ],
 "loop": true,
 "name": "leftright",
 "speed": 8.0
 }, {
-"frames": [ SubResource( 13 ), SubResource( 14 ), SubResource( 15 ), SubResource( 16 ), SubResource( 17 ), SubResource( 18 ) ],
+"frames": [ SubResource( 14 ), SubResource( 15 ), SubResource( 16 ), SubResource( 17 ), SubResource( 18 ), SubResource( 19 ) ],
 "loop": true,
 "name": "down",
 "speed": 8.0
 } ]
 
-[sub_resource type="ShaderMaterial" id=20]
+[sub_resource type="ShaderMaterial" id=21]
 shader = ExtResource( 7 )
 shader_param/emission_box_extents = Vector3( 4, 10, 0 )
 shader_param/base_speed = 1.0
@@ -112,11 +115,11 @@ shader_param/y_dir_range = Vector2( 0, 0 )
 shader_param/gravity = 0.05
 shader_param/base_colour = Color( 1, 1, 1, 1 )
 
-[sub_resource type="CapsuleShape2D" id=21]
+[sub_resource type="CapsuleShape2D" id=22]
 radius = 2.0
 height = 0.0
 
-[sub_resource type="RectangleShape2D" id=22]
+[sub_resource type="RectangleShape2D" id=23]
 extents = Vector2( 2, 0.5 )
 
 [node name="Player" type="KinematicBody2D"]
@@ -126,12 +129,16 @@ script = ExtResource( 1 )
 _hitboxPath = NodePath("Hitbox")
 _upDownColliderPath = NodePath("Hitbox/CollisionPolygon2D")
 _rightLeftColliderPath = NodePath("Hitbox/CollisionPolygon2D")
+_hitAreaPath = NodePath("HitArea")
+_upDownHitAreaPolyPath = NodePath("HitArea/UpDown")
+_rightLeftHitAreaPolyPath = NodePath("HitArea/LeftRight")
 _charSpritePath = NodePath("CharSprite")
 _shadowSpritePath = NodePath("ShadowSprite")
 _animationPlayerPath = NodePath("AnimationPlayer")
 maxHealth = 4
 _animDeath = ""
 _cameraPath = NodePath("Camera2D")
+hitBoxTraceShape = SubResource( 1 )
 
 [node name="ShadowSprite" type="Sprite" parent="."]
 modulate = Color( 1, 1, 1, 0.729412 )
@@ -140,7 +147,7 @@ texture = ExtResource( 5 )
 [node name="CharSprite" type="AnimatedSprite" parent="."]
 material = ExtResource( 9 )
 position = Vector2( 0, 1 )
-frames = SubResource( 19 )
+frames = SubResource( 20 )
 animation = "down"
 offset = Vector2( 0, -10 )
 
@@ -150,7 +157,7 @@ position = Vector2( -2, -12 )
 [node name="SpellParticle" type="Particles2D" parent="CharSprite"]
 position = Vector2( 0, -11 )
 emitting = false
-process_material = SubResource( 20 )
+process_material = SubResource( 21 )
 texture = ExtResource( 10 )
 
 [node name="staff" type="Sprite" parent="CharSprite"]
@@ -191,7 +198,7 @@ begin_cap_mode = 1
 end_cap_mode = 1
 
 [node name="Collision" type="CollisionShape2D" parent="."]
-shape = SubResource( 21 )
+shape = SubResource( 22 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
@@ -202,6 +209,7 @@ limit_smoothed = true
 anims/DamageFlash = ExtResource( 8 )
 
 [node name="Hitbox" type="KinematicBody2D" parent="."]
+visible = false
 collision_layer = 8
 collision_mask = 8
 
@@ -209,10 +217,21 @@ collision_mask = 8
 polygon = PoolVector2Array( -2, 1, -2, -17, -1, -18, 1, -18, 2, -17, 2, 1 )
 
 [node name="FeetArea" type="Area2D" parent="."]
+visible = false
 monitorable = false
 collision_layer = 0
 collision_mask = 16
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="FeetArea"]
 position = Vector2( 0, 0.5 )
-shape = SubResource( 22 )
+shape = SubResource( 23 )
+
+[node name="HitArea" type="Area2D" parent="."]
+collision_layer = 512
+collision_mask = 512
+
+[node name="UpDown" type="CollisionPolygon2D" parent="HitArea"]
+polygon = PoolVector2Array( -2, 1, -2, -17, -1, -18, 1, -18, 2, -17, 2, 1 )
+
+[node name="LeftRight" type="CollisionPolygon2D" parent="HitArea"]
+polygon = PoolVector2Array( -2, 1, -2, -17, -1, -18, 1, -18, 2, -17, 2, 1 )

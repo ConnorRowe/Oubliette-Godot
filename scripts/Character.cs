@@ -3,12 +3,12 @@ using System.Drawing;
 using System.Collections.Generic;
 using Stats;
 
-public enum Direction
+public enum Direction : byte
 {
-    Up,
-    Right,
-    Down,
-    Left
+    Up = 0,
+    Right = 1,
+    Down = 2,
+    Left = 3
 }
 static class DirectionExt
 {
@@ -164,10 +164,14 @@ public abstract class Character : KinematicBody2D
     protected float jumpVelocity = 0f;
     public int currentHealth = 0;
     public bool isDead = false;
+    public bool checkSlideCollisions = false;
+    private float checkSlideMaxCD = 0.15f;
+    private float checkSlideCD = 0.0f;
 
     public HashSet<Buff> Buffs = new HashSet<Buff>();
 
     public virtual float GetMaxSpeed() { return maxSpeed; }
+    public virtual float GetAcceleration() { return acceleration; }
 
     // Directions must be normalised
     public Vector2 dir = new Vector2();
@@ -183,6 +187,11 @@ public abstract class Character : KinematicBody2D
     private KinematicBody2D hitbox;
     private CollisionPolygon2D upDownCollider;
     private CollisionPolygon2D rightLeftCollider;
+    private Area2D hitArea;
+    private CollisionPolygon2D upDownHitAreaPoly;
+    private CollisionPolygon2D rightLeftHitAreaPoly;
+
+    public Area2D HitArea { get { return hitArea; } }
 
     // Export
     [Export]
@@ -191,6 +200,12 @@ public abstract class Character : KinematicBody2D
     NodePath _upDownColliderPath;
     [Export]
     NodePath _rightLeftColliderPath;
+    [Export]
+    NodePath _hitAreaPath;
+    [Export]
+    NodePath _upDownHitAreaPolyPath;
+    [Export]
+    NodePath _rightLeftHitAreaPolyPath;
     [Export]
     private NodePath _charSpritePath;
     [Export]
@@ -215,6 +230,8 @@ public abstract class Character : KinematicBody2D
     // Signals
     [Signal]
     public delegate void HealthChanged(int currentHealth, int maxHealth);
+    [Signal]
+    public delegate void SlideCollision(KinematicCollision2D collision);
 
     public abstract Vector2 GetInputAxis(float delta);
 
@@ -226,6 +243,9 @@ public abstract class Character : KinematicBody2D
         hitbox = GetNode<KinematicBody2D>(_hitboxPath);
         upDownCollider = GetNode<CollisionPolygon2D>(_upDownColliderPath);
         rightLeftCollider = GetNode<CollisionPolygon2D>(_rightLeftColliderPath);
+        hitArea = GetNode<Area2D>(_hitAreaPath);
+        upDownHitAreaPoly = GetNode<CollisionPolygon2D>(_upDownHitAreaPolyPath);
+        rightLeftHitAreaPoly = GetNode<CollisionPolygon2D>(_rightLeftHitAreaPolyPath);
 
         currentHealth = maxHealth;
 
@@ -268,29 +288,37 @@ public abstract class Character : KinematicBody2D
         // Update active hitbox collider
         upDownCollider.Disabled = true;
         rightLeftCollider.Disabled = true;
+        upDownHitAreaPoly.Disabled = true;
+        rightLeftHitAreaPoly.Disabled = true;
 
         switch (GetFacingDirection())
         {
             case Direction.Up:
                 {
                     upDownCollider.Disabled = false;
+                    upDownHitAreaPoly.Disabled = false;
                     break;
                 }
             case Direction.Right:
                 {
                     rightLeftCollider.Disabled = false;
+                    rightLeftHitAreaPoly.Disabled = false;
                     rightLeftCollider.Scale = new Vector2(1, 1);
+                    rightLeftHitAreaPoly.Scale = new Vector2(1, 1);
                     break;
                 }
             case Direction.Down:
                 {
                     upDownCollider.Disabled = false;
+                    upDownHitAreaPoly.Disabled = false;
                     break;
                 }
             case Direction.Left:
                 {
                     rightLeftCollider.Disabled = false;
+                    rightLeftHitAreaPoly.Disabled = false;
                     rightLeftCollider.Scale = new Vector2(-1, 1);
+                    rightLeftHitAreaPoly.Scale = new Vector2(-1, 1);
                     break;
                 }
         }
@@ -319,7 +347,7 @@ public abstract class Character : KinematicBody2D
         {
             if (speed < GetMaxSpeed())
             {
-                speed += acceleration;
+                speed += GetAcceleration();
 
             }
             if (speed > GetMaxSpeed())
@@ -353,6 +381,22 @@ public abstract class Character : KinematicBody2D
 
         // Apply movement velocity
         MoveAndSlide(finalVelocity * delta * 100.0f);
+
+        // Report slide collision
+        if (checkSlideCollisions && checkSlideCD <= 0.0f)
+        {
+            checkSlideCD = checkSlideMaxCD;
+
+            int slideCount = GetSlideCount();
+
+            if (slideCount > 0)
+                EmitSignal(nameof(SlideCollision), GetSlideCollision(slideCount - 1));
+        }
+
+        if (checkSlideCD > 0.0f)
+        {
+            checkSlideCD -= delta;
+        }
 
         // Dampen external velocity over time
         externalVelocity -= externalVelocity.Normalized() * externalVelocity.Length() * 0.9f * (delta * 8.0f);
@@ -417,44 +461,44 @@ public abstract class Character : KinematicBody2D
     }
 
     // Tuple(animation name, FlipH, freeze frame if >= 0)
-    public virtual (string, bool, int) GetSpriteAnimation()
+    public virtual (string name, bool flipH, int freezeFrame) GetSpriteAnimation()
     {
         if (isDead)
             return (_animDeath, false, -1);
 
-        (string, bool, int) anim = ("", false, -1);
+        (string name, bool flipH, int freezeFrame) anim = ("", false, -1);
 
         switch (GetFacingDirection())
         {
             case Direction.Up:
                 {
-                    anim.Item1 = _animUp;
-                    anim.Item2 = false;
+                    anim.name = _animUp;
+                    anim.flipH = false;
                     break;
                 }
             case Direction.Right:
                 {
-                    anim.Item1 = _animLeftRight;
-                    anim.Item2 = false;
+                    anim.name = _animLeftRight;
+                    anim.flipH = false;
                     break;
                 }
             case Direction.Down:
                 {
-                    anim.Item1 = _animDown;
-                    anim.Item2 = false;
+                    anim.name = _animDown;
+                    anim.flipH = false;
                     break;
                 }
             case Direction.Left:
                 {
-                    anim.Item1 = _animLeftRight;
-                    anim.Item2 = true;
+                    anim.name = _animLeftRight;
+                    anim.flipH = true;
                     break;
                 }
         }
 
         if (movementVelocity.Length() <= 0.001f)
         {
-            anim.Item3 = 0;
+            anim.freezeFrame = 0;
         }
 
         return anim;
@@ -464,8 +508,8 @@ public abstract class Character : KinematicBody2D
     {
         var anim = GetSpriteAnimation();
 
-        charSprite.Animation = anim.Item1;
-        charSprite.FlipH = anim.Item2;
+        charSprite.Animation = anim.name;
+        charSprite.FlipH = anim.flipH;
 
         if (anim.Item3 >= 0)
         {
