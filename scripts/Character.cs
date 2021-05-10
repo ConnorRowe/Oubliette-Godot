@@ -367,8 +367,8 @@ public abstract class Character : KinematicBody2D
 
             int slideCount = GetSlideCount();
 
-            if (slideCount > 0)
-                EmitSignal(nameof(SlideCollision), GetSlideCollision(slideCount - 1));
+            for (int i = 0; i < slideCount; i++)
+                onSlideCollision(GetSlideCollision(i));
         }
 
         if (checkSlideCD > 0.0f)
@@ -391,6 +391,11 @@ public abstract class Character : KinematicBody2D
                 elevation = 0;
         }
 
+    }
+
+    public virtual void onSlideCollision(KinematicCollision2D kinematicCollision)
+    {
+        EmitSignal(nameof(SlideCollision), kinematicCollision);
     }
 
     public bool IsAirborne()
@@ -527,6 +532,14 @@ public abstract class Character : KinematicBody2D
         {
             Die();
         }
+    }
+
+    public virtual void Heal(int healing)
+    {
+        currentHealth += healing;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        EmitSignal(nameof(HealthChanged), currentHealth, maxHealth);
     }
 
     public virtual void Die()

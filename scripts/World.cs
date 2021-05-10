@@ -31,7 +31,7 @@ public class World : Node2D
     //Other
     public List<Vector2[]> debugLines = new List<Vector2[]>();
 
-    public override void _Ready()   
+    public override void _Ready()
     {
         debugPoint = GD.Load<Texture>("res://textures/2x2_white.png");
         camera = GetNode<Player>("Player").GetNode<Camera2D>("Camera2D");
@@ -51,7 +51,7 @@ public class World : Node2D
 
     public DebugOverlay GetDebugOverlay()
     {
-        if(debugOverlay == null)
+        if (debugOverlay == null)
         {
             debugOverlay = GetNode<DebugOverlay>(_debugOverlayPath);
             return debugOverlay;
@@ -62,9 +62,9 @@ public class World : Node2D
         }
     }
 
-    public override void _UnhandledInput(InputEvent evt)
+    public override void _Input(InputEvent evt)
     {
-        base._UnhandledInput(evt);
+        base._Input(evt);
 
         if (evt is InputEventMouseButton emb)
         {
@@ -87,6 +87,12 @@ public class World : Node2D
                 {
                     // healthContainer.ChangeHealth(-1);
                 }
+                if (emb.ButtonIndex == (int)ButtonList.Middle)
+                {
+                    BasePickup newPickUp = GD.Load<PackedScene>("res://scenes/ElementalFruit.tscn").Instance<BasePickup>();
+                    newPickUp.Position = camera.GetGlobalMousePosition();
+                    AddChild(newPickUp);
+                }
             }
         }
     }
@@ -96,11 +102,11 @@ public class World : Node2D
         base._Draw();
 
         // Draw debug lines
-        foreach(Vector2[] line in debugLines)
+        foreach (Vector2[] line in debugLines)
         {
-            for(int i = 0; i < line.Length - 1; ++i)
+            for (int i = 0; i < line.Length - 1; ++i)
             {
-                DrawLine(line[i], line[i+1], Colors.Magenta, 10.0f);
+                DrawLine(line[i], line[i + 1], Colors.Magenta, 10.0f);
             }
         }
     }
