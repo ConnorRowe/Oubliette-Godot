@@ -24,7 +24,7 @@ public class Player : Character, ICastsSpells
     private Godot.Collections.Dictionary<Direction, Vector2> staffOrigins = new Godot.Collections.Dictionary<Direction, Vector2>() { { Direction.Up, new Vector2(4.0f, -10.0f) }, { Direction.Right, new Vector2(0.0f, -8.0f) }, { Direction.Down, new Vector2(-4.0f, -10.0f) }, { Direction.Left, new Vector2(0.0f, -10.0f) } };
     private Godot.Collections.Dictionary<Direction, Vector2> armOrigins = new Godot.Collections.Dictionary<Direction, Vector2>() { { Direction.Up, new Vector2(2.5f, -11.0f) }, { Direction.Right, new Vector2(-0.5f, -11.0f) }, { Direction.Down, new Vector2(-2.5f, -11.0f) }, { Direction.Left, new Vector2(0.5f, -11.0f) } };
     private Physics2DShapeQueryParameters hitAreaShapeQuery;
-    private HashSet<Area2D> intersectedAreas = new HashSet<Area2D>();
+    private HashSet<Node> intersectedAreas = new HashSet<Node>();
 
     // Nodes
     public Camera2D camera;
@@ -89,8 +89,9 @@ public class Player : Character, ICastsSpells
         hitAreaShapeQuery.SetShape(hitBoxTraceShape);
         hitAreaShapeQuery.Transform = new Transform2D(0.0f, GlobalPosition + new Vector2(0, -9.0f));
         hitAreaShapeQuery.CollideWithAreas = true;
+        hitAreaShapeQuery.CollideWithBodies = true;
         hitAreaShapeQuery.CollisionLayer = 512;
-        hitAreaShapeQuery.Exclude = new Godot.Collections.Array() { this, HitArea };
+        hitAreaShapeQuery.Exclude = new Godot.Collections.Array() { this };
     }
 
     public override void _Input(InputEvent evt)
@@ -274,29 +275,32 @@ public class Player : Character, ICastsSpells
 
         hitAreaShapeQuery.Transform = new Transform2D(0.0f, GlobalPosition + new Vector2(0, -8.0f));
         Godot.Collections.Array hitResult = spaceState.IntersectShape(hitAreaShapeQuery);
-        HashSet<Area2D> hitAreas = new HashSet<Area2D>();
+        HashSet<Node> hitNodes = new HashSet<Node>();
 
         foreach (Godot.Collections.Dictionary hit in hitResult)
         {
-            Area2D hitArea = ((Area2D)hit["collider"]);
-            hitAreas.Add(hitArea);
+            Node hitNode = ((Node)hit["collider"]);
+            hitNodes.Add(hitNode);
 
-            if (!intersectedAreas.Contains(hitArea))
+            if (!intersectedAreas.Contains(hitNode))
             {
-                intersectedAreas.Add(hitArea);
-                if (hitArea is IIntersectsPlayerHitArea hitable)
+                intersectedAreas.Add(hitNode);
+
+                if (hitNode is IIntersectsPlayerHitArea hitable)
                 {
                     hitable.PlayerHit(this);
+                    GD.Print("Player hit " + hitNode.Name);
                 }
-                else if (hitArea.GetParent() is IIntersectsPlayerHitArea parentHitable)
+                else if (hitNode.GetParent() is IIntersectsPlayerHitArea parentHitable)
                 {
                     parentHitable.PlayerHit(this);
+                    GD.Print("Player hit " + hitNode.GetParent().Name);
                 }
             }
         }
 
         // remove intersections that no longer exist
-        intersectedAreas.RemoveWhere((Area2D area) => { return !hitAreas.Contains(area); });
+        intersectedAreas.RemoveWhere((Node node) => { return !hitNodes.Contains(node); });
     }
 
     private bool TryInteract()

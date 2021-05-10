@@ -187,11 +187,6 @@ public abstract class Character : KinematicBody2D
     private KinematicBody2D hitbox;
     private CollisionPolygon2D upDownCollider;
     private CollisionPolygon2D rightLeftCollider;
-    private Area2D hitArea;
-    private CollisionPolygon2D upDownHitAreaPoly;
-    private CollisionPolygon2D rightLeftHitAreaPoly;
-
-    public Area2D HitArea { get { return hitArea; } }
 
     // Export
     [Export]
@@ -200,12 +195,6 @@ public abstract class Character : KinematicBody2D
     NodePath _upDownColliderPath;
     [Export]
     NodePath _rightLeftColliderPath;
-    [Export]
-    NodePath _hitAreaPath;
-    [Export]
-    NodePath _upDownHitAreaPolyPath;
-    [Export]
-    NodePath _rightLeftHitAreaPolyPath;
     [Export]
     private NodePath _charSpritePath;
     [Export]
@@ -243,9 +232,6 @@ public abstract class Character : KinematicBody2D
         hitbox = GetNode<KinematicBody2D>(_hitboxPath);
         upDownCollider = GetNode<CollisionPolygon2D>(_upDownColliderPath);
         rightLeftCollider = GetNode<CollisionPolygon2D>(_rightLeftColliderPath);
-        hitArea = GetNode<Area2D>(_hitAreaPath);
-        upDownHitAreaPoly = GetNode<CollisionPolygon2D>(_upDownHitAreaPolyPath);
-        rightLeftHitAreaPoly = GetNode<CollisionPolygon2D>(_rightLeftHitAreaPolyPath);
 
         currentHealth = maxHealth;
 
@@ -288,37 +274,29 @@ public abstract class Character : KinematicBody2D
         // Update active hitbox collider
         upDownCollider.Disabled = true;
         rightLeftCollider.Disabled = true;
-        upDownHitAreaPoly.Disabled = true;
-        rightLeftHitAreaPoly.Disabled = true;
 
         switch (GetFacingDirection())
         {
             case Direction.Up:
                 {
                     upDownCollider.Disabled = false;
-                    upDownHitAreaPoly.Disabled = false;
                     break;
                 }
             case Direction.Right:
                 {
                     rightLeftCollider.Disabled = false;
-                    rightLeftHitAreaPoly.Disabled = false;
                     rightLeftCollider.Scale = new Vector2(1, 1);
-                    rightLeftHitAreaPoly.Scale = new Vector2(1, 1);
                     break;
                 }
             case Direction.Down:
                 {
                     upDownCollider.Disabled = false;
-                    upDownHitAreaPoly.Disabled = false;
                     break;
                 }
             case Direction.Left:
                 {
                     rightLeftCollider.Disabled = false;
-                    rightLeftHitAreaPoly.Disabled = false;
                     rightLeftCollider.Scale = new Vector2(-1, 1);
-                    rightLeftHitAreaPoly.Scale = new Vector2(-1, 1);
                     break;
                 }
         }

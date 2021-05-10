@@ -80,6 +80,8 @@ public class ChargeBehaviour : MovementBehaviour
                 character.ApplyKnockBack(getDirection().AsVector() * 200.0f);
             }
 
+            mgr.owner.ApplyKnockBack(getDirection().Opposite().AsVector() * 100.0f);
+
             shouldStop = true;
             (mgr.owner as Snail).IsCharging = false;
         }
