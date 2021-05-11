@@ -1,0 +1,23 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://scenes/BasePickup.tscn" type="PackedScene" id=1]
+[ext_resource path="res://textures/potion_empty.png" type="Texture" id=2]
+[ext_resource path="res://textures/potion_fill.png" type="Texture" id=3]
+[ext_resource path="res://materials/PotionFill.shader" type="Shader" id=4]
+[ext_resource path="res://scripts/Potion.cs" type="Script" id=5]
+
+[sub_resource type="ShaderMaterial" id=1]
+shader = ExtResource( 4 )
+shader_param/time_factor = 0.5
+shader_param/colour_lerp_a = Color( 0.827451, 1, 0, 1 )
+shader_param/colour_lerp_b = Color( 0.313726, 1, 0, 1 )
+shader_param/colour_lerp_c = Color( 0, 0.670588, 1, 1 )
+shader_param/fill_texture = ExtResource( 3 )
+
+[node name="Potion" instance=ExtResource( 1 )]
+script = ExtResource( 5 )
+
+[node name="MainSprite" parent="." index="0"]
+material = SubResource( 1 )
+position = Vector2( 0, -4 )
+texture = ExtResource( 2 )

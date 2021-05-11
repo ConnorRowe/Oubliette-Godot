@@ -6,65 +6,35 @@
 [ext_resource path="res://textures/elemental_fruit_rgbmasked.png" type="Texture" id=4]
 [ext_resource path="res://scripts/ElementalFruit.cs" type="Script" id=5]
 [ext_resource path="res://textures/elemental_fruit_outerglow.png" type="Texture" id=6]
+[ext_resource path="res://materials/ThreeColourLerpGlow.shader" type="Shader" id=7]
 
-[sub_resource type="ShaderMaterial" id=3]
+[sub_resource type="ShaderMaterial" id=1]
 shader = ExtResource( 3 )
-shader_param/time_factor = 1.5
+shader_param/time_factor = 1.2
 shader_param/red_channel_colour_lerp_a = Color( 1, 0, 0, 1 )
-shader_param/red_channel_colour_lerp_b = Color( 1, 1, 1, 1 )
+shader_param/red_channel_colour_lerp_b = Color( 0.760784, 0.760784, 0.760784, 1 )
 shader_param/red_channel_colour_lerp_c = Color( 0, 0.764706, 1, 1 )
-shader_param/green_channel_colour = Color( 0.0657, 0.73, 0.309277, 1 )
-shader_param/blue_channel_colour = Color( 1, 0.894118, 0.321569, 1 )
+shader_param/green_channel_colour = Color( 0, 0.81, 0.162, 1 )
+shader_param/blue_channel_colour = Color( 0.909804, 0.866667, 0.247059, 1 )
 shader_param/highlight_texture = ExtResource( 2 )
 
-[sub_resource type="Shader" id=1]
-code = "shader_type canvas_item;
-render_mode blend_add;
-
-uniform float time_factor = 1.0;
-uniform float glow_strength = 1.0;
-uniform vec4 colour_lerp_a : hint_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
-uniform vec4 colour_lerp_b : hint_color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
-uniform vec4 colour_lerp_c : hint_color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
-
-float sat(float val)
-{
-	return clamp(val, 0.0, 1.0);
-}
-
-vec4 lerp_3_vec4(vec4 a, vec4 b, vec4 c, float time)
-{
-	float t = (sin(time) + 1.0) * time_factor;
-	return mix(mix(a, b, sat(t - 1.0f)), c, sat(t - 2.0));
-}
-
-void vertex()
-{
-	COLOR = lerp_3_vec4(colour_lerp_a, colour_lerp_b, colour_lerp_c, TIME);
-}
-
-void fragment()
-{
-	COLOR.a = texture(TEXTURE, UV).r * glow_strength;
-}"
-
 [sub_resource type="ShaderMaterial" id=2]
-shader = SubResource( 1 )
-shader_param/time_factor = 1.5
+shader = ExtResource( 7 )
+shader_param/time_factor = 1.2
 shader_param/glow_strength = 0.2
 shader_param/colour_lerp_a = Color( 1, 0, 0, 1 )
-shader_param/colour_lerp_b = Color( 0.76, 0.76, 0.76, 1 )
+shader_param/colour_lerp_b = Color( 0.760784, 0.760784, 0.760784, 1 )
 shader_param/colour_lerp_c = Color( 0, 0.764706, 1, 1 )
 
-[sub_resource type="CapsuleShape2D" id=4]
+[sub_resource type="CapsuleShape2D" id=3]
 radius = 3.0
 height = 4.0
 
 [node name="ElementalFruit" instance=ExtResource( 1 )]
 script = ExtResource( 5 )
 
-[node name="Sprite" parent="." index="0"]
-material = SubResource( 3 )
+[node name="MainSprite" parent="." index="0"]
+material = SubResource( 1 )
 texture = ExtResource( 4 )
 
 [node name="Glow" type="Sprite" parent="." index="1"]
@@ -75,4 +45,4 @@ texture = ExtResource( 6 )
 [node name="CollisionShape2D" parent="." index="2"]
 position = Vector2( 0, -3 )
 rotation = 1.5708
-shape = SubResource( 4 )
+shape = SubResource( 3 )

@@ -18,7 +18,7 @@ float sat(float val)
 
 vec4 lerp_3_vec4(vec4 a, vec4 b, vec4 c, float time)
 {
-	float t = (sin(time) + 1.0) * time_factor;
+	float t = (sin(time * time_factor) + 1.0) * 2.0;
 	return mix(mix(a, b, sat(t - 1.0f)), c, sat(t - 2.0));
 }
 

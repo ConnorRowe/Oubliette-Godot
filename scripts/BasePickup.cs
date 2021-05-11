@@ -2,19 +2,21 @@ using Godot;
 
 public class BasePickup : RigidBody2D, IIntersectsPlayerHitArea
 {
+    private Sprite _mainSprite;
+
+    protected Sprite MainSprite
+    {
+        get
+        {
+            if (_mainSprite == null)
+                _mainSprite = GetNode<Sprite>("MainSprite");
+            
+            return _mainSprite;
+        }
+    }
     public override void _Ready()
     {
         base._Ready();
-
-        Connect("body_entered", this, nameof(BodyEntered));
-    }
-
-    private void BodyEntered(Node body)
-    {
-        if (body is Player player)
-        {
-            PlayerHit(player);
-        }
     }
 
     void IIntersectsPlayerHitArea.PlayerHit(Player player)

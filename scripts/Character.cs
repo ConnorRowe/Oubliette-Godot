@@ -358,7 +358,7 @@ public abstract class Character : KinematicBody2D
         Vector2 finalVelocity = movementVelocity + externalVelocity;
 
         // Apply movement velocity
-        MoveAndSlide(finalVelocity * delta * 100.0f);
+        Vector2 slideVelocity = MoveAndSlide(finalVelocity * delta * 100.0f, infiniteInertia: false);
 
         // Report slide collision
         if (checkSlideCollisions && checkSlideCD <= 0.0f)
@@ -368,7 +368,7 @@ public abstract class Character : KinematicBody2D
             int slideCount = GetSlideCount();
 
             for (int i = 0; i < slideCount; i++)
-                onSlideCollision(GetSlideCollision(i));
+                OnSlideCollision(GetSlideCollision(i), slideVelocity);
         }
 
         if (checkSlideCD > 0.0f)
@@ -390,11 +390,15 @@ public abstract class Character : KinematicBody2D
             if (elevation < 0)
                 elevation = 0;
         }
-
     }
 
-    public virtual void onSlideCollision(KinematicCollision2D kinematicCollision)
+    public virtual void OnSlideCollision(KinematicCollision2D kinematicCollision, Vector2 slideVelocity)
     {
+        if(kinematicCollision.Collider is RigidBody2D rigidBody)
+        {
+            rigidBody.ApplyCentralImpulse(-kinematicCollision.Normal * GetMaxSpeed());
+        }
+
         EmitSignal(nameof(SlideCollision), kinematicCollision);
     }
 

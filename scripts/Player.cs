@@ -84,6 +84,8 @@ public class Player : Character, ICastsSpells
         DebugOverlay debug = world.GetDebugOverlay();
         debug.TrackFunc(nameof(GetStatValue), this, "Dmg Res", Stat.ResistDamageFlat);
         debug.TrackFunc(nameof(GetStatValue), this, "Dmg Refl", Stat.ReflectDamageFlat);
+        debug.TrackFunc(nameof(GetStatValue), this, "+Dmg", Stat.DamageFlat);
+        debug.TrackFunc(nameof(GetStatValue), this, "Range%", Stat.RangeMultiplier);
 
         hitAreaShapeQuery = new Physics2DShapeQueryParameters();
         hitAreaShapeQuery.SetShape(hitBoxTraceShape);
@@ -92,6 +94,8 @@ public class Player : Character, ICastsSpells
         hitAreaShapeQuery.CollideWithBodies = true;
         hitAreaShapeQuery.CollisionLayer = 512;
         hitAreaShapeQuery.Exclude = new Godot.Collections.Array() { this };
+
+        checkSlideCollisions = true;
     }
 
     public override void _Input(InputEvent evt)
@@ -301,6 +305,16 @@ public class Player : Character, ICastsSpells
 
         // remove intersections that no longer exist
         intersectedAreas.RemoveWhere((Node node) => { return !hitNodes.Contains(node); });
+    }
+
+    public override void OnSlideCollision(KinematicCollision2D kinematicCollision, Vector2 slideVelocity)
+    {
+        base.OnSlideCollision(kinematicCollision, slideVelocity);
+
+        if(kinematicCollision.Collider is BasePickup pickup)
+        {
+            pickup.PlayerHit(this);
+        }
     }
 
     private bool TryInteract()
