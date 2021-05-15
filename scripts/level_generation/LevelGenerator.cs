@@ -13,6 +13,7 @@ public class LevelGenerator : Node, IProvidesNav
     public Point CurrentRoom { get { return currentRoom; } }
 
     private List<PackedScene> possibleRooms = new List<PackedScene>();
+    private List<PackedScene> treasureRooms = new List<PackedScene>();
     public Dictionary<Point, Room> generatedRooms = new Dictionary<Point, Room>();
     private int roomsToGen = 12;
     private readonly Point[] pointDirections = new Point[4] { new Point(0, 1), new Point(1, 0), new Point(0, -1), new Point(-1, 0) };
@@ -25,6 +26,8 @@ public class LevelGenerator : Node, IProvidesNav
 
     [Export]
     private string rooms_directory = "res://scenes/level_generation/rooms/";
+    [Export]
+    private string treasure_rooms_directory = "res://scenes/level_generation/treasure_rooms/";
     [Export]
     private Godot.Collections.Array<PackedScene> possibleEnemies = new Godot.Collections.Array<PackedScene>();
     [Export(hintString: "The tilemap to add wall tiles to.")]
@@ -50,16 +53,8 @@ public class LevelGenerator : Node, IProvidesNav
         floorTiles = GetNode<TileMap>(_floorTileMapPath);
         NavMesh = GetNode<Navigation2D>(_navigationPath);
 
-        Directory directory = new Directory();
-        directory.Open(rooms_directory);
-        directory.ListDirBegin(skipNavigational: true);
-
-        string file = directory.GetNext();
-        do
-        {
-            possibleRooms.Add(GD.Load<PackedScene>(rooms_directory + file));
-            file = directory.GetNext();
-        } while (!file.Empty());
+        LoadRoomsFromDirectory(rooms_directory, possibleRooms);
+        LoadRoomsFromDirectory(treasure_rooms_directory, treasureRooms);
 
         // Generate level
         CallDeferred(nameof(GenerateLevel));
@@ -113,6 +108,21 @@ public class LevelGenerator : Node, IProvidesNav
         }
     }
 
+    private void LoadRoomsFromDirectory(string fileDirectory, List<PackedScene> roomScenesList)
+    {
+        Directory directory = new Directory();
+        directory.Open(fileDirectory);
+        directory.ListDirBegin(skipNavigational: true);
+
+        string file = directory.GetNext();
+        do
+        {
+            roomScenesList.Add(GD.Load<PackedScene>(fileDirectory + file));
+            file = directory.GetNext();
+        } while (!file.Empty());
+
+    }
+
     private int[,] GenerateLevelGrid()
     {
         int[,] grid = new int[gridWidth, gridHeight];
@@ -124,6 +134,9 @@ public class LevelGenerator : Node, IProvidesNav
             }
         }
         List<Point> rooms = new List<Point>();
+
+        // at least one treasure room must be generated
+        List<int> requiredSpecialRooms = new List<int>() { 1 };
 
         for (int i = 0; i < roomsToGen; ++i)
         {
@@ -155,7 +168,30 @@ public class LevelGenerator : Node, IProvidesNav
                 }
 
                 rooms.Add(next);
-                grid[next.X, next.Y] = 0;
+
+                int nextRoomID = 0;
+
+                // Generate special room if needed or at random
+                if (requiredSpecialRooms.Count > 0)
+                {
+                    if (roomsToGen - i <= requiredSpecialRooms.Count)
+                    {
+                        int specialRoomIndex = rng.RandiRange(0, requiredSpecialRooms.Count - 1);
+                        nextRoomID = requiredSpecialRooms[specialRoomIndex];
+                        requiredSpecialRooms.RemoveAt(specialRoomIndex);
+                    }
+                    else
+                    {
+                        if (rng.Randf() < 0.25f)
+                        {
+                            int specialRoomIndex = rng.RandiRange(0, requiredSpecialRooms.Count - 1);
+                            nextRoomID = requiredSpecialRooms[specialRoomIndex];
+                            requiredSpecialRooms.RemoveAt(specialRoomIndex);
+                        }
+                    }
+                }
+
+                grid[next.X, next.Y] = nextRoomID;
             }
         }
 
@@ -203,9 +239,10 @@ public class LevelGenerator : Node, IProvidesNav
             {
                 if (grid[x, y] >= 0)
                 {
-                    Room nextRoom = RandomRoomInstance();
+                    Room nextRoom = RandomRoomFromIndex(grid[x, y]);
                     nextRoom.Position = new Vector2(x, y) * nextRoom.Width * 16.0f;
                     nextRoom.Name = "Room_" + generatedRooms.Count;
+                    nextRoom.roomType = grid[x, y];
 
                     generatedRooms.Add(new Point(x, y), nextRoom);
                     GetParent().CallDeferred("add_child", nextRoom);
@@ -222,7 +259,7 @@ public class LevelGenerator : Node, IProvidesNav
                 pos.Offset(d.AsPoint());
                 if (generatedRooms.ContainsKey(pos))
                 {
-                    room.Value.connections[d] = true;
+                    room.Value.connections[d] = generatedRooms[pos].roomType;
                 }
             }
 
@@ -256,11 +293,11 @@ public class LevelGenerator : Node, IProvidesNav
             // Unify TileMaps by copying each tile from each room into the level generator's tilemaps
             foreach (Vector2 tile in room.Value.WallTiles.GetUsedCells())
             {
-                wallTiles.SetCellv((room.Value.Position / 16) + tile, 0);
+                wallTiles.SetCellv((room.Value.Position / 16) + tile, room.Value.WallTiles.GetCell(Mathf.FloorToInt(tile.x), Mathf.FloorToInt(tile.y)));
             }
             foreach (Vector2 tile in room.Value.FloorTiles.GetUsedCells())
             {
-                floorTiles.SetCellv((room.Value.Position / 16) + tile, 0);
+                floorTiles.SetCellv((room.Value.Position / 16) + tile, room.Value.FloorTiles.GetCell(Mathf.FloorToInt(tile.x), Mathf.FloorToInt(tile.y)));
             }
 
             room.Value.WallTiles.CallDeferred("queue_free");
@@ -284,9 +321,22 @@ public class LevelGenerator : Node, IProvidesNav
         EmitSignal(nameof(RoomCleared), currentRoom.X, currentRoom.Y);
     }
 
-    private Room RandomRoomInstance()
+    private Room RandomRoomFromIndex(int index)
     {
-        return possibleRooms[rng.RandiRange(0, possibleRooms.Count - 1)].Instance<Room>();
+        switch (index)
+        {
+            case 0:
+                return RandomRoomInstance(possibleRooms);
+            case 1:
+                return RandomRoomInstance(treasureRooms);
+        }
+
+        return null;
+    }
+
+    private Room RandomRoomInstance(List<PackedScene> roomScenesList)
+    {
+        return roomScenesList[rng.RandiRange(0, roomScenesList.Count - 1)].Instance<Room>();
     }
 
     private AICharacter RandomEnemyInstance()
@@ -314,6 +364,8 @@ public class LevelGenerator : Node, IProvidesNav
         roomBorder.Position = generatedRooms[currentRoom].Position + new Vector2(176, 144);
 
         EmitSignal(nameof(RoomChanged), this);
+
+        generatedRooms[currentRoom].RoomEntered();
     }
 
     private void DoorHit(Direction dir)

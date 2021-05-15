@@ -82,10 +82,10 @@ public class Player : Character, ICastsSpells
         secondarySpell = _Spells.IceSkin;
 
         DebugOverlay debug = world.GetDebugOverlay();
-        debug.TrackFunc(nameof(GetStatValue), this, "Dmg Res", Stat.ResistDamageFlat);
-        debug.TrackFunc(nameof(GetStatValue), this, "Dmg Refl", Stat.ReflectDamageFlat);
-        debug.TrackFunc(nameof(GetStatValue), this, "+Dmg", Stat.DamageFlat);
-        debug.TrackFunc(nameof(GetStatValue), this, "Range%", Stat.RangeMultiplier);
+        debug.TrackFunc(nameof(GetSpellDamage), this, "DMG", 1);
+        debug.TrackFunc(nameof(GetSpellRange), this, "RNG", 1);
+        debug.TrackFunc(nameof(GetSpellKnockback), this, "KBK", 1);
+        debug.TrackFunc(nameof(GetSpellSpeed), this, "SPD", 1);
 
         hitAreaShapeQuery = new Physics2DShapeQueryParameters();
         hitAreaShapeQuery.SetShape(hitBoxTraceShape);
@@ -311,9 +311,9 @@ public class Player : Character, ICastsSpells
     {
         base.OnSlideCollision(kinematicCollision, slideVelocity);
 
-        if(kinematicCollision.Collider is BasePickup pickup)
+        if(kinematicCollision.Collider is IIntersectsPlayerHitArea hittable)
         {
-            pickup.PlayerHit(this);
+            hittable.PlayerHit(this);
         }
     }
 

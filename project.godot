@@ -22,6 +22,7 @@ default_bus_layout="res://sound/default_bus_layout.tres"
 [autoload]
 
 Spells="*res://scripts/singletons/Spells.cs"
+Artefacts="*res://scripts/singletons/Artefacts.cs"
 
 [display]
 

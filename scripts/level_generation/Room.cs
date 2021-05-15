@@ -35,6 +35,7 @@ public class Room : Node2D
     }
 
     public bool firstRoom = false;
+    public int roomType = -1;
     public int enemyCounter;
     public Dictionary<Direction, AnimatedSprite> doors = new Dictionary<Direction, AnimatedSprite>();
     public List<AICharacter> enemies = new List<AICharacter>();
@@ -47,8 +48,10 @@ public class Room : Node2D
     public uint Width;
     [Export]
     public uint Height;
+    [Export]
+    public bool ClearedByDefault = false;
 
-    public Dictionary<Direction, bool> connections = new Dictionary<Direction, bool>() { { Direction.Up, false }, { Direction.Right, false }, { Direction.Down, false }, { Direction.Left, false } };
+    public Dictionary<Direction, int> connections = new Dictionary<Direction, int>() { { Direction.Up, -1 }, { Direction.Right, -1 }, { Direction.Down, -1 }, { Direction.Left, -1 } };
 
 
     public override void _Ready()
@@ -70,7 +73,7 @@ public class Room : Node2D
         }
 
         // Lock doors if not first room
-        UnlockDoors(firstRoom);
+        UnlockDoors(firstRoom || ClearedByDefault);
     }
 
     public Rect2 AsRect()
@@ -78,14 +81,29 @@ public class Room : Node2D
         return new Rect2(this.Position, new Vector2(Width * 16.0f, Height * 16.0f));
     }
 
+    public void RoomEntered()
+    {
+        if (ClearedByDefault)
+            EmitSignal(nameof(Cleared), this);
+    }
+
     public void UpdateDoors()
     {
-        foreach (KeyValuePair<Direction, bool> connection in connections)
+        foreach (KeyValuePair<Direction, int> connection in connections)
         {
-            if (!connection.Value)
+            if (connection.Value < 0)
             {
                 doors[connection.Key].QueueFree();
                 doors.Remove(connection.Key);
+            }
+            else if (connection.Value > 0)
+            {
+                switch (connection.Value)
+                {
+                    case 1:
+                        doors[connection.Key].Modulate = new Color(1, 0.937255f, 0);
+                        break;
+                }
             }
         }
     }

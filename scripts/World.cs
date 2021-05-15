@@ -89,10 +89,14 @@ public class World : Node2D
                 }
                 if (emb.ButtonIndex == (int)ButtonList.Middle)
                 {
-                    Potion potion = GD.Load<PackedScene>("res://scenes/Potion.tscn").Instance<Potion>();
-                    potion.Position = camera.GetGlobalMousePosition();
-                    AddChild(potion);
-                    potion.SetPotionEffects(new (Stats.Stat stat, float amount)[] { (Stats.Stat.DamageFlat, 1.0f), (Stats.Stat.RangeMultiplier, 2.0f) }, 10.0f, "Philter of Power", Colors.DarkRed, Colors.OrangeRed, Colors.Crimson);
+                    // Potion potion = GD.Load<PackedScene>("res://scenes/Potion.tscn").Instance<Potion>();
+                    // potion.Position = camera.GetGlobalMousePosition();
+                    // AddChild(potion);
+                    // potion.SetPotionEffects(new (Stats.Stat stat, float amount)[] { (Stats.Stat.DamageFlat, 1.0f), (Stats.Stat.RangeMultiplier, 2.0f) }, 10.0f, "Philter of Power", Colors.DarkRed, Colors.OrangeRed, Colors.Crimson);
+
+                    Chest chest = GD.Load<PackedScene>("res://scenes/Chest.tscn").Instance<Chest>();
+                    chest.Position = camera.GetGlobalMousePosition();
+                    AddChild(chest);
                 }
             }
         }

@@ -24,6 +24,7 @@ namespace Stats
         public string name;
         public List<(Stat stat, float amount)> stats;
         public uint startTime;
+        // Set duration 0 to be permanent
         public uint duration;
         public BuffSpell notifyExpired;
     }

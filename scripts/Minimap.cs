@@ -7,10 +7,12 @@ public class Minimap : Node2D
     struct RoomMapData
     {
         public bool cleared;
+        public int roomType;
 
-        public RoomMapData(bool cleared)
+        public RoomMapData(bool cleared, int roomType)
         {
             this.cleared = cleared;
+            this.roomType = roomType;
         }
     }
 
@@ -18,6 +20,7 @@ public class Minimap : Node2D
 
     private Dictionary<Point, RoomMapData> discoveredRooms = new Dictionary<Point, RoomMapData>();
     private Point currentRoom = new Point();
+    private Dictionary<int, Texture> specialRoomIcons = new Dictionary<int, Texture>();
 
     [Export]
     private Vector2 size;
@@ -45,6 +48,8 @@ public class Minimap : Node2D
 
         levelGen.Connect(nameof(LevelGenerator.RoomChanged), this, nameof(RoomChanged));
         levelGen.Connect(nameof(LevelGenerator.RoomCleared), this, nameof(RoomCleared));
+
+        specialRoomIcons.Add(1, GD.Load<Texture>("res://textures/treasure_room_minimap_icon.png"));
     }
 
     public override void _Draw()
@@ -68,6 +73,11 @@ public class Minimap : Node2D
 
             DrawTextureRectRegion(roomIcons, roomRect, new Rect2((roomIconSize.x * roomFrame.X), roomIconSize.y * roomFrame.Y, roomIconSize.x, roomIconSize.y));
 
+            if (specialRoomIcons.ContainsKey(room.Value.roomType))
+            {
+                DrawTextureRect(specialRoomIcons[room.Value.roomType], roomRect, false);
+            }
+
             if (room.Key == currentRoom)
             {
                 DrawTextureRect(currentRoomOverlay, roomRect, false);
@@ -88,6 +98,11 @@ public class Minimap : Node2D
     {
         currentRoom = levelGen.CurrentRoom;
 
+        if (!discoveredRooms.ContainsKey(currentRoom))
+        {
+            discoveredRooms.Add(currentRoom, new RoomMapData(false, levelGen.generatedRooms[currentRoom].roomType));
+        }
+
         foreach (Direction dir in DirectionExt.Directions())
         {
             Point newRoom = currentRoom;
@@ -95,7 +110,7 @@ public class Minimap : Node2D
 
             if (levelGen.generatedRooms.ContainsKey(newRoom) && !discoveredRooms.ContainsKey(newRoom))
             {
-                discoveredRooms.Add(newRoom, new RoomMapData(false));
+                discoveredRooms.Add(newRoom, new RoomMapData(false, levelGen.generatedRooms[newRoom].roomType));
             }
         }
 
@@ -104,7 +119,8 @@ public class Minimap : Node2D
 
     private void RoomCleared(int x, int y)
     {
-        discoveredRooms[new Point(x, y)] = new RoomMapData(true);
+        RoomMapData baseData = discoveredRooms[new Point(x, y)];
+        discoveredRooms[new Point(x, y)] = new RoomMapData(true, baseData.roomType);
 
         Update();
     }

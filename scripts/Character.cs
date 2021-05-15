@@ -305,12 +305,12 @@ public abstract class Character : KinematicBody2D
         uint time = OS.GetTicksMsec();
         foreach (Buff buff in Buffs)
         {
-            if (buff.startTime + buff.duration < time)
+            if (buff.duration > 0 && buff.startTime + buff.duration < time)
             {
                 buff.notifyExpired?.BuffExpired();
             }
         }
-        int removedBuffCount = Buffs.RemoveWhere((Buff buff) => { return buff.startTime + buff.duration < time; });
+        int removedBuffCount = Buffs.RemoveWhere((Buff buff) => { return buff.duration > 0 && buff.startTime + buff.duration < time; });
         if (removedBuffCount > 0)
         {
             RecalcStats();
