@@ -11,6 +11,7 @@ public class World : Node2D
     private HealthContainer healthContainer;
     private CanvasModulate globalLighting;
     private Tween tween;
+    private AudioStreamPlayer musicPlayer;
 
     [Export]
     private NodePath _basicAIPath;
@@ -42,11 +43,13 @@ public class World : Node2D
         healthContainer = GetNode<HealthContainer>("CanvasLayer/HealthContainer");
         globalLighting = GetNode<CanvasModulate>(_globalLightingPath);
         tween = GetNode<Tween>(_tweenPath);
+        musicPlayer = GetNode<AudioStreamPlayer>("MusicPlayer");
 
         player.Connect(nameof(Player.HealthChanged), this, nameof(UpdateHealthUI));
         UpdateHealthUI(player.currentHealth, player.maxHealth);
 
         globalLighting.Color = defaultGlobalLighting;
+        musicPlayer.Play();
     }
 
     public DebugOverlay GetDebugOverlay()
