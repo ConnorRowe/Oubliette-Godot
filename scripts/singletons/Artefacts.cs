@@ -46,13 +46,26 @@ public class Artefacts : Node
 
         // Artefact registration
 
-        RegisterArtefact(new Artefact("Lost Blood of a Dead God", GD.Load<Texture>("res://textures/health_potion.png"),
+        RegisterArtefact(new Artefact("Black Bile of a Long Dead God", GD.Load<Texture>("res://textures/dark_potion.png"),
         (Player p) =>
         {
-            p.ApplyBuff(Buffs.CreateBuff("Lost Blood of a Dead God",
+            p.ApplyBuff(Buffs.CreateBuff("Black Bile of a Long Dead God",
         new List<(Stat stat, float amount)>() { (Stat.DamageMultiplier, 2.0f), (Stat.KnockbackMultiplier, -1.0f) }, 0));
         }),
         new LootPool[] { LootPool.GENERAL });
+
+        RegisterArtefact(new Artefact("Vital Elixir", GD.Load<Texture>("res://textures/health_potion.png"),
+        (Player p) =>
+        {
+            p.AdjustMaxHealth(4, true);
+        }), new LootPool[] { LootPool.GENERAL });
+
+        RegisterArtefact(new Artefact("Amanita Muscaria", GD.Load<Texture>("res://textures/amanita_muscaria.png"),
+        (Player p) =>
+        {
+            p.ApplyBuff(Buffs.CreateBuff("Amanita Muscaria",
+        new List<(Stat stat, float amount)>() { (Stat.DamageFlat, 1.0f), (Stat.RangeMultiplier, 1.25f), (Stat.MagykaCostMultiplier, 0.75f) }, 0));
+        }), new LootPool[] { LootPool.GENERAL });
 
         RegisterPickup(GD.Load<PackedScene>("res://scenes/ElementalFruit.tscn"), new LootPool[] { LootPool.GENERAL });
     }

@@ -394,7 +394,7 @@ public abstract class Character : KinematicBody2D
 
     public virtual void OnSlideCollision(KinematicCollision2D kinematicCollision, Vector2 slideVelocity)
     {
-        if(kinematicCollision.Collider is RigidBody2D rigidBody)
+        if (kinematicCollision.Collider is RigidBody2D rigidBody)
         {
             rigidBody.ApplyCentralImpulse(-kinematicCollision.Normal * GetMaxSpeed());
         }
@@ -541,6 +541,18 @@ public abstract class Character : KinematicBody2D
     public virtual void Heal(int healing)
     {
         currentHealth += healing;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        EmitSignal(nameof(HealthChanged), currentHealth, maxHealth);
+    }
+
+    public void AdjustMaxHealth(int adjustment, bool affectCurrentHealth)
+    {
+        maxHealth += adjustment;
+        
+        if (affectCurrentHealth)
+            currentHealth += adjustment;
+
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
         EmitSignal(nameof(HealthChanged), currentHealth, maxHealth);
