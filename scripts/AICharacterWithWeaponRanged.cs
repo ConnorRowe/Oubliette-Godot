@@ -116,4 +116,13 @@ public class AICharacterWithWeaponRanged : AICharacterWithWeapon
     {
         return 999.0f;
     }
+
+    public override void Die()
+    {
+        base.Die();
+
+        // stop spell from charging and firing
+        tween.StopAll();
+        weaponParticles.QueueFree();
+    }
 }
