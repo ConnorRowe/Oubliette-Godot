@@ -19,6 +19,7 @@ public class Player : Character, ICastsSpells
     private float maxMajyka = 100.0f;
     private float currentMajyka = 100.0f;
     public float staffRot = 0.0f;
+    public List<Artefact.ArtefactTextureSet> artefactTextureSets = new List<Artefact.ArtefactTextureSet>();
     private Vector2 armSocket = Vector2.Zero;
     private Vector2 facingDir = Vector2.Zero;
     private Godot.Collections.Dictionary<Direction, Vector2> staffOrigins = new Godot.Collections.Dictionary<Direction, Vector2>() { { Direction.Up, new Vector2(4.0f, -10.0f) }, { Direction.Right, new Vector2(0.0f, -8.0f) }, { Direction.Down, new Vector2(-4.0f, -10.0f) }, { Direction.Left, new Vector2(0.0f, -10.0f) } };
@@ -254,12 +255,12 @@ public class Player : Character, ICastsSpells
 
         if (Input.IsActionPressed("g_cast_primary_spell"))
         {
-            if (currentMajyka >= primarySpell.majykaCost && primarySpellCooldown == 0.0f)
+            if (currentMajyka >= GetSpellCost(primarySpell.majykaCost) && primarySpellCooldown == 0.0f)
             {
                 // Cast primary spell
                 primarySpell.Cast(this);
 
-                currentMajyka -= primarySpell.majykaCost;
+                currentMajyka -= GetSpellCost(primarySpell.majykaCost);
                 UpdateMajykaBar();
 
                 primarySpellCooldown = GetMaxPrimarySpellCooldown();
@@ -272,12 +273,35 @@ public class Player : Character, ICastsSpells
             majykaBar.UpdateSpellCooldown(primarySpellCDPercent);
         else
             majykaBar.UpdateSpellCooldown(0.0f);
+
+        Update();
+    }
+
+    public override void _Draw()
+    {
+        DrawEquippedArtefacts(GetFacingDirection());
+    }
+
+    private void DrawEquippedArtefacts(Direction direction)
+    {
+        foreach (Artefact.ArtefactTextureSet textureSet in artefactTextureSets)
+        {
+            Texture artefactTex = textureSet.TextureFromDirection(direction);
+
+            if (artefactTex != null)
+            {
+                Rect2 rect = new Rect2(textureSet.Offset + (charSprite.Frame % 3 == 0 ? new Vector2(0, -1) : Vector2.Zero), artefactTex.GetSize());
+                if (direction == Direction.Up || direction == Direction.Left)
+                    rect.Size = new Vector2(rect.Size.x * -1.0f, rect.Size.y);
+
+                DrawTextureRect(artefactTex, rect, false);
+            }
+        }
     }
 
     public override void _PhysicsProcess(float delta)
     {
         base._PhysicsProcess(delta);
-
 
         var spaceState = GetWorld2d().DirectSpaceState;
         var result = spaceState.IntersectRay(staffLight.GlobalPosition, staffLight.GlobalPosition + (facingDir * 4.0f), new Godot.Collections.Array() { this }, collisionLayer: 0b0001, collideWithAreas: true);
@@ -423,7 +447,7 @@ public class Player : Character, ICastsSpells
 
     private void RegenMajyka(float delta)
     {
-        currentMajyka += (25.0f * delta);
+        currentMajyka += (25.0f * delta * GetStatValue(Stat.MagykaRegenMultiplayer));
 
         if (currentMajyka > maxMajyka)
             currentMajyka = maxMajyka;

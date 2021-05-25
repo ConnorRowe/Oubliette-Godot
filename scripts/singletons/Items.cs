@@ -74,21 +74,29 @@ public class Items : Node
         {
             p.ApplyBuff(Buffs.CreateBuff("Black Bile of a Long Dead God",
         new List<(Stat stat, float amount)>() { (Stat.DamageMultiplier, 2.0f), (Stat.KnockbackMultiplier, -1.0f) }, 0));
-        }),
+        }, new Artefact.ArtefactTextureSet(new Vector2(-2, -17), null, GD.Load<Texture>("res://textures/black_eyes_down.png"), GD.Load<Texture>("res://textures/black_eyes_leftright.png"))),
         new LootPool[] { LootPool.GENERAL });
 
         RegisterArtefact(new Artefact("Vital Elixir", GD.Load<Texture>("res://textures/health_potion.png"),
         (Player p) =>
         {
             p.AdjustMaxHealth(4, true);
-        }), new LootPool[] { LootPool.GENERAL });
+        }, Artefact.emptyTexSet), new LootPool[] { LootPool.GENERAL });
 
         RegisterArtefact(new Artefact("Amanita Muscaria", GD.Load<Texture>("res://textures/amanita_muscaria.png"),
         (Player p) =>
         {
             p.ApplyBuff(Buffs.CreateBuff("Amanita Muscaria",
         new List<(Stat stat, float amount)>() { (Stat.DamageFlat, 1.0f), (Stat.RangeMultiplier, 1.25f), (Stat.MagykaCostMultiplier, 0.75f) }, 0));
-        }), new LootPool[] { LootPool.GENERAL });
+        }, Artefact.emptyTexSet), new LootPool[] { LootPool.GENERAL });
+
+        RegisterArtefact(new Artefact("Grunty's Hat", GD.Load<Texture>("res://textures/witch_hat.png"),
+        (Player p) =>
+        {
+            p.ApplyBuff(Buffs.CreateBuff("Grunty's Hat",
+        new List<(Stat stat, float amount)>() { (Stat.SpellSpeedMultiplier, 1.5f), (Stat.RangeMultiplier, 2.0f), (Stat.MagykaCostMultiplier, 0.5f), (Stat.CooldownMultplier, 0.5f) }, 0));
+        }, new Artefact.ArtefactTextureSet(new Vector2(-3, -22), GD.Load<Texture>("res://textures/witch_hat_equip_updown.png"), GD.Load<Texture>("res://textures/witch_hat_equip_updown.png"), GD.Load<Texture>("res://textures/witch_hat_equip_leftright.png"))
+        ), new LootPool[] { LootPool.GENERAL });
     }
 
     private void RegisterPickups()

@@ -124,6 +124,7 @@ extents = Vector2( 2, 0.5 )
 
 [node name="Player" type="KinematicBody2D"]
 process_priority = -1
+z_index = 1
 collision_layer = 512
 script = ExtResource( 1 )
 _hitboxPath = NodePath("Hitbox")
@@ -139,11 +140,13 @@ hitBoxTraceShape = SubResource( 1 )
 
 [node name="ShadowSprite" type="Sprite" parent="."]
 modulate = Color( 1, 1, 1, 0.729412 )
+z_index = -1
 texture = ExtResource( 5 )
 
 [node name="CharSprite" type="AnimatedSprite" parent="."]
 material = ExtResource( 9 )
 position = Vector2( 0, 1 )
+z_index = -1
 frames = SubResource( 20 )
 animation = "down"
 offset = Vector2( 0, -10 )

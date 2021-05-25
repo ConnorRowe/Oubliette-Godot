@@ -16,7 +16,8 @@ namespace Stats
         MagykaCostFlat,
         MagykaCostMultiplier,
         ReflectDamageFlat,
-        ResistDamageFlat
+        ResistDamageFlat,
+        MagykaRegenMultiplayer,
     }
 
     public struct Buff
@@ -45,6 +46,7 @@ namespace Stats
             {Stat.MagykaCostMultiplier, 1},
             {Stat.ReflectDamageFlat, 0},
             {Stat.ResistDamageFlat, 0},
+            {Stat.MagykaRegenMultiplayer, 1},
         };
 
         // Duration is in seconds for ease of use

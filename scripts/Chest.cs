@@ -43,7 +43,7 @@ public class Chest : RigidBody2D, IIntersectsPlayerHitArea
         {
             if (!itemTaken && artefact != null)
             {
-                artefact.PlayerPickUpAction.Invoke(player);
+                artefact.PlayerPickUp(player);
                 itemTaken = true;
                 artefactSprite.Visible = false;
             }

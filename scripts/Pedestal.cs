@@ -19,7 +19,7 @@ public class Pedestal : StaticBody2D, IIntersectsPlayerHitArea
     {
         if (!itemTaken)
         {
-            CurrentArtefact.PlayerPickUpAction.Invoke(player);
+            CurrentArtefact.PlayerPickUp(player);
             ItemSprite.Visible = false;
             itemTaken = true;
         }
