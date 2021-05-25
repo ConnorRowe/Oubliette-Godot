@@ -11,7 +11,7 @@ public class Pedestal : StaticBody2D, IIntersectsPlayerHitArea
     {
         ItemSprite = GetNode<Sprite>("Sprite/ItemSprite");
 
-        CurrentArtefact = GetNode<Artefacts>("/root/Artefacts").GetRandomArtefact(Artefacts.LootPool.GENERAL);
+        CurrentArtefact = GetNode<Items>("/root/Items").GetRandomArtefact(Items.LootPool.GENERAL);
         ItemSprite.Texture = CurrentArtefact.Texture;
     }
 

@@ -10,7 +10,7 @@ public class BasePickup : RigidBody2D, IIntersectsPlayerHitArea
         {
             if (_mainSprite == null)
                 _mainSprite = GetNode<Sprite>("MainSprite");
-            
+
             return _mainSprite;
         }
     }

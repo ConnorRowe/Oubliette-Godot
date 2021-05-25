@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=22 format=2]
 
 [ext_resource path="res://font/small_font.tres" type="DynamicFont" id=1]
 [ext_resource path="res://scripts/World.cs" type="Script" id=2]
@@ -17,6 +17,18 @@
 [ext_resource path="res://textures/other_tiles/dungeon_wall/tileset_dungeon_wall.tres" type="TileSet" id=15]
 [ext_resource path="res://textures/other_tiles/dungeon_floor/tileset_dungeon_floor.tres" type="TileSet" id=16]
 [ext_resource path="res://sound/music/theme_mix_6.ogg" type="AudioStream" id=17]
+[ext_resource path="res://scenes/ItemDisplaySlot.tscn" type="PackedScene" id=18]
+[ext_resource path="res://textures/rgb_potion_fill.png" type="Texture" id=19]
+[ext_resource path="res://materials/PotionFill.shader" type="Shader" id=20]
+
+[sub_resource type="ShaderMaterial" id=1]
+resource_local_to_scene = true
+shader = ExtResource( 20 )
+shader_param/time_factor = 0.5
+shader_param/colour_lerp_a = Color( 0.827451, 1, 0, 1 )
+shader_param/colour_lerp_b = Color( 0.313726, 1, 0, 1 )
+shader_param/colour_lerp_c = Color( 0, 0.670588, 1, 1 )
+shader_param/fill_texture = ExtResource( 19 )
 
 [node name="LevelGenWorld" type="YSort"]
 script = ExtResource( 2 )
@@ -41,6 +53,7 @@ motion_mirroring = Vector2( 1024, 600 )
 margin_right = 1024.0
 margin_bottom = 600.0
 rect_min_size = Vector2( 1024, 600 )
+mouse_filter = 2
 color = Color( 0, 0, 0, 1 )
 __meta__ = {
 "_edit_use_anchors_": true
@@ -72,6 +85,10 @@ margin_bottom = -304.0
 [node name="Minimap" parent="CanvasLayer" instance=ExtResource( 9 )]
 position = Vector2( 218, 0 )
 backgroundColour = Color( 0, 0, 0, 0.74902 )
+
+[node name="PotionSlot" parent="CanvasLayer" instance=ExtResource( 18 )]
+material = SubResource( 1 )
+position = Vector2( 4, 52 )
 
 [node name="LevelGenerator" parent="." instance=ExtResource( 5 )]
 possibleEnemies = [ ExtResource( 10 ), ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 11 ) ]

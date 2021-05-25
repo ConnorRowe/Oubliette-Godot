@@ -18,19 +18,22 @@ public class Chest : RigidBody2D, IIntersectsPlayerHitArea
         animPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
         artefactSprite = GetNode<Sprite>("ArtefactSprite");
 
-        Artefacts artefacts = GetNode<Artefacts>("/root/Artefacts");
-        rng = artefacts.Rng;
+        Items items = GetNode<Items>("/root/Items");
+        rng = items.Rng;
 
         if (rng.Randf() <= 0.25f)
         {
-            artefact = artefacts.GetRandomArtefact(Artefacts.LootPool.GENERAL);
-            artefactSprite.Texture = artefact.Texture;
+            // artefact = items.GetRandomArtefact(Items.LootPool.GENERAL);
+            // artefactSprite.Texture = artefact.Texture;
         }
 
-        int maxPickups = rng.RandiRange(0, 3);
+        int maxPickups = rng.RandiRange(0, 2);
         for (int i = 0; i < maxPickups; i++)
         {
-            pickups.Add(artefacts.GetRandomPickup(Artefacts.LootPool.GENERAL));
+            if (rng.Randf() <= 0.25f)
+                pickups.Add(items.GetRandomPotionPickup());
+            else
+                pickups.Add(items.GetRandomPickup(Items.LootPool.WOOD_CHEST));
         }
     }
 

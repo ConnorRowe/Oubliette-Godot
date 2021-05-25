@@ -25,6 +25,8 @@ public class Player : Character, ICastsSpells
     private Godot.Collections.Dictionary<Direction, Vector2> armOrigins = new Godot.Collections.Dictionary<Direction, Vector2>() { { Direction.Up, new Vector2(2.5f, -11.0f) }, { Direction.Right, new Vector2(-0.5f, -11.0f) }, { Direction.Down, new Vector2(-2.5f, -11.0f) }, { Direction.Left, new Vector2(0.5f, -11.0f) } };
     private Physics2DShapeQueryParameters hitAreaShapeQuery;
     private HashSet<Node> intersectedAreas = new HashSet<Node>();
+    private Potion currentPotion;
+    private float pickupCooldown = 0.0f;
 
     // Nodes
     public Camera2D camera;
@@ -37,6 +39,7 @@ public class Player : Character, ICastsSpells
     private Line2D armOutline;
     private Light2D staffLight;
     private Node2D spellSpawnPoint;
+    private ItemDisplaySlot potionSlot;
 
     // Input
     private bool inputMoveUp = false;
@@ -46,7 +49,8 @@ public class Player : Character, ICastsSpells
 
     // Assets
     private Texture debugPoint;
-    private PackedScene projectile;
+    private PackedScene projectileScene;
+    private PackedScene potionScene;
 
     // Export
     [Export]
@@ -64,7 +68,8 @@ public class Player : Character, ICastsSpells
         feetArea.Connect("area_exited", this, nameof(OnAreaExited));
 
         debugPoint = GD.Load<Texture>("res://textures/2x2_white.png");
-        projectile = GD.Load<PackedScene>("res://scenes/Projectile.tscn");
+        projectileScene = GD.Load<PackedScene>("res://scenes/Projectile.tscn");
+        potionScene = GD.Load<PackedScene>("res://scenes/Potion.tscn");
 
         _Spells = (Spells)GetNode("/root/Spells");
         majykaBar = GetParent().GetNode<MajykaContainer>("CanvasLayer/MajykaContainer");
@@ -77,6 +82,7 @@ public class Player : Character, ICastsSpells
         armOutline = GetNode<Line2D>("CharSprite/ArmOutline");
         staffLight = GetNode<Light2D>("CharSprite/staff/StaffLight");
         spellSpawnPoint = GetNode<Node2D>("CharSprite/staff/SpellSpawnPoint");
+        potionSlot = world.GetNode<ItemDisplaySlot>("CanvasLayer/PotionSlot");
 
         primarySpell = _Spells.MagicMissile;
         secondarySpell = _Spells.IceSkin;
@@ -96,6 +102,8 @@ public class Player : Character, ICastsSpells
         hitAreaShapeQuery.Exclude = new Godot.Collections.Array() { this };
 
         checkSlideCollisions = true;
+
+        UpdatePotionSlot();
     }
 
     public override void _Input(InputEvent evt)
@@ -131,6 +139,10 @@ public class Player : Character, ICastsSpells
                 {
                     inputMoveRight = true;
                 }
+                if (evt.IsActionPressed("g_use_potion"))
+                {
+                    ConsumeCurrentPotion();
+                }
             }
             else
             {
@@ -150,7 +162,6 @@ public class Player : Character, ICastsSpells
                 {
                     inputMoveRight = false;
                 }
-
             }
 
             // Jump
@@ -221,6 +232,12 @@ public class Player : Character, ICastsSpells
 
         if (primarySpellCooldown < 0.0f)
             primarySpellCooldown = 0.0f;
+
+        if (pickupCooldown > 0.0f)
+            pickupCooldown -= delta;
+
+        if (pickupCooldown < 0.0f)
+            pickupCooldown = 0.0f;
 
         Direction fDir = GetFacingDirection();
 
@@ -311,7 +328,7 @@ public class Player : Character, ICastsSpells
     {
         base.OnSlideCollision(kinematicCollision, slideVelocity);
 
-        if(kinematicCollision.Collider is IIntersectsPlayerHitArea hittable)
+        if (kinematicCollision.Collider is IIntersectsPlayerHitArea hittable)
         {
             hittable.PlayerHit(this);
         }
@@ -543,5 +560,64 @@ public class Player : Character, ICastsSpells
             spillageDmgTimer = GetTree().CreateTimer(1.0f, false);
             spillageDmgTimer.Connect("timeout", this, nameof(SpillageDamage));
         }
+    }
+
+    public bool PickUpPotion(Potion newPotion)
+    {
+        if (pickupCooldown > 0.0f)
+        {
+            return false;
+        }
+
+        if (currentPotion != null)
+        {
+            // Drop current potion
+
+            PotionPickup droppedPotion = potionScene.Instance<PotionPickup>();
+            droppedPotion.potion = currentPotion;
+            world.AddChild(droppedPotion);
+            droppedPotion.Position = Position;
+            droppedPotion.ApplyCentralImpulse(dir * 60f);
+        }
+
+        currentPotion = newPotion;
+
+        UpdatePotionSlot();
+
+        pickupCooldown = 0.5f;
+
+        return true;
+    }
+
+    private void ConsumeCurrentPotion()
+    {
+        if (currentPotion == null)
+            return;
+
+        ApplyBuff(Stats.Buffs.CreateBuff(currentPotion.name, new List<(Stat stat, float amount)>(currentPotion.buffs), currentPotion.duration));
+
+        currentPotion = null;
+
+        UpdatePotionSlot();
+    }
+
+    private void UpdatePotionSlot()
+    {
+        if (currentPotion == null)
+        {
+            potionSlot.SelfModulate = Colors.Transparent;
+            potionSlot.ItemName = "";
+
+            return;
+        }
+
+        potionSlot.SelfModulate = Colors.White;
+        potionSlot.ItemName = currentPotion.name;
+
+        ShaderMaterial shaderMat = (ShaderMaterial)potionSlot.Material;
+
+        shaderMat.SetShaderParam("colour_lerp_a", currentPotion.lerpColours[0]);
+        shaderMat.SetShaderParam("colour_lerp_b", currentPotion.lerpColours[1]);
+        shaderMat.SetShaderParam("colour_lerp_c", currentPotion.lerpColours[2]);
     }
 }

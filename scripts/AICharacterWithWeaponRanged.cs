@@ -119,10 +119,10 @@ public class AICharacterWithWeaponRanged : AICharacterWithWeapon
 
     public override void Die()
     {
-        base.Die();
-
         // stop spell from charging and firing
         tween.StopAll();
         weaponParticles.QueueFree();
+
+        base.Die();
     }
 }

@@ -12,6 +12,7 @@ public class World : Node2D
     private CanvasModulate globalLighting;
     private Tween tween;
     private AudioStreamPlayer musicPlayer;
+    private Items items;
 
     [Export]
     private NodePath _basicAIPath;
@@ -44,6 +45,7 @@ public class World : Node2D
         globalLighting = GetNode<CanvasModulate>(_globalLightingPath);
         tween = GetNode<Tween>(_tweenPath);
         musicPlayer = GetNode<AudioStreamPlayer>("MusicPlayer");
+        items = GetNode<Items>("/root/Items");
 
         player.Connect(nameof(Player.HealthChanged), this, nameof(UpdateHealthUI));
         UpdateHealthUI(player.currentHealth, player.maxHealth);
@@ -92,14 +94,13 @@ public class World : Node2D
                 }
                 if (emb.ButtonIndex == (int)ButtonList.Middle)
                 {
-                    // Potion potion = GD.Load<PackedScene>("res://scenes/Potion.tscn").Instance<Potion>();
-                    // potion.Position = camera.GetGlobalMousePosition();
-                    // AddChild(potion);
-                    // potion.SetPotionEffects(new (Stats.Stat stat, float amount)[] { (Stats.Stat.DamageFlat, 1.0f), (Stats.Stat.RangeMultiplier, 2.0f) }, 10.0f, "Philter of Power", Colors.DarkRed, Colors.OrangeRed, Colors.Crimson);
-
                     Chest chest = GD.Load<PackedScene>("res://scenes/Chest.tscn").Instance<Chest>();
-                    chest.Position = camera.GetGlobalMousePosition();
                     AddChild(chest);
+                    chest.Position = camera.GetGlobalMousePosition();
+
+                    // PotionPickup testPotion = items.GetRandomPotionPickup();
+                    // AddChild(testPotion);
+                    // testPotion.Position = camera.GetGlobalMousePosition();
                 }
             }
         }
