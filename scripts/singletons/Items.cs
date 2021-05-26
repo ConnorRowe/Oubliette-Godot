@@ -69,7 +69,7 @@ public class Items : Node
 
     private void RegisterArtefacts()
     {
-        RegisterArtefact(new Artefact("Black Bile of a Long Dead God", GD.Load<Texture>("res://textures/dark_potion.png"),
+        RegisterArtefact(new Artefact("Black Bile of a Long Dead God", "raw godly power", GD.Load<Texture>("res://textures/dark_potion.png"),
         (Player p) =>
         {
             p.ApplyBuff(Buffs.CreateBuff("Black Bile of a Long Dead God",
@@ -77,20 +77,20 @@ public class Items : Node
         }, new Artefact.ArtefactTextureSet(new Vector2(-2, -17), null, GD.Load<Texture>("res://textures/black_eyes_down.png"), GD.Load<Texture>("res://textures/black_eyes_leftright.png"))),
         new LootPool[] { LootPool.GENERAL });
 
-        RegisterArtefact(new Artefact("Vital Elixir", GD.Load<Texture>("res://textures/health_potion.png"),
+        RegisterArtefact(new Artefact("Vital Elixir", "you feel more vital!", GD.Load<Texture>("res://textures/health_potion.png"),
         (Player p) =>
         {
             p.AdjustMaxHealth(4, true);
         }, Artefact.emptyTexSet), new LootPool[] { LootPool.GENERAL });
 
-        RegisterArtefact(new Artefact("Amanita Muscaria", GD.Load<Texture>("res://textures/amanita_muscaria.png"),
+        RegisterArtefact(new Artefact("Amanita Muscaria", "this time without deer piss", GD.Load<Texture>("res://textures/amanita_muscaria.png"),
         (Player p) =>
         {
             p.ApplyBuff(Buffs.CreateBuff("Amanita Muscaria",
         new List<(Stat stat, float amount)>() { (Stat.DamageFlat, 1.0f), (Stat.RangeMultiplier, 1.25f), (Stat.MagykaCostMultiplier, 0.75f) }, 0));
         }, Artefact.emptyTexSet), new LootPool[] { LootPool.GENERAL });
 
-        RegisterArtefact(new Artefact("Grunty's Hat", GD.Load<Texture>("res://textures/witch_hat.png"),
+        RegisterArtefact(new Artefact("Grunty's Hat", "although she's dim, she attended Fat Hag High!", GD.Load<Texture>("res://textures/witch_hat.png"),
         (Player p) =>
         {
             p.ApplyBuff(Buffs.CreateBuff("Grunty's Hat",

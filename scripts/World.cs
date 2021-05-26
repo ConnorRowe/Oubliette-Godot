@@ -13,6 +13,7 @@ public class World : Node2D
     private Tween tween;
     private AudioStreamPlayer musicPlayer;
     private Items items;
+    public ArtefactNamePopup artefactNamePopup;
 
     [Export]
     private NodePath _basicAIPath;
@@ -26,6 +27,8 @@ public class World : Node2D
     private NodePath _tweenPath;
     [Export]
     private Color defaultGlobalLighting = new Color(0.15f, 0.15f, 0.15f, 1);
+    [Export]
+    private NodePath _artefactNamePopupPath;
 
     //Assets
     private Texture debugPoint;
@@ -46,6 +49,7 @@ public class World : Node2D
         tween = GetNode<Tween>(_tweenPath);
         musicPlayer = GetNode<AudioStreamPlayer>("MusicPlayer");
         items = GetNode<Items>("/root/Items");
+        artefactNamePopup = GetNode<ArtefactNamePopup>(_artefactNamePopupPath);
 
         player.Connect(nameof(Player.HealthChanged), this, nameof(UpdateHealthUI));
         UpdateHealthUI(player.currentHealth, player.maxHealth);

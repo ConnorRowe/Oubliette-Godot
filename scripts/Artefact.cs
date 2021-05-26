@@ -42,13 +42,15 @@ public class Artefact : Reference
     public static ArtefactTextureSet emptyTexSet = new ArtefactTextureSet(Vector2.Zero, null, null, null);
 
     public string Name { get; set; }
+    public string Description { get; set; }
     public Texture Texture { get; set; }
     private Action<Player> playerPickUpAction { get; set; }
     public ArtefactTextureSet TextureSet;
 
-    public Artefact(string name, Texture texture, Action<Player> playerPickUpAction, ArtefactTextureSet textureSet)
+    public Artefact(string name, string desc, Texture texture, Action<Player> playerPickUpAction, ArtefactTextureSet textureSet)
     {
         Name = name;
+        Description = desc;
         Texture = texture;
         this.playerPickUpAction = playerPickUpAction;
         TextureSet = textureSet;
@@ -60,5 +62,7 @@ public class Artefact : Reference
 
         if (TextureSet.IsValid())
             player.artefactTextureSets.Add(TextureSet);
+
+        player.PickedUpArtefact(this);
     }
 }

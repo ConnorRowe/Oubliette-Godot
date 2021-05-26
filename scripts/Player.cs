@@ -644,4 +644,9 @@ public class Player : Character, ICastsSpells
         shaderMat.SetShaderParam("colour_lerp_b", currentPotion.lerpColours[1]);
         shaderMat.SetShaderParam("colour_lerp_c", currentPotion.lerpColours[2]);
     }
+
+    public void PickedUpArtefact(Artefact artefact)
+    {
+        world.artefactNamePopup.DisplayPopup(artefact.Name, artefact.Description);
+    }
 }
