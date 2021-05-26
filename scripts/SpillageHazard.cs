@@ -13,13 +13,19 @@ public class SpillageHazard : Area2D
         {
             if (Modulate.a > 0)
             {
-                Modulate = Modulate.LinearInterpolate(new Color(Modulate, 0.0f), delta * 2.0f);
+                Modulate = new Color(Modulate, Mathf.Lerp(Modulate.a, 0.0f, delta * 2.0f));
             }
 
-            if(Modulate.a < 0.05)
+            if (Modulate.a < 0.05)
             {
                 QueueFree();
             }
         }
+    }
+
+    public void SetColours(Color spillageColour, Color bubbleColor)
+    {
+        GetNode<Sprite>("Sprite").SelfModulate = spillageColour;
+        GetNode<Particles2D>("Bubbles").SelfModulate = bubbleColor;
     }
 }

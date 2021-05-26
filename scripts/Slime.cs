@@ -21,7 +21,7 @@ public class Slime : AICharacter
         distanceMoved += (Position - lastPosition).Abs();
         lastPosition = Position;
 
-        if(distanceMoved.x >= distBetweenSpillages.x || distanceMoved.y >= distBetweenSpillages.y)
+        if (distanceMoved.x >= distBetweenSpillages.x || distanceMoved.y >= distBetweenSpillages.y)
         {
             distanceMoved = Vector2.Zero;
 
@@ -38,6 +38,6 @@ public class Slime : AICharacter
         GetParent().AddChild(newSpillage);
 
         newSpillage.GlobalPosition = GlobalPosition + new Vector2(0, -7);
-        newSpillage.Modulate = new Color(0.431373f, 1, 0);
+        newSpillage.SetColours(new Color(0.431373f, 1, 0), new Color(0.933333f, 1, 0.878431f));
     }
 }
