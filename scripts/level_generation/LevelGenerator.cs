@@ -287,6 +287,24 @@ public class LevelGenerator : Node, IProvidesNav
                 }
             }
 
+            // Manage ChanceSpawnChild nodes
+            Node2D objectSpawnPoints = room.Value.GetNode<Node2D>("ObjectSpawnPoints");
+            List<ChanceSpawnChild> chanceSpawns = objectSpawnPoints.GetChildren().OfType<ChanceSpawnChild>().ToList<ChanceSpawnChild>();
+
+            for (int i = 0; i < chanceSpawns.Count; ++i)
+            {
+                if (rng.Randf() <= chanceSpawns[i].SpawnChance)
+                {
+                    Node2D child = (Node2D)chanceSpawns[i].GetChild(0);
+                    child.Position = chanceSpawns[i].Position;
+                    chanceSpawns[i].RemoveChild(child);
+                    objectSpawnPoints.AddChild(child);
+                }
+
+                chanceSpawns[i].QueueFree();
+            }
+
+
             // Connect cleared signal
             room.Value.Connect(nameof(Room.Cleared), this, nameof(RoomWasCleared));
 

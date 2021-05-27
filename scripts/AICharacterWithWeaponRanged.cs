@@ -104,7 +104,7 @@ public class AICharacterWithWeaponRanged : AICharacterWithWeapon
 
     private void SetShownParticles(int num)
     {
-        (weaponParticles.ProcessMaterial as ShaderMaterial).SetShaderParam("number_particles_shown", num);
+        (weaponParticles.ProcessMaterial as ShaderMaterial)?.SetShaderParam("number_particles_shown", num);
     }
 
     public override Vector2 GetSpellSpawnPos()

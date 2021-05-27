@@ -98,14 +98,13 @@ public class World : Node2D
                 }
                 if (emb.ButtonIndex == (int)ButtonList.Middle)
                 {
-                    // Chest chest = GD.Load<PackedScene>("res://scenes/Chest.tscn").Instance<Chest>();
-                    // AddChild(chest);
-                    // chest.Position = camera.GetGlobalMousePosition();
+                    Chest chest = GD.Load<PackedScene>("res://scenes/Chest.tscn").Instance<Chest>();
+                    AddChild(chest);
+                    chest.Position = camera.GetGlobalMousePosition();
 
-                    Pedestal pedestal = GD.Load<PackedScene>("res://scenes/Pedestal.tscn").Instance<Pedestal>();
-                    AddChild(pedestal);
-                    pedestal.Position = camera.GetGlobalMousePosition();
-
+                    // Pedestal pedestal = GD.Load<PackedScene>("res://scenes/Pedestal.tscn").Instance<Pedestal>();
+                    // AddChild(pedestal);
+                    // pedestal.Position = camera.GetGlobalMousePosition();
 
                     // PotionPickup testPotion = items.GetRandomPotionPickup();
                     // AddChild(testPotion);
