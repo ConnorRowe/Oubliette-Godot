@@ -17,6 +17,11 @@ public class Items : Node
     public List<Potion> potions = new List<Potion>();
 
     private PackedScene potionScene;
+    private Artefact defaultArtefact = new Artefact("Vital Elixir", "you feel more vital!", GD.Load<Texture>("res://textures/health_potion.png"),
+    (Player p) =>
+    {
+        p.AdjustMaxHealth(4, true);
+    }, Artefact.emptyTexSet);
 
     public void RegisterArtefact(Artefact artifact, LootPool[] lootPools)
     {
@@ -41,7 +46,20 @@ public class Items : Node
 
     public Artefact GetRandomArtefact(LootPool lootPool)
     {
-        return artefactPools[lootPool][Rng.RandiRange(0, artefactPools[lootPool].Count - 1)];
+        Artefact artefactOut;
+
+        if (artefactPools[lootPool].Count <= 0)
+        {
+            artefactOut = defaultArtefact;
+        }
+        else
+        {
+            artefactOut = artefactPools[lootPool][Rng.RandiRange(0, artefactPools[lootPool].Count - 1)];
+
+            RemoveArtefactFromPools(artefactOut);
+        }
+
+        return artefactOut;
     }
 
     public BasePickup GetRandomPickup(LootPool lootPool)
@@ -57,6 +75,14 @@ public class Items : Node
         return randPotionPickup;
     }
 
+    private void RemoveArtefactFromPools(Artefact artefact)
+    {
+        foreach (LootPool pool in artefactPools.Keys)
+        {
+            artefactPools[pool].Remove(artefact);
+        }
+    }
+
     public Items()
     {
         Rng.Randomize();
@@ -69,6 +95,8 @@ public class Items : Node
 
     private void RegisterArtefacts()
     {
+        RegisterArtefact(defaultArtefact, new LootPool[] { LootPool.GENERAL });
+
         RegisterArtefact(new Artefact("Black Bile of a Long Dead God", "raw godly power", GD.Load<Texture>("res://textures/dark_potion.png"),
         (Player p) =>
         {
@@ -76,12 +104,6 @@ public class Items : Node
         new List<(Stat stat, float amount)>() { (Stat.DamageMultiplier, 2.0f), (Stat.KnockbackMultiplier, -1.0f) }, 0));
         }, new Artefact.ArtefactTextureSet(new Vector2(-2, -17), null, GD.Load<Texture>("res://textures/black_eyes_down.png"), GD.Load<Texture>("res://textures/black_eyes_leftright.png"))),
         new LootPool[] { LootPool.GENERAL });
-
-        RegisterArtefact(new Artefact("Vital Elixir", "you feel more vital!", GD.Load<Texture>("res://textures/health_potion.png"),
-        (Player p) =>
-        {
-            p.AdjustMaxHealth(4, true);
-        }, Artefact.emptyTexSet), new LootPool[] { LootPool.GENERAL });
 
         RegisterArtefact(new Artefact("Amanita Muscaria", "this time without deer piss", GD.Load<Texture>("res://textures/amanita_muscaria.png"),
         (Player p) =>

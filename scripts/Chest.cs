@@ -30,7 +30,7 @@ public class Chest : RigidBody2D, IIntersectsPlayerHitArea
         int maxPickups = rng.RandiRange(0, 2);
         for (int i = 0; i < maxPickups; i++)
         {
-            if (rng.Randf() <= 0.5f)
+            if (rng.Randf() <= 0.3f)
                 pickups.Add(items.GetRandomPotionPickup());
             else
                 pickups.Add(items.GetRandomPickup(Items.LootPool.WOOD_CHEST));
