@@ -314,7 +314,7 @@ public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
             shadowSprite.Visible = false;
         }
 
-        GetNode<CollisionShape2D>("CollisionShape2D").Disabled = true;
+        GetNode<CollisionShape2D>("CollisionShape2D").SetDeferred("disabled", true);
 
         aIManager.SetCurrentBehaviour("dead");
 

@@ -15,6 +15,7 @@ public class AIManager : Godot.Object
     public Character lastTarget;
     public Vector2 targetPosCache = Vector2.Zero;
     public RandomNumberGenerator rng = new RandomNumberGenerator();
+    public bool CanTryTransition = true;
 
     private SceneTreeTimer transitionTimer;
 
@@ -37,11 +38,11 @@ public class AIManager : Godot.Object
 
     public void TryTransition()
     {
-        if (CurrentBehaviour.Empty())
-            return;
-
         transitionTimer = owner.GetTree().CreateTimer(0.5f);
         transitionTimer.Connect("timeout", this, nameof(TryTransition));
+
+        if (CurrentBehaviour.Empty() || !CanTryTransition)
+            return;
 
         if (!CurrentBehaviour.Empty())
         {

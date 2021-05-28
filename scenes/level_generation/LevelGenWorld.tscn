@@ -9,11 +9,11 @@
 [ext_resource path="res://scenes/DialogueBox.tscn" type="PackedScene" id=7]
 [ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=8]
 [ext_resource path="res://scenes/Minimap.tscn" type="PackedScene" id=9]
-[ext_resource path="res://scenes/Snail.tscn" type="PackedScene" id=10]
-[ext_resource path="res://scenes/AICharacterWithWeapon.tscn" type="PackedScene" id=11]
-[ext_resource path="res://scenes/Slime.tscn" type="PackedScene" id=12]
-[ext_resource path="res://scenes/SkeletonMage.tscn" type="PackedScene" id=13]
-[ext_resource path="res://scenes/Imp.tscn" type="PackedScene" id=14]
+[ext_resource path="res://scenes/enemies/Snail.tscn" type="PackedScene" id=10]
+[ext_resource path="res://scenes/enemies/AICharacterWithWeapon.tscn" type="PackedScene" id=11]
+[ext_resource path="res://scenes/enemies/Slime.tscn" type="PackedScene" id=12]
+[ext_resource path="res://scenes/enemies/SkeletonMage.tscn" type="PackedScene" id=13]
+[ext_resource path="res://scenes/enemies/Imp.tscn" type="PackedScene" id=14]
 [ext_resource path="res://textures/other_tiles/dungeon_wall/tileset_dungeon_wall.tres" type="TileSet" id=15]
 [ext_resource path="res://textures/other_tiles/dungeon_floor/tileset_dungeon_floor.tres" type="TileSet" id=16]
 [ext_resource path="res://sound/music/theme_mix_6.ogg" type="AudioStream" id=17]
@@ -96,7 +96,7 @@ position = Vector2( 4, 52 )
 position = Vector2( 88.5, 16.5 )
 
 [node name="LevelGenerator" parent="." instance=ExtResource( 5 )]
-possibleEnemies = [ ExtResource( 10 ), ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 11 ) ]
+possibleEnemies = [ ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 11 ), ExtResource( 10 ) ]
 _wallTileMapPath = NodePath("../WallTiles")
 _floorTileMapPath = NodePath("../Navigation2D/FloorTiles")
 _navigationPath = NodePath("../Navigation2D")

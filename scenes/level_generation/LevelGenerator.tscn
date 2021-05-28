@@ -2,10 +2,10 @@
 
 [ext_resource path="res://textures/room_border.png" type="Texture" id=1]
 [ext_resource path="res://scripts/level_generation/LevelGenerator.cs" type="Script" id=2]
-[ext_resource path="res://scenes/Imp.tscn" type="PackedScene" id=3]
-[ext_resource path="res://scenes/SkeletonMage.tscn" type="PackedScene" id=4]
-[ext_resource path="res://scenes/AICharacterWithWeapon.tscn" type="PackedScene" id=5]
-[ext_resource path="res://scenes/Slime.tscn" type="PackedScene" id=6]
+[ext_resource path="res://scenes/enemies/Imp.tscn" type="PackedScene" id=3]
+[ext_resource path="res://scenes/enemies/SkeletonMage.tscn" type="PackedScene" id=4]
+[ext_resource path="res://scenes/enemies/AICharacterWithWeapon.tscn" type="PackedScene" id=5]
+[ext_resource path="res://scenes/enemies/Slime.tscn" type="PackedScene" id=6]
 
 [node name="LevelGenerator" type="Node2D"]
 script = ExtResource( 2 )

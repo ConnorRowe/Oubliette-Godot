@@ -124,7 +124,7 @@ public class Room : Node2D
         {
             UnlockDoors();
 
-            EmitSignal(nameof(Cleared), this);
+            RoomCleared();
         }
     }
 
@@ -136,5 +136,10 @@ public class Room : Node2D
             door.Value.GetChild<Area2D>(0).Monitorable = unlock;
             door.Value.GetChild<Area2D>(0).Monitoring = unlock;
         }
+    }
+
+    public virtual void RoomCleared()
+    {
+        EmitSignal(nameof(Cleared), this);
     }
 }

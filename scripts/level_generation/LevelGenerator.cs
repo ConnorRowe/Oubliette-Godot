@@ -14,6 +14,8 @@ public class LevelGenerator : Node, IProvidesNav
 
     private List<PackedScene> possibleRooms = new List<PackedScene>();
     private List<PackedScene> treasureRooms = new List<PackedScene>();
+    private List<PackedScene> allBosses = new List<PackedScene>();
+    private PackedScene bossRoom;
     public Dictionary<Point, Room> generatedRooms = new Dictionary<Point, Room>();
     private int roomsToGen = 12;
     private readonly Point[] pointDirections = new Point[4] { new Point(0, 1), new Point(1, 0), new Point(0, -1), new Point(-1, 0) };
@@ -28,6 +30,8 @@ public class LevelGenerator : Node, IProvidesNav
     private string rooms_directory = "res://scenes/level_generation/rooms/";
     [Export]
     private string treasure_rooms_directory = "res://scenes/level_generation/treasure_rooms/";
+    [Export]
+    private string boss_enemies_directory = "res://scenes/enemies/bosses/";
     [Export]
     private Godot.Collections.Array<PackedScene> possibleEnemies = new Godot.Collections.Array<PackedScene>();
     [Export(hintString: "The tilemap to add wall tiles to.")]
@@ -53,8 +57,11 @@ public class LevelGenerator : Node, IProvidesNav
         floorTiles = GetNode<TileMap>(_floorTileMapPath);
         NavMesh = GetNode<Navigation2D>(_navigationPath);
 
-        LoadRoomsFromDirectory(rooms_directory, possibleRooms);
-        LoadRoomsFromDirectory(treasure_rooms_directory, treasureRooms);
+        bossRoom = GD.Load<PackedScene>("res://scenes/level_generation/BossRoom.tscn");
+
+        LoadScenesFromDirectory(rooms_directory, possibleRooms);
+        LoadScenesFromDirectory(treasure_rooms_directory, treasureRooms);
+        LoadScenesFromDirectory(boss_enemies_directory, allBosses);
 
         // Generate level
         CallDeferred(nameof(GenerateLevel));
@@ -108,7 +115,7 @@ public class LevelGenerator : Node, IProvidesNav
         }
     }
 
-    private void LoadRoomsFromDirectory(string fileDirectory, List<PackedScene> roomScenesList)
+    private void LoadScenesFromDirectory(string fileDirectory, List<PackedScene> scenesList)
     {
         Directory directory = new Directory();
         directory.Open(fileDirectory);
@@ -117,7 +124,7 @@ public class LevelGenerator : Node, IProvidesNav
         string file = directory.GetNext();
         do
         {
-            roomScenesList.Add(GD.Load<PackedScene>(fileDirectory + file));
+            scenesList.Add(GD.Load<PackedScene>(fileDirectory + file));
             file = directory.GetNext();
         } while (!file.Empty());
 
@@ -135,8 +142,10 @@ public class LevelGenerator : Node, IProvidesNav
         }
         List<Point> rooms = new List<Point>();
 
-        // at least one treasure room must be generated
-        List<int> requiredSpecialRooms = new List<int>() { 1 };
+        // Treasure room    = 1
+        // Boss room        = 2
+        // at least one treasure room and one boss room must be generated
+        List<int> requiredSpecialRooms = new List<int>() { 1, 2 };
 
         for (int i = 0; i < roomsToGen; ++i)
         {
@@ -285,6 +294,20 @@ public class LevelGenerator : Node, IProvidesNav
                     // Connect enemy die signal to room function
                     newEnemy.Connect(nameof(AICharacter.Died), room.Value, nameof(Room.EnemyDied));
                 }
+
+                // If boss room spawn boss only
+                if (room.Value.roomType == 2)
+                {
+                    AICharacter boss = allBosses[rng.RandiRange(0, allBosses.Count - 1)].Instance<AICharacter>();
+                    room.Value.AddChild(boss);
+                    boss.navProvider = this;
+                    boss.initPos = room.Value.Position + new Vector2(177, 143);
+
+                    room.Value.enemies.Add(boss);
+                    room.Value.enemyCounter++;
+
+                    boss.Connect(nameof(AICharacter.Died), room.Value, nameof(Room.EnemyDied));
+                }
             }
 
             // Manage ChanceSpawnChild nodes
@@ -347,6 +370,8 @@ public class LevelGenerator : Node, IProvidesNav
                 return RandomRoomInstance(possibleRooms);
             case 1:
                 return RandomRoomInstance(treasureRooms);
+            case 2:
+                return bossRoom.Instance<BossRoom>();
         }
 
         return null;

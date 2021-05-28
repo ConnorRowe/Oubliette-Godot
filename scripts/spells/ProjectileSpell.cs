@@ -13,15 +13,25 @@ public class ProjectileSpell : BaseSpell
         projectileScene = GD.Load<PackedScene>(projectilePath);
         this.hueAdjust = hueAdjust;
     }
+
     public override void Cast(ICastsSpells source)
+    {
+        CastAndReturn(source);
+    }
+
+    public virtual Projectile CastAndReturn(ICastsSpells source)
     {
         Projectile proj = projectileScene.Instance<Projectile>();
         ((Node)source).GetParent().AddChild(proj);
         proj.GlobalPosition = source.GetSpellSpawnPos();
         proj.direction = source.GetSpellDirection();
         proj.source = (Character)source;
-        ((ParticlesMaterial)proj.particles.ProcessMaterial).HueVariation = hueAdjust;
+
+        if (proj.particles.ProcessMaterial != null)
+            ((ParticlesMaterial)proj.particles.ProcessMaterial).HueVariation = hueAdjust;
 
         proj.SetSpellStats(source.GetSpellDamage(damage), source.GetSpellRange(range), source.GetSpellKnockback(knockback), source.GetSpellSpeed(speed));
+
+        return proj;
     }
 }

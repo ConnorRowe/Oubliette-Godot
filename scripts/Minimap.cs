@@ -50,6 +50,7 @@ public class Minimap : Node2D
         levelGen.Connect(nameof(LevelGenerator.RoomCleared), this, nameof(RoomCleared));
 
         specialRoomIcons.Add(1, GD.Load<Texture>("res://textures/treasure_room_minimap_icon.png"));
+        specialRoomIcons.Add(2, GD.Load<Texture>("res://textures/boss_room_minimap_icon.png"));
     }
 
     public override void _Draw()

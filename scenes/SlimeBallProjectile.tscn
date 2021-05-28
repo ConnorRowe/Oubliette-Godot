@@ -1,0 +1,79 @@
+[gd_scene load_steps=15 format=2]
+
+[ext_resource path="res://scenes/SpillageHazard.tscn" type="PackedScene" id=2]
+[ext_resource path="res://textures/64_light_2.png" type="Texture" id=3]
+[ext_resource path="res://particle/AngleCurve.tres" type="Curve" id=4]
+[ext_resource path="res://particle/DampCurve.tres" type="Curve" id=5]
+[ext_resource path="res://scripts/SpillageProjectile.cs" type="Script" id=6]
+[ext_resource path="res://textures/slimeball.png" type="Texture" id=7]
+
+[sub_resource type="CurveTexture" id=1]
+curve = ExtResource( 4 )
+
+[sub_resource type="Curve" id=2]
+bake_resolution = 200
+_data = [ Vector2( 0, 0 ), 0.0, 0.0, 0, 0, Vector2( 0.0382653, 1 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=3]
+curve = SubResource( 2 )
+
+[sub_resource type="Gradient" id=4]
+offsets = PoolRealArray( 0, 0.971714, 0.998336 )
+colors = PoolColorArray( 0.698039, 1, 0.282353, 1, 0.521569, 0.894118, 0.192157, 1, 1, 1, 1, 0 )
+
+[sub_resource type="GradientTexture" id=7]
+gradient = SubResource( 4 )
+
+[sub_resource type="CurveTexture" id=6]
+width = 3072
+curve = ExtResource( 5 )
+
+[sub_resource type="ParticlesMaterial" id=8]
+emission_shape = 1
+emission_sphere_radius = 2.0
+flag_align_y = true
+flag_disable_z = true
+direction = Vector3( 0, -1, 0 )
+spread = 8.0
+gravity = Vector3( 0, 392, 0 )
+initial_velocity = 168.0
+initial_velocity_random = 0.16
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+damping_curve = SubResource( 6 )
+angle = -80.5
+angle_random = 1.0
+angle_curve = SubResource( 1 )
+color_ramp = SubResource( 7 )
+anim_offset_curve = SubResource( 3 )
+
+[sub_resource type="CircleShape2D" id=9]
+radius = 3.0
+
+[node name="SlimeBallProjectile" type="KinematicBody2D"]
+z_index = 1
+collision_layer = 0
+collision_mask = 8
+script = ExtResource( 6 )
+explodeParticleMaterial = SubResource( 8 )
+spillageScene = ExtResource( 2 )
+spillageModulate = Color( 0.517647, 0.890196, 0.192157, 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 9 )
+
+[node name="Light2D" type="Light2D" parent="."]
+modulate = Color( 2, 2, 2, 1 )
+texture = ExtResource( 3 )
+color = Color( 0.43, 1, 0.4395, 1 )
+energy = 0.7
+
+[node name="Tween" type="Tween" parent="."]
+
+[node name="Sprite" type="Sprite" parent="."]
+texture = ExtResource( 7 )
+
+[node name="Particles2D" type="Particles2D" parent="."]
+amount = 64
+lifetime = 0.5
+local_coords = false

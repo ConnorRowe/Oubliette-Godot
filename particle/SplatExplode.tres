@@ -15,9 +15,9 @@ curve = SubResource( 2 )
 
 [sub_resource type="Gradient" id=4]
 offsets = PoolRealArray( 0, 0.971714, 0.998336 )
-colors = PoolColorArray( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 )
+colors = PoolColorArray( 0.698039, 1, 0.282353, 1, 0.521569, 0.894118, 0.192157, 1, 1, 1, 1, 0 )
 
-[sub_resource type="GradientTexture" id=5]
+[sub_resource type="GradientTexture" id=7]
 gradient = SubResource( 4 )
 
 [sub_resource type="CurveTexture" id=6]
@@ -40,5 +40,5 @@ damping_curve = SubResource( 6 )
 angle = -80.5
 angle_random = 1.0
 angle_curve = SubResource( 1 )
-color_ramp = SubResource( 5 )
+color_ramp = SubResource( 7 )
 anim_offset_curve = SubResource( 3 )

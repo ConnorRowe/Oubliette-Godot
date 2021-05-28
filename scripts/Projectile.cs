@@ -25,7 +25,7 @@ public class Projectile : KinematicBody2D
         base._Ready();
 
         light = GetNode<Light2D>("Light2D");
-        particles = GetNode<Particles2D>("Particles2D");
+        particles = GetNodeOrNull<Particles2D>("Particles2D");
         tween = GetNode<Tween>("Tween");
     }
 
@@ -68,7 +68,9 @@ public class Projectile : KinematicBody2D
         deactivated = true;
         SetPhysicsProcess(false);
 
-        float hueCache = ((ParticlesMaterial)particles.ProcessMaterial).HueVariation;
+        float hueCache = 0.0f;
+        if(particles.ProcessMaterial != null && particles.ProcessMaterial is ParticlesMaterial pMat)
+            hueCache = pMat.HueVariation;    
 
         direction = Vector2.Zero;
         particles.OneShot = true;
