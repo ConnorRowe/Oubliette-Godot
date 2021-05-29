@@ -290,7 +290,7 @@ public class Player : Character, ICastsSpells
 
             if (artefactTex != null)
             {
-                Rect2 rect = new Rect2(textureSet.Offset + (charSprite.Frame % 3 == 0 ? new Vector2(0, -1) : Vector2.Zero), artefactTex.GetSize());
+                Rect2 rect = new Rect2(textureSet.Offset + (charSprite.Frame % 3 == 0 ? new Vector2(0, -1) : Vector2.Zero) + new Vector2(0, -elevation), artefactTex.GetSize());
                 if (direction == Direction.Up || direction == Direction.Left)
                     rect.Size = new Vector2(rect.Size.x * -1.0f, rect.Size.y);
 

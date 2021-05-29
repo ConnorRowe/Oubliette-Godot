@@ -16,6 +16,7 @@ public class LevelGenerator : Node, IProvidesNav
     private List<PackedScene> treasureRooms = new List<PackedScene>();
     private List<PackedScene> allBosses = new List<PackedScene>();
     private PackedScene bossRoom;
+    private PackedScene startingRoom;
     public Dictionary<Point, Room> generatedRooms = new Dictionary<Point, Room>();
     private int roomsToGen = 12;
     private readonly Point[] pointDirections = new Point[4] { new Point(0, 1), new Point(1, 0), new Point(0, -1), new Point(-1, 0) };
@@ -58,6 +59,7 @@ public class LevelGenerator : Node, IProvidesNav
         NavMesh = GetNode<Navigation2D>(_navigationPath);
 
         bossRoom = GD.Load<PackedScene>("res://scenes/level_generation/BossRoom.tscn");
+        startingRoom = GD.Load<PackedScene>("res://scenes/level_generation/StartingRoom.tscn");
 
         LoadScenesFromDirectory(rooms_directory, possibleRooms);
         LoadScenesFromDirectory(treasure_rooms_directory, treasureRooms);
@@ -144,8 +146,9 @@ public class LevelGenerator : Node, IProvidesNav
 
         // Treasure room    = 1
         // Boss room        = 2
+        // Starting room    = 3
         // at least one treasure room and one boss room must be generated
-        List<int> requiredSpecialRooms = new List<int>() { 1, 2 };
+        List<int> requiredSpecialRooms = new List<int>() { 1, 2, 3 };
 
         for (int i = 0; i < roomsToGen; ++i)
         {
@@ -272,42 +275,36 @@ public class LevelGenerator : Node, IProvidesNav
                 }
             }
 
-            // room.Value.Visible = false;
-
             // Connect door collision
             room.Value.Connect(nameof(Room.DoorHit), this, nameof(DoorHit));
 
-            // Don't spawn enemies in first room
-            if (room.Key != generatedRooms.First().Key)
+            // Spawn enemies
+            foreach (Node2D point in room.Value.GetNode("EnemySpawnPoints").GetChildren())
             {
-                // Spawn enemies
-                foreach (Node2D point in room.Value.GetNode("EnemySpawnPoints").GetChildren())
-                {
-                    AICharacter newEnemy = RandomEnemyInstance();
-                    room.Value.AddChild(newEnemy);
-                    newEnemy.navProvider = this;
-                    newEnemy.initPos = room.Value.Position + point.Position;
+                AICharacter newEnemy = RandomEnemyInstance();
+                room.Value.AddChild(newEnemy);
+                newEnemy.navProvider = this;
+                newEnemy.initPos = room.Value.Position + point.Position;
 
-                    room.Value.enemies.Add(newEnemy);
-                    room.Value.enemyCounter++;
+                room.Value.enemies.Add(newEnemy);
+                room.Value.enemyCounter++;
 
-                    // Connect enemy die signal to room function
-                    newEnemy.Connect(nameof(AICharacter.Died), room.Value, nameof(Room.EnemyDied));
-                }
+                // Connect enemy die signal to room function
+                newEnemy.Connect(nameof(AICharacter.Died), room.Value, nameof(Room.EnemyDied));
+            }
 
-                // If boss room spawn boss only
-                if (room.Value.roomType == 2)
-                {
-                    AICharacter boss = allBosses[rng.RandiRange(0, allBosses.Count - 1)].Instance<AICharacter>();
-                    room.Value.AddChild(boss);
-                    boss.navProvider = this;
-                    boss.initPos = room.Value.Position + new Vector2(177, 143);
+            // If boss room spawn a random boss
+            if (room.Value.roomType == 2)
+            {
+                AICharacter boss = allBosses[rng.RandiRange(0, allBosses.Count - 1)].Instance<AICharacter>();
+                room.Value.AddChild(boss);
+                boss.navProvider = this;
+                boss.initPos = room.Value.Position + new Vector2(177, 143);
 
-                    room.Value.enemies.Add(boss);
-                    room.Value.enemyCounter++;
+                room.Value.enemies.Add(boss);
+                room.Value.enemyCounter++;
 
-                    boss.Connect(nameof(AICharacter.Died), room.Value, nameof(Room.EnemyDied));
-                }
+                boss.Connect(nameof(AICharacter.Died), room.Value, nameof(Room.EnemyDied));
             }
 
             // Manage ChanceSpawnChild nodes
@@ -327,7 +324,6 @@ public class LevelGenerator : Node, IProvidesNav
                 chanceSpawns[i].QueueFree();
             }
 
-
             // Connect cleared signal
             room.Value.Connect(nameof(Room.Cleared), this, nameof(RoomWasCleared));
 
@@ -343,19 +339,22 @@ public class LevelGenerator : Node, IProvidesNav
 
             room.Value.WallTiles.CallDeferred("queue_free");
             room.Value.FloorTiles.CallDeferred("queue_free");
+
+            if (room.Value.roomType == 3)
+            {
+                // Put player in starting room
+                currentRoom = room.Key;
+                player.Position = generatedRooms[currentRoom].Position + new Vector2(8 * 16, 4 * 16);
+                generatedRooms[currentRoom].Visible = true;
+                generatedRooms[currentRoom].firstRoom = true;
+                roomBorder.Position = generatedRooms[currentRoom].Position + new Vector2(176, 144);
+            }
         }
 
         wallTiles.UpdateBitmaskRegion();
         wallTiles.UpdateDirtyQuadrants();
         floorTiles.UpdateBitmaskRegion();
         floorTiles.UpdateDirtyQuadrants();
-
-        // Put player in a room
-        currentRoom = generatedRooms.First().Key;
-        player.Position = generatedRooms[currentRoom].Position + new Vector2(8 * 16, 4 * 16);
-        generatedRooms[currentRoom].Visible = true;
-        generatedRooms[currentRoom].firstRoom = true;
-        roomBorder.Position = generatedRooms[currentRoom].Position + new Vector2(176, 144);
 
         // Update minimap
         EmitSignal(nameof(RoomChanged), this);
@@ -372,6 +371,8 @@ public class LevelGenerator : Node, IProvidesNav
                 return RandomRoomInstance(treasureRooms);
             case 2:
                 return bossRoom.Instance<BossRoom>();
+            case 3:
+                return startingRoom.Instance<Room>();
         }
 
         return null;
