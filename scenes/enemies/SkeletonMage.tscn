@@ -1,9 +1,11 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://textures/staff.png" type="Texture" id=1]
 [ext_resource path="res://textures/magic_gather_particles.png" type="Texture" id=2]
 [ext_resource path="res://scenes/enemies/AICharacterWithWeapon.tscn" type="PackedScene" id=3]
+[ext_resource path="res://textures/staff_emmision.png" type="Texture" id=4]
 [ext_resource path="res://scripts/AICharacterWithWeaponRanged.cs" type="Script" id=5]
+[ext_resource path="res://scenes/enemies/EmissiveOverlay.shader" type="Shader" id=6]
 
 [sub_resource type="Shader" id=1]
 code = "shader_type canvas_item;
@@ -56,7 +58,7 @@ tracks/0/keys = {
 "times": PoolRealArray( 0, 0.075, 0.15, 0.3 ),
 "transitions": PoolRealArray( 1, 1, 1, 1 ),
 "update": 0,
-"values": [ Color( 1, 1, 1, 1 ), Color( 1, 0, 0, 1 ), Color( 1, 1, 1, 1 ), Color( 1, 0, 0, 1 ) ]
+"values": [ Color( 1, 1, 1, 1 ), Color( 15, 0.19, 0, 1 ), Color( 15, 15, 15, 1 ), Color( 15, 0.19, 0, 1 ) ]
 }
 tracks/1/type = "value"
 tracks/1/path = NodePath("CharSprite:material:shader_param/override_lerp")
@@ -71,14 +73,20 @@ tracks/1/keys = {
 "values": [ 0.0, 1.0, 0.0 ]
 }
 
-[sub_resource type="CanvasItemMaterial" id=5]
+[sub_resource type="ShaderMaterial" id=6]
+shader = ExtResource( 6 )
+shader_param/emission_tint = Color( 0.639216, 0, 1, 1 )
+shader_param/intensity = 20.0
+shader_param/emission_texture = ExtResource( 4 )
+
+[sub_resource type="CanvasItemMaterial" id=7]
 light_mode = 1
 particles_animation = true
 particles_anim_h_frames = 4
 particles_anim_v_frames = 1
 particles_anim_loop = true
 
-[sub_resource type="Shader" id=6]
+[sub_resource type="Shader" id=8]
 code = "shader_type particles;
 
 /*
@@ -301,16 +309,16 @@ void vertex() {
 
 "
 
-[sub_resource type="Gradient" id=7]
+[sub_resource type="Gradient" id=9]
 offsets = PoolRealArray( 0, 0.76824, 1 )
 colors = PoolColorArray( 1, 0, 0.805664, 1, 0.678431, 0, 1, 1, 0.678431, 0, 1, 0 )
 
-[sub_resource type="GradientTexture" id=8]
-gradient = SubResource( 7 )
+[sub_resource type="GradientTexture" id=10]
+gradient = SubResource( 9 )
 
-[sub_resource type="ShaderMaterial" id=9]
+[sub_resource type="ShaderMaterial" id=11]
 resource_local_to_scene = true
-shader = SubResource( 6 )
+shader = SubResource( 8 )
 shader_param/spread = null
 shader_param/flatness = null
 shader_param/initial_linear_velocity = 0.0
@@ -344,7 +352,7 @@ shader_param/gravity = Vector3( 0, 0, 0 )
 shader_param/number_particles_shown = 0
 shader_param/max_number_particles = 32
 shader_param/number_batches = 1
-shader_param/color_ramp = SubResource( 8 )
+shader_param/color_ramp = SubResource( 10 )
 
 [node name="SkeletonMage" instance=ExtResource( 3 )]
 script = ExtResource( 5 )
@@ -382,14 +390,15 @@ shape = SubResource( 3 )
 anims/DamageFlash = SubResource( 4 )
 
 [node name="Weapon" parent="." index="5"]
+material = SubResource( 6 )
 texture = ExtResource( 1 )
 offset = Vector2( -5, -2.5 )
 
 [node name="StaffParticles" type="Particles2D" parent="Weapon" index="0"]
-material = SubResource( 5 )
+material = SubResource( 7 )
 position = Vector2( 6.5, 0 )
 amount = 32
 lifetime = 0.5
 local_coords = false
-process_material = SubResource( 9 )
+process_material = SubResource( 11 )
 texture = ExtResource( 2 )

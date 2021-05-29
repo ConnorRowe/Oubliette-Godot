@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=2]
+[gd_scene load_steps=24 format=2]
 
 [ext_resource path="res://font/small_font.tres" type="DynamicFont" id=1]
 [ext_resource path="res://scripts/World.cs" type="Script" id=2]
@@ -21,6 +21,7 @@
 [ext_resource path="res://textures/rgb_potion_fill.png" type="Texture" id=19]
 [ext_resource path="res://materials/PotionFill.shader" type="Shader" id=20]
 [ext_resource path="res://scenes/ArtefactNamePopup.tscn" type="PackedScene" id=21]
+[ext_resource path="res://default_env.tres" type="Environment" id=22]
 
 [sub_resource type="ShaderMaterial" id=1]
 resource_local_to_scene = true
@@ -133,3 +134,6 @@ __meta__ = {
 stream = ExtResource( 17 )
 autoplay = true
 bus = "Music"
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource( 22 )

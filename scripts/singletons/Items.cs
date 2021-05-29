@@ -116,7 +116,7 @@ public class Items : Node
         (Player p) =>
         {
             p.ApplyBuff(Buffs.CreateBuff("Grunty's Hat",
-        new List<(Stat stat, float amount)>() { (Stat.SpellSpeedMultiplier, 1.5f), (Stat.RangeMultiplier, 2.0f), (Stat.MagykaCostMultiplier, 0.5f), (Stat.CooldownMultplier, 0.5f) }, 0));
+        new List<(Stat stat, float amount)>() { (Stat.SpellSpeedMultiplier, 1.5f), (Stat.RangeMultiplier, 2.0f), (Stat.MagykaCostMultiplier, -0.5f), (Stat.CooldownMultplier, -0.5f) }, 0));
         }, new Artefact.ArtefactTextureSet(new Vector2(-3, -22), GD.Load<Texture>("res://textures/witch_hat_equip_updown.png"), GD.Load<Texture>("res://textures/witch_hat_equip_updown.png"), GD.Load<Texture>("res://textures/witch_hat_equip_leftright.png"))
         ), new LootPool[] { LootPool.GENERAL });
     }

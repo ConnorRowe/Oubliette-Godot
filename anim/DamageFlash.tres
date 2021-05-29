@@ -14,7 +14,7 @@ tracks/0/keys = {
 "times": PoolRealArray( 0, 0.075, 0.15, 0.3 ),
 "transitions": PoolRealArray( 1, 1, 1, 1 ),
 "update": 0,
-"values": [ Color( 1, 1, 1, 1 ), Color( 1, 0, 0, 1 ), Color( 1, 1, 1, 1 ), Color( 1, 0, 0, 1 ) ]
+"values": [ Color( 1, 1, 1, 1 ), Color( 15, 0.19, 0, 1 ), Color( 15, 15, 15, 1 ), Color( 15, 0.19, 0, 1 ) ]
 }
 tracks/1/type = "value"
 tracks/1/path = NodePath("CharSprite:material:shader_param/override_lerp")
@@ -38,7 +38,7 @@ tracks/2/keys = {
 "times": PoolRealArray( 0, 0.075, 0.15, 0.3 ),
 "transitions": PoolRealArray( 1, 1, 1, 1 ),
 "update": 0,
-"values": [ Color( 1, 1, 1, 1 ), Color( 1, 0, 0, 1 ), Color( 1, 1, 1, 1 ), Color( 1, 0, 0, 1 ) ]
+"values": [ Color( 1, 1, 1, 1 ), Color( 15, 0.19, 0, 1 ), Color( 15, 15, 15, 1 ), Color( 15, 0.19, 0, 1 ) ]
 }
 tracks/3/type = "value"
 tracks/3/path = NodePath("CharSprite/Arm:material:shader_param/override_lerp")

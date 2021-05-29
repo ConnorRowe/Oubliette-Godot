@@ -44,7 +44,7 @@ tracks/0/keys = {
 "times": PoolRealArray( 0, 0.075, 0.15, 0.3 ),
 "transitions": PoolRealArray( 1, 1, 1, 1 ),
 "update": 0,
-"values": [ Color( 1, 1, 1, 1 ), Color( 1, 0, 0, 1 ), Color( 1, 1, 1, 1 ), Color( 1, 0, 0, 1 ) ]
+"values": [ Color( 1, 1, 1, 1 ), Color( 15, 0.19, 0, 1 ), Color( 15, 15, 15, 1 ), Color( 15, 0.19, 0, 1 ) ]
 }
 tracks/1/type = "value"
 tracks/1/path = NodePath("CharSprite:material:shader_param/override_lerp")
@@ -64,9 +64,6 @@ script = ExtResource( 1 )
 _hitboxPath = NodePath("Hitbox")
 _upDownColliderPath = NodePath("Hitbox/UpDown")
 _rightLeftColliderPath = NodePath("Hitbox/LeftRight")
-_hitAreaPath = NodePath("")
-_upDownHitAreaPolyPath = NodePath("")
-_rightLeftHitAreaPolyPath = NodePath("")
 _charSpritePath = NodePath("CharSprite")
 _shadowSpritePath = NodePath("shadow")
 _animationPlayerPath = NodePath("AnimationPlayer")
