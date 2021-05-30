@@ -115,6 +115,7 @@ public class Items : Node
         RegisterArtefact(new Artefact("Grunty's Hat", "although she's dim, she attended Fat Hag High!", GD.Load<Texture>("res://textures/witch_hat.png"),
         (Player p) =>
         {
+            p.MixInSpellColour(new Color(0.546667f, 1, 0.15f), 1.0f);
             p.ApplyBuff(Buffs.CreateBuff("Grunty's Hat",
         new List<(Stat stat, float amount)>() { (Stat.SpellSpeedMultiplier, 1.5f), (Stat.RangeMultiplier, 2.0f), (Stat.MagykaCostMultiplier, -0.5f), (Stat.CooldownMultplier, -0.5f) }, 0));
         }, new Artefact.ArtefactTextureSet(new Vector2(-3, -22), GD.Load<Texture>("res://textures/witch_hat_equip_updown.png"), GD.Load<Texture>("res://textures/witch_hat_equip_updown.png"), GD.Load<Texture>("res://textures/witch_hat_equip_leftright.png"))

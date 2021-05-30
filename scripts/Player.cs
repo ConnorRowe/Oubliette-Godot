@@ -28,6 +28,7 @@ public class Player : Character, ICastsSpells
     private HashSet<Node> intersectedAreas = new HashSet<Node>();
     private Potion currentPotion;
     private float pickupCooldown = 0.0f;
+    public Color PrimarySpellColourAdjust = Colors.Transparent;
 
     // Nodes
     public Camera2D camera;
@@ -88,7 +89,8 @@ public class Player : Character, ICastsSpells
         primarySpell = _Spells.MagicMissile;
         secondarySpell = _Spells.IceSkin;
 
-        (staff.Material as ShaderMaterial).SetShaderParam("emission_tint", primarySpell.baseColour);
+        PrimarySpellColourAdjust = primarySpell.baseColour;
+        UpdateStaffGlow();
 
         DebugOverlay debug = world.GetDebugOverlay();
         debug.TrackFunc(nameof(GetSpellDamage), this, "DMG", 1);
@@ -534,7 +536,7 @@ public class Player : Character, ICastsSpells
 
     public Color GetSpellColour(Color baseColour)
     {
-        return baseColour;
+        return PrimarySpellColourAdjust == Colors.Transparent ? baseColour : PrimarySpellColourAdjust;
     }
 
     public int GetSpellDamage(int baseDamage)
@@ -659,5 +661,30 @@ public class Player : Character, ICastsSpells
     public void PickedUpArtefact(Artefact artefact)
     {
         world.artefactNamePopup.DisplayPopup(artefact.Name, artefact.Description);
+    }
+
+    public void MixInSpellColour(Color newColour, float weight)
+    {
+        if (PrimarySpellColourAdjust == Colors.Transparent)
+            PrimarySpellColourAdjust = newColour;
+        else
+            PrimarySpellColourAdjust = BlendColors(PrimarySpellColourAdjust, newColour, weight);
+
+        UpdateStaffGlow();
+    }
+
+    private Color BlendColors(Color a, Color b, float t)
+    {
+        return new Color(BlendColourChannel(a.r, b.r, t), BlendColourChannel(a.g, b.g, t), BlendColourChannel(a.b, b.b, t));
+    }
+
+    private float BlendColourChannel(float a, float b, float t)
+    {
+        return Mathf.Sqrt((1.0f - t) * Mathf.Pow(a, 2.2f) + t * Mathf.Pow(b, 2.2f));
+    }
+
+    private void UpdateStaffGlow()
+    {
+        (staff.Material as ShaderMaterial).SetShaderParam("emission_tint", PrimarySpellColourAdjust);
     }
 }

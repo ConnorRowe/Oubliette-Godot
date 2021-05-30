@@ -16,14 +16,11 @@ public class Torch : Node2D
         GD.Randomize();
         count = GD.Randf();
     }
-    
+
     public override void _Process(float delta)
     {
-        // float time = ((float)OS.GetTicksMsec()) * 1000.0f;
-        // float frac = time - Mathf.Floor(time);
-        
         count += delta / 2.0f;
-        if(count > 1.0f)
+        if (count > 1.0f)
             count -= 1.0f;
 
         light.Energy = flickerCurve.InterpolateBaked(count) * 0.75f;

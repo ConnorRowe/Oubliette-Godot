@@ -279,9 +279,10 @@ script = ExtResource( 3 )
 flickerCurve = ExtResource( 2 )
 
 [node name="Sprite" type="AnimatedSprite" parent="."]
+self_modulate = Color( 5, 4.4, 3.75, 1 )
 position = Vector2( 0, -8 )
 frames = SubResource( 9 )
-frame = 2
+frame = 6
 playing = true
 
 [node name="Light2D" type="Light2D" parent="Sprite"]
