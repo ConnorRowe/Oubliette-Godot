@@ -123,6 +123,13 @@ public class AICharacterWithWeaponRanged : AICharacterWithWeapon
         tween.StopAll();
         weaponParticles.QueueFree();
 
+        tween.InterpolateMethod(this, nameof(SetWeaponGlow), 20.0f, 1.0f, 4.0f, Tween.TransitionType.Cubic, Tween.EaseType.In);
+
         base.Die();
+    }
+
+    private void SetWeaponGlow(float intensity)
+    {
+        (weapon.Material as ShaderMaterial).SetShaderParam("intensity", intensity);
     }
 }

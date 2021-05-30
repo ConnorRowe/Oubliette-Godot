@@ -9,7 +9,7 @@ public class AICharacterWithWeapon : AICharacter
     private Vector2 wepFallPos = Vector2.Zero;
 
     // Nodes
-    private Sprite weapon;
+    protected Sprite weapon;
     private Line2D arm;
 
     // Export

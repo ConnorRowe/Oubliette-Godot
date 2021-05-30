@@ -4,8 +4,8 @@ using System;
 public class GiantSlime : AICharacter, ICastsSpells
 {
     private bool attackSwitch = false;
-    private ProjectileSpell slimeBallSpell = new ProjectileSpell(0.0f, 1, 400.0f, 100.0f, 200.0f, 0.0f, "res://scenes/SlimeBallProjectile.tscn");
-    private ProjectileSpell tripleSlimeBallSpell = new MultiSpreadProjectileSpell(3, Mathf.Pi / 5f, 0.0f, 1, 400.0f, 100.0f, 200.0f, 0.0f, "res://scenes/SlimeBallProjectile.tscn");
+    private ProjectileSpell slimeBallSpell = new ProjectileSpell(1, 400.0f, 100.0f, 140.0f, 0.0f, new Color(0.682353f, 0.917647f, 0.301961f), "res://scenes/SlimeBallProjectile.tscn");
+    private ProjectileSpell tripleSlimeBallSpell = new MultiSpreadProjectileSpell(3, Mathf.Pi / 5f, 1, 400.0f, 100.0f, 140.0f, 0.0f, new Color(0.682353f, 0.917647f, 0.301961f), "res://scenes/SlimeBallProjectile.tscn");
 
     public override void _Ready()
     {

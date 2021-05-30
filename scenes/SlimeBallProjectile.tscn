@@ -21,14 +21,14 @@ curve = SubResource( 2 )
 offsets = PoolRealArray( 0, 0.971714, 0.998336 )
 colors = PoolColorArray( 0.698039, 1, 0.282353, 1, 0.521569, 0.894118, 0.192157, 1, 1, 1, 1, 0 )
 
-[sub_resource type="GradientTexture" id=7]
+[sub_resource type="GradientTexture" id=5]
 gradient = SubResource( 4 )
 
 [sub_resource type="CurveTexture" id=6]
 width = 3072
 curve = ExtResource( 5 )
 
-[sub_resource type="ParticlesMaterial" id=8]
+[sub_resource type="ParticlesMaterial" id=7]
 emission_shape = 1
 emission_sphere_radius = 2.0
 flag_align_y = true
@@ -44,10 +44,10 @@ damping_curve = SubResource( 6 )
 angle = -80.5
 angle_random = 1.0
 angle_curve = SubResource( 1 )
-color_ramp = SubResource( 7 )
+color_ramp = SubResource( 5 )
 anim_offset_curve = SubResource( 3 )
 
-[sub_resource type="CircleShape2D" id=9]
+[sub_resource type="CircleShape2D" id=8]
 radius = 3.0
 
 [node name="SlimeBallProjectile" type="KinematicBody2D"]
@@ -55,14 +55,15 @@ z_index = 1
 collision_layer = 0
 collision_mask = 8
 script = ExtResource( 6 )
-explodeParticleMaterial = SubResource( 8 )
+explodeParticleMaterial = SubResource( 7 )
 spillageScene = ExtResource( 2 )
 spillageModulate = Color( 0.517647, 0.890196, 0.192157, 1 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource( 9 )
+shape = SubResource( 8 )
 
 [node name="Light2D" type="Light2D" parent="."]
+visible = false
 modulate = Color( 2, 2, 2, 1 )
 texture = ExtResource( 3 )
 color = Color( 0.43, 1, 0.4395, 1 )

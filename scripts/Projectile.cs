@@ -7,6 +7,7 @@ public class Projectile : KinematicBody2D
     private float range = 0;
     private float knockback = 0;
     private float speed = 0;
+    private Color spellColour = Colors.Transparent;
 
     private float rangeCounter = 0;
     private bool deactivated = false;
@@ -69,8 +70,8 @@ public class Projectile : KinematicBody2D
         SetPhysicsProcess(false);
 
         float hueCache = 0.0f;
-        if(particles.ProcessMaterial != null && particles.ProcessMaterial is ParticlesMaterial pMat)
-            hueCache = pMat.HueVariation;    
+        if (particles.ProcessMaterial != null && particles.ProcessMaterial is ParticlesMaterial pMat)
+            hueCache = pMat.HueVariation;
 
         direction = Vector2.Zero;
         particles.OneShot = true;
@@ -97,5 +98,17 @@ public class Projectile : KinematicBody2D
         this.range = range;
         this.knockback = knockback;
         this.speed = speed;
+    }
+
+    public void SetProjectileColour(Color newColour)
+    {
+        spellColour = newColour;
+
+        if (particles.ProcessMaterial != null)
+        {
+            GradientTexture particleColourRamp = (GradientTexture)((ParticlesMaterial)particles.ProcessMaterial).ColorRamp;
+            particleColourRamp.Gradient.SetColor(0, spellColour);
+            explodeParticleMaterial.ColorRamp = particleColourRamp;
+        }
     }
 }

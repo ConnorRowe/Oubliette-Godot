@@ -29,7 +29,7 @@ void fragment()
 [resource]
 resource_local_to_scene = true
 shader = SubResource( 1 )
-shader_param/colour_override = Color( 1, 0, 0, 1 )
+shader_param/colour_override = Color( 1, 1, 1, 1 )
 shader_param/override_lerp = 0.0
 shader_param/outline_colour = Color( 1, 1, 1, 1 )
 shader_param/outline_width = 0.0

@@ -4,14 +4,12 @@ using System;
 public class ProjectileSpell : BaseSpell
 {
     private readonly PackedScene projectileScene;
-    private readonly float hueAdjust;
 
     public ProjectileSpell() { }
 
-    public ProjectileSpell(float hueAdjust, int damage, float range, float knockback, float speed, float majykaCost, NodePath projectilePath) : base(damage, range, knockback, speed, majykaCost)
+    public ProjectileSpell(int damage, float range, float knockback, float speed, float majykaCost, Color baseColour, NodePath projectilePath) : base(damage, range, knockback, speed, majykaCost, baseColour)
     {
         projectileScene = GD.Load<PackedScene>(projectilePath);
-        this.hueAdjust = hueAdjust;
     }
 
     public override void Cast(ICastsSpells source)
@@ -26,9 +24,7 @@ public class ProjectileSpell : BaseSpell
         proj.GlobalPosition = source.GetSpellSpawnPos();
         proj.direction = source.GetSpellDirection();
         proj.source = (Character)source;
-
-        if (proj.particles.ProcessMaterial != null)
-            ((ParticlesMaterial)proj.particles.ProcessMaterial).HueVariation = hueAdjust;
+        proj.SetProjectileColour(source.GetSpellColour(baseColour));
 
         proj.SetSpellStats(source.GetSpellDamage(damage), source.GetSpellRange(range), source.GetSpellKnockback(knockback), source.GetSpellSpeed(speed));
 

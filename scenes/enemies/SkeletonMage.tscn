@@ -5,7 +5,7 @@
 [ext_resource path="res://scenes/enemies/AICharacterWithWeapon.tscn" type="PackedScene" id=3]
 [ext_resource path="res://textures/staff_emmision.png" type="Texture" id=4]
 [ext_resource path="res://scripts/AICharacterWithWeaponRanged.cs" type="Script" id=5]
-[ext_resource path="res://scenes/enemies/EmissiveOverlay.shader" type="Shader" id=6]
+[ext_resource path="res://materials/EmissiveOverlay.shader" type="Shader" id=6]
 
 [sub_resource type="Shader" id=1]
 code = "shader_type canvas_item;
@@ -73,20 +73,21 @@ tracks/1/keys = {
 "values": [ 0.0, 1.0, 0.0 ]
 }
 
-[sub_resource type="ShaderMaterial" id=6]
+[sub_resource type="ShaderMaterial" id=5]
+resource_local_to_scene = true
 shader = ExtResource( 6 )
-shader_param/emission_tint = Color( 0.639216, 0, 1, 1 )
+shader_param/emission_tint = Color( 0.640667, 0.02, 1, 1 )
 shader_param/intensity = 20.0
 shader_param/emission_texture = ExtResource( 4 )
 
-[sub_resource type="CanvasItemMaterial" id=7]
+[sub_resource type="CanvasItemMaterial" id=6]
 light_mode = 1
 particles_animation = true
 particles_anim_h_frames = 4
 particles_anim_v_frames = 1
 particles_anim_loop = true
 
-[sub_resource type="Shader" id=8]
+[sub_resource type="Shader" id=7]
 code = "shader_type particles;
 
 /*
@@ -309,16 +310,16 @@ void vertex() {
 
 "
 
-[sub_resource type="Gradient" id=9]
+[sub_resource type="Gradient" id=8]
 offsets = PoolRealArray( 0, 0.76824, 1 )
 colors = PoolColorArray( 1, 0, 0.805664, 1, 0.678431, 0, 1, 1, 0.678431, 0, 1, 0 )
 
-[sub_resource type="GradientTexture" id=10]
-gradient = SubResource( 9 )
+[sub_resource type="GradientTexture" id=9]
+gradient = SubResource( 8 )
 
-[sub_resource type="ShaderMaterial" id=11]
+[sub_resource type="ShaderMaterial" id=10]
 resource_local_to_scene = true
-shader = SubResource( 8 )
+shader = SubResource( 7 )
 shader_param/spread = null
 shader_param/flatness = null
 shader_param/initial_linear_velocity = 0.0
@@ -352,7 +353,7 @@ shader_param/gravity = Vector3( 0, 0, 0 )
 shader_param/number_particles_shown = 0
 shader_param/max_number_particles = 32
 shader_param/number_batches = 1
-shader_param/color_ramp = SubResource( 10 )
+shader_param/color_ramp = SubResource( 9 )
 
 [node name="SkeletonMage" instance=ExtResource( 3 )]
 script = ExtResource( 5 )
@@ -390,15 +391,15 @@ shape = SubResource( 3 )
 anims/DamageFlash = SubResource( 4 )
 
 [node name="Weapon" parent="." index="5"]
-material = SubResource( 6 )
+material = SubResource( 5 )
 texture = ExtResource( 1 )
 offset = Vector2( -5, -2.5 )
 
 [node name="StaffParticles" type="Particles2D" parent="Weapon" index="0"]
-material = SubResource( 7 )
+material = SubResource( 6 )
 position = Vector2( 6.5, 0 )
 amount = 32
 lifetime = 0.5
 local_coords = false
-process_material = SubResource( 11 )
+process_material = SubResource( 10 )
 texture = ExtResource( 2 )

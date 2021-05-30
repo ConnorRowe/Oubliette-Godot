@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=2]
+[gd_scene load_steps=39 format=2]
 
 [ext_resource path="res://scripts/Player.cs" type="Script" id=1]
 [ext_resource path="res://textures/Player_run_right.png" type="Texture" id=2]
@@ -12,6 +12,8 @@
 [ext_resource path="res://textures/1x1_white.png" type="Texture" id=10]
 [ext_resource path="res://textures/staff.png" type="Texture" id=11]
 [ext_resource path="res://materials/M_ColourOverride_Vertex.tres" type="Material" id=12]
+[ext_resource path="res://scenes/enemies/EmissiveOverlay.shader" type="Shader" id=13]
+[ext_resource path="res://textures/staff_emmision.png" type="Texture" id=14]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 2, 9 )
@@ -115,6 +117,12 @@ shader_param/y_dir_range = Vector2( 0, 0 )
 shader_param/gravity = 0.05
 shader_param/base_colour = Color( 1, 1, 1, 1 )
 
+[sub_resource type="ShaderMaterial" id=24]
+shader = ExtResource( 13 )
+shader_param/emission_tint = Color( 0.901961, 0.282353, 0.968627, 1 )
+shader_param/intensity = 6.0
+shader_param/emission_texture = ExtResource( 14 )
+
 [sub_resource type="CapsuleShape2D" id=22]
 radius = 2.0
 height = 0.0
@@ -161,6 +169,7 @@ process_material = SubResource( 21 )
 texture = ExtResource( 10 )
 
 [node name="staff" type="Sprite" parent="CharSprite"]
+material = SubResource( 24 )
 position = Vector2( -4, -6 )
 rotation = 1.5708
 texture = ExtResource( 11 )

@@ -402,6 +402,16 @@ public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
         return baseSpeed;
     }
 
+    Color ICastsSpells.GetSpellColour(Color baseColour)
+    {
+        return GetSpellColour(baseColour);
+    }
+
+    public virtual Color GetSpellColour(Color baseColour)
+    {
+        return baseColour;
+    }
+
     void IIntersectsPlayerHitArea.PlayerHit(Player player)
     {
         PlayerHit(player);

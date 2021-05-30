@@ -7,8 +7,9 @@ _data = [ Vector2( 0, 0 ), 0.0, 1.0, 0, 1, Vector2( 1, 1 ), 1.10158, 0.0, 0, 0 ]
 curve = SubResource( 1 )
 
 [sub_resource type="Gradient" id=3]
-offsets = PoolRealArray( 0.00858369, 0.055794, 0.450644, 0.738197, 0.987124 )
-colors = PoolColorArray( 1, 0.976494, 0.695313, 1, 1, 0.922852, 0, 1, 1, 0, 0, 1, 0.310547, 0, 0, 1, 0.0566406, 0.0566406, 0.0566406, 1 )
+resource_local_to_scene = true
+offsets = PoolRealArray( 0.00757576, 0.981618, 1 )
+colors = PoolColorArray( 1, 0.0392157, 0.0392157, 1, 0, 0, 0, 1, 0, 0, 0, 0 )
 
 [sub_resource type="GradientTexture" id=4]
 gradient = SubResource( 3 )

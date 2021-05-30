@@ -44,6 +44,7 @@ _artefactNamePopupPath = NodePath("CanvasLayer/ArtefactNamePopup")
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
 
 [node name="Player" parent="." instance=ExtResource( 8 )]
+position = Vector2( 36, 58 )
 maxHealth = 8
 
 [node name="Background" type="ParallaxBackground" parent="."]

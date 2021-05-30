@@ -88,6 +88,8 @@ public class Player : Character, ICastsSpells
         primarySpell = _Spells.MagicMissile;
         secondarySpell = _Spells.IceSkin;
 
+        (staff.Material as ShaderMaterial).SetShaderParam("emission_tint", primarySpell.baseColour);
+
         DebugOverlay debug = world.GetDebugOverlay();
         debug.TrackFunc(nameof(GetSpellDamage), this, "DMG", 1);
         debug.TrackFunc(nameof(GetSpellRange), this, "RNG", 1);
@@ -273,6 +275,10 @@ public class Player : Character, ICastsSpells
             majykaBar.UpdateSpellCooldown(primarySpellCDPercent);
         else
             majykaBar.UpdateSpellCooldown(0.0f);
+
+
+        // Update staff glow intensity
+        (staff.Material as ShaderMaterial).SetShaderParam("intensity", Mathf.Lerp(6.0f, 0.0f, primarySpellCooldown / maxPrimarySpellCooldown));
 
         Update();
     }
@@ -524,6 +530,11 @@ public class Player : Character, ICastsSpells
     public Vector2 GetSpellSpawnPos()
     {
         return spellSpawnPoint.GlobalPosition;
+    }
+
+    public Color GetSpellColour(Color baseColour)
+    {
+        return baseColour;
     }
 
     public int GetSpellDamage(int baseDamage)

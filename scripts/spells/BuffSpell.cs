@@ -12,7 +12,7 @@ public class BuffSpell : BaseSpell
 
     public BuffSpell() { }
 
-    public BuffSpell(string name, float duration, float majykaCost, (Stat stat, float amount)[] buffs, Shader effectShader, Color outlineColour) : base(0, 0, 0, 0, majykaCost)
+    public BuffSpell(string name, float duration, float majykaCost, Color baseColour, (Stat stat, float amount)[] buffs, Shader effectShader, Color outlineColour) : base(0, 0, 0, 0, majykaCost, baseColour)
     {
         this.name = name;
         this.duration = duration;

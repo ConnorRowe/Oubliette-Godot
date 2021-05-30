@@ -9,4 +9,5 @@ public interface ICastsSpells
     float GetSpellSpeed(float baseSpeed);
     Vector2 GetSpellDirection();
     Vector2 GetSpellSpawnPos();
+    Color GetSpellColour(Color baseColour);
 }

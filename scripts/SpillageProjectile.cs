@@ -5,7 +5,7 @@ public class SpillageProjectile : Projectile
 {
     private Vector2 lastPosition;
     private Vector2 distanceMoved = Vector2.Zero;
-    private readonly Vector2 distBetweenSpillages = new Vector2(10.0f, 5.5f);
+    private readonly Vector2 distBetweenSpillages = new Vector2(10.0f, 4.5f);
 
 
     [Export]
