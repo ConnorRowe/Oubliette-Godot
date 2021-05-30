@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class AIManager : Godot.Object
+public class AIManager : Godot.Reference
 {
     public static uint visibilityLayer = 0b0100;
     public static uint tilesLayer = 0b0001;
@@ -38,10 +38,13 @@ public class AIManager : Godot.Object
 
     public void TryTransition()
     {
+        if (CurrentBehaviour.Empty())
+            return;
+
         transitionTimer = owner.GetTree().CreateTimer(0.5f);
         transitionTimer.Connect("timeout", this, nameof(TryTransition));
 
-        if (CurrentBehaviour.Empty() || !CanTryTransition)
+        if (!CanTryTransition)
             return;
 
         if (!CurrentBehaviour.Empty())
@@ -121,6 +124,12 @@ public class AIManager : Godot.Object
     public void RemoveBehaviour(string behaviourKey)
     {
         Behaviours.Remove(behaviourKey);
+    }
+
+    public void StopTryTransitionLoop()
+    {
+        SetCurrentBehaviour("");
+        transitionTimer.Disconnect("timeout", this, nameof(TryTransition));
     }
 
     public static Player CheckForPlayer(Physics2DShapeQueryParameters shapeQuery, Physics2DDirectSpaceState spaceState)

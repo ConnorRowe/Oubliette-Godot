@@ -286,7 +286,7 @@ public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
     public override void _ExitTree()
     {
         // Stop AIManager
-        aIManager.SetCurrentBehaviour("");
+        aIManager.StopTryTransitionLoop();
         aIManager.Dispose();
         tween.StopAll();
         base._ExitTree();

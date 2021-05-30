@@ -361,6 +361,21 @@ public class LevelGenerator : Node, IProvidesNav
         EmitSignal(nameof(RoomCleared), currentRoom.X, currentRoom.Y);
     }
 
+    public void RegenerateLevel()
+    {
+        foreach (Node node in GetParent().GetChildren())
+        {
+            if (node is Room)
+            {
+                node.QueueFree();
+            }
+        }
+
+        GetParent().GetNode<Minimap>("CanvasLayer/Minimap").ClearMinimap();
+
+        CallDeferred(nameof(GenerateLevel));
+    }
+
     private Room RandomRoomFromIndex(int index)
     {
         switch (index)

@@ -117,17 +117,17 @@ shader_param/y_dir_range = Vector2( 0, 0 )
 shader_param/gravity = 0.05
 shader_param/base_colour = Color( 1, 1, 1, 1 )
 
-[sub_resource type="ShaderMaterial" id=24]
+[sub_resource type="ShaderMaterial" id=22]
 shader = ExtResource( 13 )
 shader_param/emission_tint = Color( 0.901961, 0.282353, 0.968627, 1 )
 shader_param/intensity = 6.0
 shader_param/emission_texture = ExtResource( 14 )
 
-[sub_resource type="CapsuleShape2D" id=22]
+[sub_resource type="CapsuleShape2D" id=23]
 radius = 2.0
 height = 0.0
 
-[sub_resource type="RectangleShape2D" id=23]
+[sub_resource type="RectangleShape2D" id=24]
 extents = Vector2( 2, 0.5 )
 
 [node name="Player" type="KinematicBody2D"]
@@ -169,7 +169,7 @@ process_material = SubResource( 21 )
 texture = ExtResource( 10 )
 
 [node name="staff" type="Sprite" parent="CharSprite"]
-material = SubResource( 24 )
+material = SubResource( 22 )
 position = Vector2( -4, -6 )
 rotation = 1.5708
 texture = ExtResource( 11 )
@@ -207,7 +207,7 @@ begin_cap_mode = 1
 end_cap_mode = 1
 
 [node name="Collision" type="CollisionShape2D" parent="."]
-shape = SubResource( 22 )
+shape = SubResource( 23 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
@@ -227,10 +227,9 @@ polygon = PoolVector2Array( -2, 1, -2, -17, -1, -18, 1, -18, 2, -17, 2, 1 )
 
 [node name="FeetArea" type="Area2D" parent="."]
 visible = false
-monitorable = false
-collision_layer = 0
+collision_layer = 2
 collision_mask = 16
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="FeetArea"]
 position = Vector2( 0, 0.5 )
-shape = SubResource( 23 )
+shape = SubResource( 24 )

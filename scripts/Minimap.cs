@@ -125,4 +125,11 @@ public class Minimap : Node2D
 
         Update();
     }
+
+    public void ClearMinimap()
+    {
+        discoveredRooms.Clear();
+
+        Update();
+    }
 }
