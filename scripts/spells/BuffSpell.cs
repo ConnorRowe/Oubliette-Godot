@@ -1,4 +1,5 @@
 using Godot;
+using System;
 using System.Collections.Generic;
 using Stats;
 
@@ -6,15 +7,13 @@ public class BuffSpell : BaseSpell
 {
     private readonly (Stat stat, float amount)[] buffs;
     private readonly float duration;
-    public readonly string name;
     public readonly Shader effectShader;
     public readonly Color outlineColour;
 
     public BuffSpell() { }
 
-    public BuffSpell(string name, float duration, float majykaCost, Color baseColour, (Stat stat, float amount)[] buffs, Shader effectShader, Color outlineColour) : base(0, 0, 0, 0, majykaCost, baseColour)
+    public BuffSpell(string name, float duration, float majykaCost, Color baseColour, Texture icon, Action<Character> hitCharEvt, (Stat stat, float amount)[] buffs, Shader effectShader, Color outlineColour) : base(name, 0, 0, 0, 0, majykaCost, baseColour, icon, hitCharEvt)
     {
-        this.name = name;
         this.duration = duration;
         this.buffs = buffs;
         this.effectShader = effectShader;
@@ -23,7 +22,7 @@ public class BuffSpell : BaseSpell
 
     public override void Cast(ICastsSpells source)
     {
-        (source as Character).ApplyBuff(Buffs.CreateBuff(name, new List<(Stat stat, float amount)>(buffs), duration, this));
+        (source as Character).ApplyBuff(Buffs.CreateBuff(Name, new List<(Stat stat, float amount)>(buffs), duration, this));
 
         if (source is Player player)
         {

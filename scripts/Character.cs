@@ -170,7 +170,11 @@ public abstract class Character : KinematicBody2D
 
     public HashSet<Buff> Buffs = new HashSet<Buff>();
 
-    public virtual float GetMaxSpeed() { return maxSpeed; }
+    public virtual float GetMaxSpeed()
+    {
+        return maxSpeed * currentStats[Stat.MoveSpeedMultiplier];
+    }
+
     public virtual float GetAcceleration() { return acceleration; }
 
     // Directions must be normalised
@@ -549,7 +553,7 @@ public abstract class Character : KinematicBody2D
     public void AdjustMaxHealth(int adjustment, bool affectCurrentHealth)
     {
         maxHealth += adjustment;
-        
+
         if (affectCurrentHealth)
             currentHealth += adjustment;
 

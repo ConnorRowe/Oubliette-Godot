@@ -17,6 +17,7 @@ public class Projectile : KinematicBody2D
     public Light2D light;
     public Particles2D particles;
     private Tween tween;
+    private Action<Character> hitCharEvent = null;
 
     [Export]
     private ParticlesMaterial explodeParticleMaterial;
@@ -55,10 +56,11 @@ public class Projectile : KinematicBody2D
         if (deactivated || node.Owner == source || node is Projectile)
             return;
 
-        if (node.Owner is Character)
+        if (node.Owner is Character character)
         {
-            (node.Owner as Character).TakeDamage(damage, source);
-            (node.Owner as Character).ApplyKnockBack(direction * knockback);
+            character.TakeDamage(damage, source);
+            character.ApplyKnockBack(direction * knockback);
+            hitCharEvent?.Invoke(character);
         }
 
         Explode();
@@ -98,6 +100,11 @@ public class Projectile : KinematicBody2D
         this.range = range;
         this.knockback = knockback;
         this.speed = speed;
+    }
+
+    public void SetHitCharEvent(Action<Character> hitCharEvent)
+    {
+        this.hitCharEvent = hitCharEvent;
     }
 
     public void SetProjectileColour(Color newColour)

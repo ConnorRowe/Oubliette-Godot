@@ -7,7 +7,7 @@ public class ProjectileSpell : BaseSpell
 
     public ProjectileSpell() { }
 
-    public ProjectileSpell(int damage, float range, float knockback, float speed, float majykaCost, Color baseColour, NodePath projectilePath) : base(damage, range, knockback, speed, majykaCost, baseColour)
+    public ProjectileSpell(string name, int damage, float range, float knockback, float speed, float majykaCost, Color baseColour, Texture icon, Action<Character> hitCharEvt, NodePath projectilePath) : base(name, damage, range, knockback, speed, majykaCost, baseColour, icon, hitCharEvt)
     {
         projectileScene = GD.Load<PackedScene>(projectilePath);
     }
@@ -27,6 +27,7 @@ public class ProjectileSpell : BaseSpell
         proj.SetProjectileColour(source.GetSpellColour(baseColour));
 
         proj.SetSpellStats(source.GetSpellDamage(damage), source.GetSpellRange(range), source.GetSpellKnockback(knockback), source.GetSpellSpeed(speed));
+        proj.SetHitCharEvent(HitCharEvent);
 
         return proj;
     }

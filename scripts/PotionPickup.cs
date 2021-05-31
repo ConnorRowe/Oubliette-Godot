@@ -23,6 +23,9 @@ public class PotionPickup : BasePickup
 
     public override void PlayerHit(Player player)
     {
+        if(IsQueuedForDeletion())
+            return;
+
         if (player.PickUpPotion(potion))
             QueueFree();
     }

@@ -6,6 +6,17 @@ public class ItemDisplaySlot : Sprite
     private Label nameLabel;
     private string _itemName = "";
 
+    public Label NameLabel
+    {
+        get
+        {
+            if (nameLabel == null)
+                nameLabel = GetNode<Label>("Label");
+
+            return nameLabel;
+        }
+    }
+
     public string ItemName
     {
         get
@@ -17,7 +28,7 @@ public class ItemDisplaySlot : Sprite
             if (_itemName != value)
             {
                 _itemName = value;
-                nameLabel.Text = _itemName;
+                NameLabel.Text = _itemName;
             }
         }
     }
@@ -26,7 +37,6 @@ public class ItemDisplaySlot : Sprite
     {
         base._Ready();
 
-        nameLabel = GetNode<Label>("Label");
         Area2D mouseOverArea = GetNode<Area2D>("MouseOverArea");
 
         mouseOverArea.Connect("mouse_entered", this, nameof(SetLabelVisibility), new Godot.Collections.Array() { true });
@@ -49,11 +59,11 @@ public class ItemDisplaySlot : Sprite
     {
         if (isVisible)
         {
-            nameLabel.Show();
+            NameLabel.Show();
         }
         else
         {
-            nameLabel.Hide();
+            NameLabel.Hide();
         }
     }
 }

@@ -6,8 +6,8 @@ public class Player : Character, ICastsSpells
 {
     private float jumpPower = 175f;
     private float scrollScale = 1.0f;
-    public BaseSpell primarySpell;
-    public BaseSpell secondarySpell;
+    private BaseSpell primarySpell;
+    private BaseSpell secondarySpell;
     private SceneTreeTimer spellEffectTimer;
     private SceneTreeTimer takeDmgTimer;
     private SceneTreeTimer spillageDmgTimer;
@@ -28,11 +28,11 @@ public class Player : Character, ICastsSpells
     private HashSet<Node> intersectedAreas = new HashSet<Node>();
     private Potion currentPotion;
     private float pickupCooldown = 0.0f;
-    public Color PrimarySpellColourAdjust = Colors.Transparent;
+    public HashSet<(Color colour, float weight)> SpellColourMods = new HashSet<(Color colour, float weight)>();
+    private Color primarySpellColourCache;
 
     // Nodes
     public Camera2D camera;
-    private Spells _Spells;
     private Particles2D spellParticle;
     private MajykaContainer majykaBar;
     private Sprite staff;
@@ -42,6 +42,8 @@ public class Player : Character, ICastsSpells
     private Light2D staffLight;
     private Node2D spellSpawnPoint;
     private ItemDisplaySlot potionSlot;
+    private ItemDisplaySlot primarySpellSlot;
+    private PackedScene spellPickupScene;
 
     // Input
     private bool inputMoveUp = false;
@@ -72,8 +74,8 @@ public class Player : Character, ICastsSpells
         debugPoint = GD.Load<Texture>("res://textures/2x2_white.png");
         projectileScene = GD.Load<PackedScene>("res://scenes/Projectile.tscn");
         potionScene = GD.Load<PackedScene>("res://scenes/Potion.tscn");
+        spellPickupScene = GD.Load<PackedScene>("res://scenes/SpellPickup.tscn");
 
-        _Spells = (Spells)GetNode("/root/Spells");
         majykaBar = GetParent().GetNode<MajykaContainer>("CanvasLayer/MajykaContainer");
         spellParticle = GetNode<Particles2D>("CharSprite/SpellParticle");
         spellParticle.Material = new ShaderMaterial();
@@ -85,12 +87,13 @@ public class Player : Character, ICastsSpells
         staffLight = GetNode<Light2D>("CharSprite/staff/StaffLight");
         spellSpawnPoint = GetNode<Node2D>("CharSprite/staff/SpellSpawnPoint");
         potionSlot = world.GetNode<ItemDisplaySlot>("CanvasLayer/PotionSlot");
+        primarySpellSlot = world.GetNode<ItemDisplaySlot>("CanvasLayer/PrimarySpellSlot");
 
-        primarySpell = _Spells.MagicMissile;
-        secondarySpell = _Spells.IceSkin;
+        PickUpPrimarySpell(Spells.MagicMissile);
+        GetNode<Items>("/root/Items").RemoveSpellFromPools(Spells.MagicMissile);
+        secondarySpell = Spells.IceSkin;
 
-        PrimarySpellColourAdjust = primarySpell.baseColour;
-        UpdateStaffGlow();
+        CachePrimarySpellColour();
 
         DebugOverlay debug = world.GetDebugOverlay();
         debug.TrackFunc(nameof(GetSpellDamage), this, "DMG", 1);
@@ -489,11 +492,6 @@ public class Player : Character, ICastsSpells
         return GetDirection(facingDir);
     }
 
-    public override float GetMaxSpeed()
-    {
-        return base.GetMaxSpeed() * currentStats[Stat.MoveSpeedMultiplier];
-    }
-
     public void UpdatePlayerSpellEffects(Shader effectShader, Color outlineColour, float duration)
     {
         ShaderMaterial mat = (ShaderMaterial)charSprite.Material;
@@ -536,7 +534,7 @@ public class Player : Character, ICastsSpells
 
     public Color GetSpellColour(Color baseColour)
     {
-        return PrimarySpellColourAdjust == Colors.Transparent ? baseColour : PrimarySpellColourAdjust;
+        return primarySpellColourCache;
     }
 
     public int GetSpellDamage(int baseDamage)
@@ -665,12 +663,9 @@ public class Player : Character, ICastsSpells
 
     public void MixInSpellColour(Color newColour, float weight)
     {
-        if (PrimarySpellColourAdjust == Colors.Transparent)
-            PrimarySpellColourAdjust = newColour;
-        else
-            PrimarySpellColourAdjust = BlendColors(PrimarySpellColourAdjust, newColour, weight);
+        SpellColourMods.Add((newColour, weight));
 
-        UpdateStaffGlow();
+        CachePrimarySpellColour();
     }
 
     private Color BlendColors(Color a, Color b, float t)
@@ -683,8 +678,43 @@ public class Player : Character, ICastsSpells
         return Mathf.Sqrt((1.0f - t) * Mathf.Pow(a, 2.2f) + t * Mathf.Pow(b, 2.2f));
     }
 
+    private void CachePrimarySpellColour()
+    {
+        Color baseColour = primarySpell.baseColour;
+
+        foreach (var modifier in SpellColourMods)
+        {
+            baseColour = BlendColors(baseColour, modifier.colour, modifier.weight);
+        }
+
+        primarySpellColourCache = baseColour;
+        UpdateStaffGlow();
+    }
+
     private void UpdateStaffGlow()
     {
-        (staff.Material as ShaderMaterial).SetShaderParam("emission_tint", PrimarySpellColourAdjust);
+        (staff.Material as ShaderMaterial).SetShaderParam("emission_tint", primarySpellColourCache);
+    }
+
+    public void PickUpPrimarySpell(BaseSpell spell)
+    {
+        if (primarySpell != null)
+            DropSpellPickup(primarySpell);
+
+        primarySpell = spell;
+
+        primarySpellSlot.SetItemTexture(spell.Icon);
+        primarySpellSlot.ItemName = spell.Name;
+
+        CachePrimarySpellColour();
+    }
+
+    private void DropSpellPickup(BaseSpell spell)
+    {
+        SpellPickup droppedSpell = spellPickupScene.Instance<SpellPickup>();
+        droppedSpell.SetSpell(spell);
+        world.AddChild(droppedSpell);
+        droppedSpell.Position = Position + new Vector2(dir * -8.0f);
+        droppedSpell.ApplyCentralImpulse(dir * -80.0f);
     }
 }

@@ -8,7 +8,7 @@ public class MultiSpreadProjectileSpell : ProjectileSpell
 
     public MultiSpreadProjectileSpell() : base() { }
 
-    public MultiSpreadProjectileSpell(int projectileCount, float spread, int damage, float range, float knockback, float speed, float majykaCost, Color baseColour, NodePath projectilePath) : base(damage, range, knockback, speed, majykaCost, baseColour, projectilePath)
+    public MultiSpreadProjectileSpell(int projectileCount, float spread, string name, int damage, float range, float knockback, float speed, float majykaCost, Color baseColour, Texture icon, Action<Character> hitCharEvt, NodePath projectilePath) : base(name, damage, range, knockback, speed, majykaCost, baseColour, icon, hitCharEvt, projectilePath)
     {
         this.projectileCount = projectileCount;
         this.spread = spread;

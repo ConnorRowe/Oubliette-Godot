@@ -16,7 +16,7 @@ public class AICharacterWithWeaponRanged : AICharacterWithWeapon
     {
         base._Ready();
 
-        currentSpell = GetNode<Spells>("/root/Spells").Shadowbolt;
+        currentSpell = Spells.Shadowbolt;
 
         weaponParticles = GetNode<Particles2D>(_weaponParticlesPath);
 

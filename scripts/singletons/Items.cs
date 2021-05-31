@@ -14,6 +14,7 @@ public class Items : Node
     public RandomNumberGenerator Rng = new RandomNumberGenerator();
     public Dictionary<LootPool, List<Artefact>> artefactPools = new Dictionary<LootPool, List<Artefact>>() { { LootPool.GENERAL, new List<Artefact>() }, { LootPool.ENEMY, new List<Artefact>() }, { LootPool.WOOD_CHEST, new List<Artefact>() } };
     public Dictionary<LootPool, List<PackedScene>> pickupPools = new Dictionary<LootPool, List<PackedScene>>() { { LootPool.GENERAL, new List<PackedScene>() }, { LootPool.ENEMY, new List<PackedScene>() }, { LootPool.WOOD_CHEST, new List<PackedScene>() } };
+    public Dictionary<LootPool, List<BaseSpell>> spellPools = new Dictionary<LootPool, List<BaseSpell>>() { { LootPool.GENERAL, new List<BaseSpell>() }, { LootPool.ENEMY, new List<BaseSpell>() }, { LootPool.WOOD_CHEST, new List<BaseSpell>() } };
     public List<Potion> potions = new List<Potion>();
 
     private PackedScene potionScene;
@@ -22,6 +23,7 @@ public class Items : Node
     {
         p.AdjustMaxHealth(4, true);
     }, Artefact.emptyTexSet);
+    private PackedScene spellPickupScene;
 
     public void RegisterArtefact(Artefact artifact, LootPool[] lootPools)
     {
@@ -42,6 +44,14 @@ public class Items : Node
     public void RegisterPotion(Potion potion)
     {
         potions.Add(potion);
+    }
+
+    public void RegisterSpell(BaseSpell spell, LootPool[] lootPools)
+    {
+        foreach (LootPool pool in lootPools)
+        {
+            spellPools[pool].Add(spell);
+        }
     }
 
     public Artefact GetRandomArtefact(LootPool lootPool)
@@ -75,6 +85,37 @@ public class Items : Node
         return randPotionPickup;
     }
 
+    public BaseSpell GetRandomSpell(LootPool lootPool)
+    {
+        BaseSpell spell;
+
+        if (spellPools[lootPool].Count <= 0)
+        {
+            return null;
+        }
+        else
+        {
+            spell = spellPools[lootPool][Rng.RandiRange(0, spellPools[lootPool].Count - 1)];
+
+            RemoveSpellFromPools(spell);
+        }
+
+        return spell;
+    }
+
+    public SpellPickup GetRandomSpellPickup(LootPool lootPool)
+    {
+        BaseSpell spell = GetRandomSpell(lootPool);
+
+        if (spell == null)
+            return null;
+
+        SpellPickup spellPickup = spellPickupScene.Instance<SpellPickup>();
+        spellPickup.SetSpell(spell);
+
+        return spellPickup;
+    }
+
     private void RemoveArtefactFromPools(Artefact artefact)
     {
         foreach (LootPool pool in artefactPools.Keys)
@@ -83,14 +124,24 @@ public class Items : Node
         }
     }
 
+    public void RemoveSpellFromPools(BaseSpell spell)
+    {
+        foreach (LootPool pool in spellPools.Keys)
+        {
+            spellPools[pool].Remove(spell);
+        }
+    }
+
     public Items()
     {
         Rng.Randomize();
         potionScene = GD.Load<PackedScene>("res://scenes/Potion.tscn");
+        spellPickupScene = GD.Load<PackedScene>("res://scenes/SpellPickup.tscn");
 
         RegisterArtefacts();
         RegisterPickups();
         RegisterPotions();
+        RegisterSpells();
     }
 
     private void RegisterArtefacts()
@@ -132,6 +183,13 @@ public class Items : Node
         RegisterPotion(new Potion(new (Stat stat, float amount)[] { (Stat.ResistDamageFlat, 1.0f), (Stat.MagykaCostFlat, -5.0f) }, 10.0f, "Humble Huckleberry", Color.Color8(37, 27, 147), Color.Color8(105, 10, 130), Color.Color8(95, 103, 146)));
 
         RegisterPotion(new Potion(new (Stat stat, float amount)[] { (Stat.ReflectDamageFlat, 2.0f) }, 10.0f, "Beverage of Briars", Color.Color8(82, 71, 36), Color.Color8(38, 71, 36), Color.Color8(56, 36, 41)));
+    }
+
+    private void RegisterSpells()
+    {
+        RegisterSpell(Spells.MagicMissile, new LootPool[] { LootPool.GENERAL });
+        RegisterSpell(Spells.Shadowbolt, new LootPool[] { LootPool.GENERAL });
+        RegisterSpell(Spells.IceSpike, new LootPool[] { LootPool.GENERAL });
     }
 
     public override void _Ready()
