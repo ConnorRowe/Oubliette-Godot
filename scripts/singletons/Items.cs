@@ -176,7 +176,7 @@ public class Items : Node
     {
         RegisterArtefact(defaultArtefact, new LootPool[] { LootPool.GENERAL });
 
-        RegisterArtefact(new Artefact("Black Bile of a Long Dead God", "raw godly power", 0.3f, GD.Load<Texture>("res://textures/dark_potion.png"),
+        RegisterArtefact(new Artefact("Black Bile of a Long Dead God", "raw godly power", rarityWeight: 0.3f, GD.Load<Texture>("res://textures/dark_potion.png"),
         (Player p) =>
         {
             p.ApplyBuff(Buffs.CreateBuff("Black Bile of a Long Dead God",
@@ -184,14 +184,14 @@ public class Items : Node
         }, new Artefact.ArtefactTextureSet(new Vector2(-2, -17), null, GD.Load<Texture>("res://textures/black_eyes_down.png"), GD.Load<Texture>("res://textures/black_eyes_leftright.png"))),
         new LootPool[] { LootPool.GENERAL });
 
-        RegisterArtefact(new Artefact("Amanita Muscaria", "this time without deer piss", 0.5f, GD.Load<Texture>("res://textures/amanita_muscaria.png"),
+        RegisterArtefact(new Artefact("Amanita Muscaria", "this time without deer piss", rarityWeight: 0.5f, GD.Load<Texture>("res://textures/amanita_muscaria.png"),
         (Player p) =>
         {
             p.ApplyBuff(Buffs.CreateBuff("Amanita Muscaria",
         new List<(Stat stat, float amount)>() { (Stat.DamageFlat, 1.0f), (Stat.RangeMultiplier, 1.25f), (Stat.MagykaCostMultiplier, 0.75f) }, 0));
         }, Artefact.emptyTexSet), new LootPool[] { LootPool.GENERAL });
 
-        RegisterArtefact(new Artefact("Grunty's Hat", "although she's dim, she attended Fat Hag High!", 0.7f, GD.Load<Texture>("res://textures/witch_hat.png"),
+        RegisterArtefact(new Artefact("Grunty's Hat", "although she's dim, she attended Fat Hag High!", rarityWeight: 0.7f, GD.Load<Texture>("res://textures/witch_hat.png"),
         (Player p) =>
         {
             p.MixInSpellColour(new Color(0.546667f, 1, 0.15f), 1.0f);

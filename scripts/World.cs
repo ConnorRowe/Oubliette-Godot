@@ -105,6 +105,7 @@ public class World : Node2D
                     Pedestal pedestal = GD.Load<PackedScene>("res://scenes/Pedestal.tscn").Instance<Pedestal>();
                     AddChild(pedestal);
                     pedestal.Position = camera.GetGlobalMousePosition();
+                    pedestal.GenerateItem();
 
                     // PotionPickup testPotion = items.GetRandomPotionPickup();
                     // AddChild(testPotion);

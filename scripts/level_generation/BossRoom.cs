@@ -22,6 +22,7 @@ public class BossRoom : Room
         Pedestal bossItem = pedestalScene.Instance<Pedestal>();
         AddChild(bossItem);
         bossItem.Position = new Vector2(177, 143);
+        bossItem.GenerateItem();
 
         Area2D ladder = ladderScene.Instance<Area2D>();
         AddChild(ladder);

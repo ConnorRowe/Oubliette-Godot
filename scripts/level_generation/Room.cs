@@ -81,7 +81,7 @@ public class Room : Node2D
         return new Rect2(this.Position, new Vector2(Width * 16.0f, Height * 16.0f));
     }
 
-    public void RoomEntered()
+    public virtual void RoomEntered()
     {
         if (ClearedByDefault)
             EmitSignal(nameof(Cleared), this);
