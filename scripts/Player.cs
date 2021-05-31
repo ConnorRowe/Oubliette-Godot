@@ -89,8 +89,10 @@ public class Player : Character, ICastsSpells
         potionSlot = world.GetNode<ItemDisplaySlot>("CanvasLayer/PotionSlot");
         primarySpellSlot = world.GetNode<ItemDisplaySlot>("CanvasLayer/PrimarySpellSlot");
 
-        PickUpPrimarySpell(Spells.MagicMissile);
-        GetNode<Items>("/root/Items").RemoveSpellFromPools(Spells.MagicMissile);
+        Items items = GetNode<Items>("/root/Items");
+        var magicMissile = items.FindSpellPoolEntry(Spells.MagicMissile, Items.LootPool.GENERAL);
+        PickUpPrimarySpell(magicMissile.spell);
+        items.RemoveSpellFromPools(magicMissile);
         secondarySpell = Spells.IceSkin;
 
         CachePrimarySpellColour();

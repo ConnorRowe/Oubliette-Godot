@@ -365,11 +365,14 @@ public class LevelGenerator : Node, IProvidesNav
     {
         foreach (Node node in GetParent().GetChildren())
         {
-            if (node is Room)
+            if (node is Room || node is AICharacter || node is BasePickup)
             {
                 node.QueueFree();
             }
         }
+
+        wallTiles.Clear();
+        floorTiles.Clear();
 
         GetParent().GetNode<Minimap>("CanvasLayer/Minimap").ClearMinimap();
 

@@ -14,11 +14,14 @@ public class Items : Node
     public RandomNumberGenerator Rng = new RandomNumberGenerator();
     public Dictionary<LootPool, List<Artefact>> artefactPools = new Dictionary<LootPool, List<Artefact>>() { { LootPool.GENERAL, new List<Artefact>() }, { LootPool.ENEMY, new List<Artefact>() }, { LootPool.WOOD_CHEST, new List<Artefact>() } };
     public Dictionary<LootPool, List<PackedScene>> pickupPools = new Dictionary<LootPool, List<PackedScene>>() { { LootPool.GENERAL, new List<PackedScene>() }, { LootPool.ENEMY, new List<PackedScene>() }, { LootPool.WOOD_CHEST, new List<PackedScene>() } };
-    public Dictionary<LootPool, List<BaseSpell>> spellPools = new Dictionary<LootPool, List<BaseSpell>>() { { LootPool.GENERAL, new List<BaseSpell>() }, { LootPool.ENEMY, new List<BaseSpell>() }, { LootPool.WOOD_CHEST, new List<BaseSpell>() } };
+    public Dictionary<LootPool, List<(BaseSpell spell, float weight)>> spellPools = new Dictionary<LootPool, List<(BaseSpell spell, float weight)>>() { { LootPool.GENERAL, new List<(BaseSpell spell, float weight)>() }, { LootPool.ENEMY, new List<(BaseSpell spell, float weight)>() }, { LootPool.WOOD_CHEST, new List<(BaseSpell, float)>() } };
     public List<Potion> potions = new List<Potion>();
 
+    private Dictionary<LootPool, float> artefactPoolWeightSum = new Dictionary<LootPool, float>() { { LootPool.GENERAL, 0.0f }, { LootPool.ENEMY, 0.0f }, { LootPool.WOOD_CHEST, 0.0f } };
+    private Dictionary<LootPool, float> spellPoolWeightSum = new Dictionary<LootPool, float>() { { LootPool.GENERAL, 0.0f }, { LootPool.ENEMY, 0.0f }, { LootPool.WOOD_CHEST, 0.0f } };
+
     private PackedScene potionScene;
-    private Artefact defaultArtefact = new Artefact("Vital Elixir", "you feel more vital!", GD.Load<Texture>("res://textures/health_potion.png"),
+    private Artefact defaultArtefact = new Artefact("Vital Elixir", "you feel more vital!", 1.0f, GD.Load<Texture>("res://textures/health_potion.png"),
     (Player p) =>
     {
         p.AdjustMaxHealth(4, true);
@@ -30,6 +33,8 @@ public class Items : Node
         foreach (LootPool pool in lootPools)
         {
             artefactPools[pool].Add(artifact);
+
+            artefactPoolWeightSum[pool] += artifact.RarityWeight;
         }
     }
 
@@ -46,17 +51,17 @@ public class Items : Node
         potions.Add(potion);
     }
 
-    public void RegisterSpell(BaseSpell spell, LootPool[] lootPools)
+    public void RegisterSpell(BaseSpell spell, float rarityWeight, LootPool[] lootPools)
     {
         foreach (LootPool pool in lootPools)
         {
-            spellPools[pool].Add(spell);
+            spellPools[pool].Add((spell, rarityWeight));
         }
     }
 
     public Artefact GetRandomArtefact(LootPool lootPool)
     {
-        Artefact artefactOut;
+        Artefact artefactOut = null;
 
         if (artefactPools[lootPool].Count <= 0)
         {
@@ -64,9 +69,19 @@ public class Items : Node
         }
         else
         {
-            artefactOut = artefactPools[lootPool][Rng.RandiRange(0, artefactPools[lootPool].Count - 1)];
+            float rnd = Rng.RandfRange(0.0f, artefactPoolWeightSum[lootPool] - 0.001f);
 
-            RemoveArtefactFromPools(artefactOut);
+            foreach (Artefact artefact in artefactPools[lootPool])
+            {
+                if (rnd < artefact.RarityWeight)
+                {
+                    artefactOut = artefact;
+                    RemoveArtefactFromPools(artefact);
+                    break;
+                }
+
+                rnd -= artefact.RarityWeight;
+            }
         }
 
         return artefactOut;
@@ -87,20 +102,26 @@ public class Items : Node
 
     public BaseSpell GetRandomSpell(LootPool lootPool)
     {
-        BaseSpell spell;
+        BaseSpell spellOut = null;
 
-        if (spellPools[lootPool].Count <= 0)
+        if (spellPools[lootPool].Count > 0)
         {
-            return null;
-        }
-        else
-        {
-            spell = spellPools[lootPool][Rng.RandiRange(0, spellPools[lootPool].Count - 1)];
+            float rnd = Rng.RandfRange(0.0f, spellPoolWeightSum[lootPool] - 0.001f);
 
-            RemoveSpellFromPools(spell);
+            foreach (var spell in spellPools[lootPool])
+            {
+                if (rnd < spell.weight)
+                {
+                    spellOut = spell.spell;
+                    RemoveSpellFromPools(spell);
+                    break;
+                }
+
+                rnd -= spell.weight;
+            }
         }
 
-        return spell;
+        return spellOut;
     }
 
     public SpellPickup GetRandomSpellPickup(LootPool lootPool)
@@ -121,15 +142,22 @@ public class Items : Node
         foreach (LootPool pool in artefactPools.Keys)
         {
             artefactPools[pool].Remove(artefact);
+
+            artefactPoolWeightSum[pool] -= artefact.RarityWeight;
         }
     }
 
-    public void RemoveSpellFromPools(BaseSpell spell)
+    public void RemoveSpellFromPools((BaseSpell spell, float weight) spell)
     {
         foreach (LootPool pool in spellPools.Keys)
         {
             spellPools[pool].Remove(spell);
         }
+    }
+
+    public (BaseSpell spell, float weight) FindSpellPoolEntry(BaseSpell spell, LootPool lootPool)
+    {
+        return spellPools[lootPool].Find(((BaseSpell s, float w) f) => { return f.s.Name == spell.Name; });
     }
 
     public Items()
@@ -148,7 +176,7 @@ public class Items : Node
     {
         RegisterArtefact(defaultArtefact, new LootPool[] { LootPool.GENERAL });
 
-        RegisterArtefact(new Artefact("Black Bile of a Long Dead God", "raw godly power", GD.Load<Texture>("res://textures/dark_potion.png"),
+        RegisterArtefact(new Artefact("Black Bile of a Long Dead God", "raw godly power", 0.3f, GD.Load<Texture>("res://textures/dark_potion.png"),
         (Player p) =>
         {
             p.ApplyBuff(Buffs.CreateBuff("Black Bile of a Long Dead God",
@@ -156,14 +184,14 @@ public class Items : Node
         }, new Artefact.ArtefactTextureSet(new Vector2(-2, -17), null, GD.Load<Texture>("res://textures/black_eyes_down.png"), GD.Load<Texture>("res://textures/black_eyes_leftright.png"))),
         new LootPool[] { LootPool.GENERAL });
 
-        RegisterArtefact(new Artefact("Amanita Muscaria", "this time without deer piss", GD.Load<Texture>("res://textures/amanita_muscaria.png"),
+        RegisterArtefact(new Artefact("Amanita Muscaria", "this time without deer piss", 0.5f, GD.Load<Texture>("res://textures/amanita_muscaria.png"),
         (Player p) =>
         {
             p.ApplyBuff(Buffs.CreateBuff("Amanita Muscaria",
         new List<(Stat stat, float amount)>() { (Stat.DamageFlat, 1.0f), (Stat.RangeMultiplier, 1.25f), (Stat.MagykaCostMultiplier, 0.75f) }, 0));
         }, Artefact.emptyTexSet), new LootPool[] { LootPool.GENERAL });
 
-        RegisterArtefact(new Artefact("Grunty's Hat", "although she's dim, she attended Fat Hag High!", GD.Load<Texture>("res://textures/witch_hat.png"),
+        RegisterArtefact(new Artefact("Grunty's Hat", "although she's dim, she attended Fat Hag High!", 0.7f, GD.Load<Texture>("res://textures/witch_hat.png"),
         (Player p) =>
         {
             p.MixInSpellColour(new Color(0.546667f, 1, 0.15f), 1.0f);
@@ -187,9 +215,9 @@ public class Items : Node
 
     private void RegisterSpells()
     {
-        RegisterSpell(Spells.MagicMissile, new LootPool[] { LootPool.GENERAL });
-        RegisterSpell(Spells.Shadowbolt, new LootPool[] { LootPool.GENERAL });
-        RegisterSpell(Spells.IceSpike, new LootPool[] { LootPool.GENERAL });
+        RegisterSpell(Spells.MagicMissile, 1.0f, new LootPool[] { LootPool.GENERAL });
+        RegisterSpell(Spells.Shadowbolt, 0.5f, new LootPool[] { LootPool.GENERAL });
+        RegisterSpell(Spells.IceSpike, 1.0f, new LootPool[] { LootPool.GENERAL });
     }
 
     public override void _Ready()

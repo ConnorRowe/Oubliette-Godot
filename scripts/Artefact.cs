@@ -46,14 +46,16 @@ public class Artefact : Reference
     public Texture Texture { get; set; }
     private Action<Player> playerPickUpAction { get; set; }
     public ArtefactTextureSet TextureSet;
+    public float RarityWeight;
 
-    public Artefact(string name, string desc, Texture texture, Action<Player> playerPickUpAction, ArtefactTextureSet textureSet)
+    public Artefact(string name, string desc, float rarityWeight, Texture texture, Action<Player> playerPickUpAction, ArtefactTextureSet textureSet)
     {
         Name = name;
         Description = desc;
         Texture = texture;
         this.playerPickUpAction = playerPickUpAction;
         TextureSet = textureSet;
+        RarityWeight = rarityWeight;
     }
 
     public void PlayerPickUp(Player player)
