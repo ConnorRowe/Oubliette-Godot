@@ -102,14 +102,16 @@ public class World : Node2D
                     // AddChild(chest);
                     // chest.Position = camera.GetGlobalMousePosition();
 
-                    Pedestal pedestal = GD.Load<PackedScene>("res://scenes/Pedestal.tscn").Instance<Pedestal>();
-                    AddChild(pedestal);
-                    pedestal.Position = camera.GetGlobalMousePosition();
-                    pedestal.GenerateItem();
+                    // Pedestal pedestal = GD.Load<PackedScene>("res://scenes/Pedestal.tscn").Instance<Pedestal>();
+                    // AddChild(pedestal);
+                    // pedestal.Position = camera.GetGlobalMousePosition();
+                    // pedestal.GenerateItem();
 
                     // PotionPickup testPotion = items.GetRandomPotionPickup();
                     // AddChild(testPotion);
                     // testPotion.Position = camera.GetGlobalMousePosition();
+
+                    TestSpawnEnemyAtMouse<FireFly>("res://scenes/enemies/FireFly.tscn");
                 }
             }
         }
@@ -151,5 +153,28 @@ public class World : Node2D
     private void UpdateHealthUI(int currentHealth, int maxHealth)
     {
         healthContainer.SetHealth(currentHealth, maxHealth);
+    }
+
+
+
+    // For testing purposes only. vvv
+    private T TestSpawnNodeAtMouse<T>(NodePath scenePath) where T : Node2D
+    {
+        T instance = GD.Load<PackedScene>(scenePath).Instance<T>();
+        instance.Position = camera.GetGlobalMousePosition();
+        AddChild(instance);
+
+        return instance;
+    }
+
+    private T TestSpawnEnemyAtMouse<T>(string scenePath) where T : AICharacter
+    {
+        T enemy = GD.Load<PackedScene>(scenePath).Instance<T>();
+        AddChild(enemy);
+        enemy.Position = camera.GetGlobalMousePosition();
+        enemy.TargetPlayer(player);
+        enemy.navProvider = GetNode<LevelGenerator>("LevelGenerator");
+
+        return enemy;
     }
 }

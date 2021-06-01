@@ -12,7 +12,7 @@
 [ext_resource path="res://textures/1x1_white.png" type="Texture" id=10]
 [ext_resource path="res://textures/staff.png" type="Texture" id=11]
 [ext_resource path="res://materials/M_ColourOverride_Vertex.tres" type="Material" id=12]
-[ext_resource path="res://scenes/enemies/EmissiveOverlay.shader" type="Shader" id=13]
+[ext_resource path="res://materials/EmissiveOverlay.shader" type="Shader" id=13]
 [ext_resource path="res://textures/staff_emmision.png" type="Texture" id=14]
 
 [sub_resource type="RectangleShape2D" id=1]
@@ -142,6 +142,7 @@ _charSpritePath = NodePath("CharSprite")
 _shadowSpritePath = NodePath("ShadowSprite")
 _animationPlayerPath = NodePath("AnimationPlayer")
 maxHealth = 4
+renderElevation = true
 _animDeath = ""
 _cameraPath = NodePath("Camera2D")
 hitBoxTraceShape = SubResource( 1 )

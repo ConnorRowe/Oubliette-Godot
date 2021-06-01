@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://scenes/Projectile.tscn" type="PackedScene" id=1]
 [ext_resource path="res://textures/magic_projectile_small.png" type="Texture" id=2]
@@ -11,11 +11,10 @@ curve = SubResource( 1 )
 
 [sub_resource type="Gradient" id=3]
 resource_local_to_scene = true
-offsets = PoolRealArray( 0, 0.981618, 1 )
-colors = PoolColorArray( 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0 )
+offsets = PoolRealArray( 0 )
+colors = PoolColorArray( 1, 1, 1, 1 )
 
 [sub_resource type="GradientTexture" id=4]
-resource_local_to_scene = true
 gradient = SubResource( 3 )
 
 [sub_resource type="ParticlesMaterial" id=5]
@@ -33,29 +32,12 @@ radial_accel_random = 0.25
 color_ramp = SubResource( 4 )
 anim_offset_curve = SubResource( 2 )
 
-[sub_resource type="Curve" id=6]
-_data = [ Vector2( 0, 0 ), 0.0, 1.0, 0, 1, Vector2( 1, 1 ), 1.10158, 0.0, 0, 0 ]
-
-[sub_resource type="CurveTexture" id=7]
-curve = SubResource( 6 )
-
-[sub_resource type="ParticlesMaterial" id=8]
-resource_local_to_scene = true
-flag_disable_z = true
-direction = Vector3( 0, 1, 0 )
-spread = 0.0
-gravity = Vector3( 0, 0, 0 )
-orbit_velocity = 0.0
-orbit_velocity_random = 0.0
-tangential_accel = -100.0
-tangential_accel_random = 1.0
-color_ramp = SubResource( 4 )
-anim_offset_curve = SubResource( 7 )
-
 [node name="ProjectileSmall" instance=ExtResource( 1 )]
 position = Vector2( -9, 0 )
 explodeParticleMaterial = SubResource( 5 )
 
 [node name="Particles2D" parent="." index="1"]
-process_material = SubResource( 8 )
 texture = ExtResource( 2 )
+
+[node name="Light2D" parent="." index="2"]
+enabled = false

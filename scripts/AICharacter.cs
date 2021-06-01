@@ -3,13 +3,13 @@ using System;
 
 public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
 {
-    protected AIManager aIManager;
+    public AIManager aIManager;
     protected Particles2D deathParticles;
     private CircleShape2D detectionShape = new CircleShape2D();
     protected Label debugLabel;
     protected Tween tween;
     protected Sprite detectionNotifier;
-    protected bool hasTarget = false;
+    public bool hasTarget = false;
 
     public Physics2DShapeQueryParameters shapeQuery;
     public World world;
@@ -267,6 +267,9 @@ public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
         {
             GlobalPosition = initPos;
         }
+
+        if(hasTarget)
+            aIManager.TryTransition();
     }
 
     public override Vector2 GetInputAxis(float delta)

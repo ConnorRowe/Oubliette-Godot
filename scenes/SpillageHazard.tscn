@@ -16,20 +16,20 @@ particles_anim_h_frames = 8
 particles_anim_v_frames = 1
 particles_anim_loop = false
 
-[sub_resource type="Curve" id=4]
+[sub_resource type="Curve" id=3]
 _data = [ Vector2( 0, 0 ), 0.0, 1.5608, 0, 1, Vector2( 0.097561, 0.152273 ), 0.0, 0.0, 0, 0, Vector2( 0.487805, 0.155682 ), 0.0, 0.0, 0, 0, Vector2( 0.675958, 0.473864 ), 0.0, 0.0, 0, 0, Vector2( 1, 1 ), 1.62367, 0.0, 1, 0 ]
 
-[sub_resource type="CurveTexture" id=5]
-curve = SubResource( 4 )
+[sub_resource type="CurveTexture" id=4]
+curve = SubResource( 3 )
 
-[sub_resource type="Curve" id=6]
+[sub_resource type="Curve" id=5]
 max_value = 20.0
 _data = [ Vector2( 0, 0 ), 0.0, 0.0, 0, 0, Vector2( 0.689895, 0 ), 0.0, 0.0, 0, 0, Vector2( 0.749129, 20 ), 0.0, 0.0, 0, 0 ]
 
-[sub_resource type="CurveTexture" id=7]
-curve = SubResource( 6 )
+[sub_resource type="CurveTexture" id=6]
+curve = SubResource( 5 )
 
-[sub_resource type="ParticlesMaterial" id=3]
+[sub_resource type="ParticlesMaterial" id=7]
 resource_local_to_scene = true
 emission_shape = 1
 emission_sphere_radius = 2.67
@@ -37,8 +37,8 @@ flag_disable_z = true
 gravity = Vector3( 0, 0, 0 )
 orbit_velocity = 0.0
 orbit_velocity_random = 0.0
-linear_accel_curve = SubResource( 7 )
-anim_offset_curve = SubResource( 5 )
+linear_accel_curve = SubResource( 6 )
+anim_offset_curve = SubResource( 4 )
 
 [node name="SpillageHazard" type="Area2D"]
 monitoring = false
@@ -56,10 +56,11 @@ position = Vector2( 0, 12 )
 polygon = PoolVector2Array( -7, -7, -4, -7, -4, -9, 1, -10, 7, -9, 6, -7, 8, -6, 7, -4, 0, -2, -6, -3, -8, -5 )
 
 [node name="Bubbles" type="Particles2D" parent="."]
+modulate = Color( 2, 2, 2, 1 )
 material = SubResource( 2 )
 position = Vector2( 0, 3 )
 amount = 3
 lifetime = 1.5
 randomness = 0.19
-process_material = SubResource( 3 )
+process_material = SubResource( 7 )
 texture = ExtResource( 5 )

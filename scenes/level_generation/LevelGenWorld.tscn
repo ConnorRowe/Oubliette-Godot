@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=2]
+[gd_scene load_steps=26 format=2]
 
 [ext_resource path="res://font/small_font.tres" type="DynamicFont" id=1]
 [ext_resource path="res://scripts/World.cs" type="Script" id=2]
@@ -23,6 +23,7 @@
 [ext_resource path="res://scenes/ArtefactNamePopup.tscn" type="PackedScene" id=21]
 [ext_resource path="res://default_env.tres" type="Environment" id=22]
 [ext_resource path="res://textures/tome_magic_missile.png" type="Texture" id=23]
+[ext_resource path="res://scenes/enemies/FireFly.tscn" type="PackedScene" id=24]
 
 [sub_resource type="ShaderMaterial" id=1]
 resource_local_to_scene = true
@@ -104,7 +105,7 @@ position = Vector2( 4, 52 )
 position = Vector2( 88.5, 16.5 )
 
 [node name="LevelGenerator" parent="." instance=ExtResource( 5 )]
-possibleEnemies = [ ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 11 ), ExtResource( 10 ) ]
+possibleEnemies = [ ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 11 ), ExtResource( 10 ), ExtResource( 24 ) ]
 _wallTileMapPath = NodePath("../WallTiles")
 _floorTileMapPath = NodePath("../Navigation2D/FloorTiles")
 _navigationPath = NodePath("../Navigation2D")

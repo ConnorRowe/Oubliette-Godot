@@ -188,7 +188,7 @@ public abstract class Character : KinematicBody2D
     protected AnimatedSprite charSprite;
     protected Sprite shadowSprite;
     protected AnimationPlayer animPlayer;
-    private KinematicBody2D hitbox;
+    protected KinematicBody2D hitbox;
     private CollisionPolygon2D upDownCollider;
     private CollisionPolygon2D rightLeftCollider;
 
@@ -207,6 +207,9 @@ public abstract class Character : KinematicBody2D
     private NodePath _animationPlayerPath;
     [Export]
     public int maxHealth = 12;
+    [Export]
+    private bool renderElevation = false;
+
 
     // Sprite animations
     [Export]
@@ -254,9 +257,12 @@ public abstract class Character : KinematicBody2D
             dir = inputDir;
 
         // Render elevation
-        charSprite.Position = new Vector2(0, -elevation);
-        float shadowScale = Mathf.Lerp(1f, 0f, Mathf.Clamp(elevation / 32f, 0f, 0.9f));
-        shadowSprite.Scale = new Vector2(shadowScale, shadowScale);
+        if (renderElevation)
+        {
+            charSprite.Position = new Vector2(0, -elevation);
+            float shadowScale = Mathf.Lerp(1f, 0f, Mathf.Clamp(elevation / 32f, 0f, 0.9f));
+            shadowSprite.Scale = new Vector2(shadowScale, shadowScale);
+        }
 
         if (isDead)
             return;

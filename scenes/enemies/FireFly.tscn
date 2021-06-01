@@ -1,93 +1,56 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=20 format=2]
 
-[ext_resource path="res://textures/staff.png" type="Texture" id=1]
-[ext_resource path="res://textures/magic_gather_particles.png" type="Texture" id=2]
-[ext_resource path="res://scenes/enemies/AICharacterWithWeapon.tscn" type="PackedScene" id=3]
-[ext_resource path="res://textures/staff_emmision.png" type="Texture" id=4]
-[ext_resource path="res://scripts/AICharacterWithWeaponRanged.cs" type="Script" id=5]
-[ext_resource path="res://materials/EmissiveOverlay.shader" type="Shader" id=6]
+[ext_resource path="res://scenes/AICharacter.tscn" type="PackedScene" id=1]
+[ext_resource path="res://textures/fire_fly.png" type="Texture" id=2]
+[ext_resource path="res://materials/ColourOverlayWithEmissiveMap.shader" type="Shader" id=3]
+[ext_resource path="res://textures/fire_fly_emissive.png" type="Texture" id=4]
+[ext_resource path="res://scripts/FireFly.cs" type="Script" id=5]
+[ext_resource path="res://textures/tiny_shadow.png" type="Texture" id=6]
+[ext_resource path="res://textures/bubble_proj_anim.png" type="Texture" id=7]
 
-[sub_resource type="Shader" id=1]
-code = "shader_type canvas_item;
-
-uniform vec4 colour_override : hint_color;
-uniform float override_lerp: hint_range(0, 1) = 0f;
-uniform vec4 outline_colour : hint_color = vec4(1.0);
-uniform float outline_width : hint_range(0, 1) = 0f;
-
-void fragment()
-{
-	vec4 tex = texture(TEXTURE, UV);
-	vec4 base_colour = mix(tex, vec4(colour_override.rgb, tex.a * colour_override.a), override_lerp);
-	
-	float w = outline_width * 1.0 / float(textureSize(TEXTURE, 0).x);
-	float h = outline_width * 1.0 / float(textureSize(TEXTURE, 0).y);
-	
-	float alpha = -4.0 * base_colour.a;
-	alpha += texture(TEXTURE, UV + vec2(w, 0.0)).a;
-	alpha += texture(TEXTURE, UV + vec2(-w, 0.0)).a;
-	alpha += texture(TEXTURE, UV + vec2(0.0, h)).a;
-	alpha += texture(TEXTURE, UV + vec2(0.0, -h)).a;
-	
-	vec4 finalColour = mix(base_colour, outline_colour, clamp(alpha, 0.0, 1.0));
-	COLOR = vec4(finalColour.rgb, clamp(abs(alpha) + base_colour.a, 0.0, 1.0));
-}"
-
-[sub_resource type="ShaderMaterial" id=2]
+[sub_resource type="ShaderMaterial" id=1]
 resource_local_to_scene = true
-shader = SubResource( 1 )
-shader_param/colour_override = Color( 1, 1, 1, 1 )
+shader = ExtResource( 3 )
+shader_param/colour_override = Color( 15, 0.19, 0, 1 )
 shader_param/override_lerp = 0.0
-shader_param/outline_colour = Color( 1, 1, 1, 1 )
-shader_param/outline_width = 0.0
-
-[sub_resource type="CapsuleShape2D" id=3]
-radius = 1.5
-height = 1.5
-
-[sub_resource type="Animation" id=4]
-length = 0.3
-step = 0.025
-tracks/0/type = "value"
-tracks/0/path = NodePath("CharSprite:material:shader_param/colour_override")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 0.075, 0.15, 0.3 ),
-"transitions": PoolRealArray( 1, 1, 1, 1 ),
-"update": 0,
-"values": [ Color( 1, 1, 1, 1 ), Color( 15, 0.19, 0, 1 ), Color( 15, 15, 15, 1 ), Color( 15, 0.19, 0, 1 ) ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath("CharSprite:material:shader_param/override_lerp")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0, 0.075, 0.3 ),
-"transitions": PoolRealArray( 1, 1, 1 ),
-"update": 0,
-"values": [ 0.0, 1.0, 0.0 ]
-}
-
-[sub_resource type="ShaderMaterial" id=5]
-resource_local_to_scene = true
-shader = ExtResource( 6 )
-shader_param/emission_tint = Color( 0.639216, 0.0196078, 1, 1 )
-shader_param/intensity = 20.0
+shader_param/emission_tint = Color( 0.968627, 0.490196, 0.168627, 1 )
+shader_param/intensity = 5.0
 shader_param/emission_texture = ExtResource( 4 )
 
-[sub_resource type="CanvasItemMaterial" id=6]
-light_mode = 1
+[sub_resource type="AtlasTexture" id=2]
+atlas = ExtResource( 2 )
+region = Rect2( 0, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=3]
+atlas = ExtResource( 2 )
+region = Rect2( 16, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=4]
+atlas = ExtResource( 2 )
+region = Rect2( 32, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=5]
+atlas = ExtResource( 2 )
+region = Rect2( 48, 0, 16, 16 )
+
+[sub_resource type="SpriteFrames" id=6]
+animations = [ {
+"frames": [ SubResource( 2 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ) ],
+"loop": true,
+"name": "default",
+"speed": 29.0
+} ]
+
+[sub_resource type="CircleShape2D" id=7]
+radius = 1.0
+
+[sub_resource type="CanvasItemMaterial" id=8]
 particles_animation = true
 particles_anim_h_frames = 4
-particles_anim_v_frames = 1
-particles_anim_loop = true
+particles_anim_v_frames = 2
+particles_anim_loop = false
 
-[sub_resource type="Shader" id=7]
+[sub_resource type="Shader" id=9]
 code = "shader_type particles;
 
 /*
@@ -310,16 +273,16 @@ void vertex() {
 
 "
 
-[sub_resource type="Gradient" id=8]
-offsets = PoolRealArray( 0, 0.76824, 1 )
-colors = PoolColorArray( 1, 0, 0.805664, 1, 0.678431, 0, 1, 1, 0.678431, 0, 1, 0 )
+[sub_resource type="Gradient" id=10]
+offsets = PoolRealArray( 0.0757576 )
+colors = PoolColorArray( 1, 1, 1, 1 )
 
-[sub_resource type="GradientTexture" id=9]
-gradient = SubResource( 8 )
+[sub_resource type="GradientTexture" id=11]
+gradient = SubResource( 10 )
 
-[sub_resource type="ShaderMaterial" id=10]
+[sub_resource type="ShaderMaterial" id=12]
 resource_local_to_scene = true
-shader = SubResource( 7 )
+shader = SubResource( 9 )
 shader_param/spread = null
 shader_param/flatness = null
 shader_param/initial_linear_velocity = 0.0
@@ -327,11 +290,11 @@ shader_param/initial_angle = null
 shader_param/angular_velocity = null
 shader_param/orbit_velocity = null
 shader_param/linear_accel = null
-shader_param/radial_accel = -52.0
+shader_param/radial_accel = 0.0
 shader_param/tangent_accel = null
 shader_param/damping = null
 shader_param/scale = 1.0
-shader_param/hue_variation = 0.06
+shader_param/hue_variation = 0.0
 shader_param/anim_speed = 1.0
 shader_param/anim_offset = null
 shader_param/initial_linear_velocity_random = null
@@ -343,7 +306,7 @@ shader_param/radial_accel_random = null
 shader_param/tangent_accel_random = null
 shader_param/damping_random = null
 shader_param/scale_random = null
-shader_param/hue_variation_random = 0.22
+shader_param/hue_variation_random = 0.0
 shader_param/anim_speed_random = null
 shader_param/anim_offset_random = null
 shader_param/emission_box_extents = Vector3( 16, 16, 0 )
@@ -351,55 +314,46 @@ shader_param/color_value = Color( 1, 1, 1, 1 )
 shader_param/trail_divisor = 1
 shader_param/gravity = Vector3( 0, 0, 0 )
 shader_param/number_particles_shown = 0
-shader_param/max_number_particles = 32
+shader_param/max_number_particles = 10
 shader_param/number_batches = 1
-shader_param/color_ramp = SubResource( 9 )
+shader_param/color_ramp = SubResource( 11 )
 
-[node name="SkeletonMage" instance=ExtResource( 3 )]
+[node name="FireFly" instance=ExtResource( 1 )]
 script = ExtResource( 5 )
-maxHealth = 4
-attackSpeed = 2.0
-attackRange = 160.0
-detectionRadius = 160.0
-weaponRotOffset = 0.0
-weaponRotDistance = 4.0
-weaponOriginsString = {
-"down": Vector2( -4, -8 ),
-"left": Vector2( 0.5, -8 ),
-"right": Vector2( 0.5, -8 ),
-"up": Vector2( 4, -8 )
-}
-armOriginsString = {
-"down": Vector2( -2.5, -12 ),
-"left": Vector2( 0.5, -12 ),
-"right": Vector2( 0.5, -12 ),
-"up": Vector2( 2.5, -12 )
-}
-_weaponParticlesPath = NodePath("Weapon/StaffParticles")
-projHueAdjust = 0.81
+maxHealth = 3
+_animDeath = ""
+maxMovementSpeed = 28.0
+PathTolerance = 4.0
 
 [node name="DeathParticles" parent="." index="0"]
-amount = 16
+modulate = Color( 5, 0.58, 0.1, 0.9 )
+
+[node name="shadow" parent="." index="1"]
+modulate = Color( 1, 1, 1, 0.458824 )
+texture = ExtResource( 6 )
 
 [node name="CharSprite" parent="." index="2"]
-material = SubResource( 2 )
+material = SubResource( 1 )
+frames = SubResource( 6 )
+frame = 1
 
 [node name="CollisionShape2D" parent="." index="3"]
-shape = SubResource( 3 )
+position = Vector2( 0, 0 )
+shape = SubResource( 7 )
 
-[node name="AnimationPlayer" parent="." index="4"]
-anims/DamageFlash = SubResource( 4 )
+[node name="UpDown" parent="Hitbox" index="0"]
+polygon = PoolVector2Array( -2, -6, -6, -11, -3, -14, 3, -14, 6, -11, 2, -6 )
 
-[node name="Weapon" parent="." index="5"]
-material = SubResource( 5 )
-texture = ExtResource( 1 )
-offset = Vector2( -5, -2.5 )
+[node name="LeftRight" parent="Hitbox" index="1"]
+polygon = PoolVector2Array( -2, -6, -6, -11, -3, -14, 3, -14, 6, -11, 2, -6 )
 
-[node name="StaffParticles" type="Particles2D" parent="Weapon" index="0"]
-material = SubResource( 6 )
-position = Vector2( 6.5, 0 )
-amount = 32
-lifetime = 0.5
+[node name="DeathBubbles" type="Particles2D" parent="." index="9"]
+modulate = Color( 7.52157, 1.74902, 0.301961, 1 )
+material = SubResource( 8 )
+position = Vector2( 0, -8 )
+emitting = false
+amount = 10
+explosiveness = 0.39
 local_coords = false
-process_material = SubResource( 10 )
-texture = ExtResource( 2 )
+process_material = SubResource( 12 )
+texture = ExtResource( 7 )
