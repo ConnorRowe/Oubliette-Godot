@@ -344,7 +344,7 @@ public class LevelGenerator : Node, IProvidesNav
             {
                 // Put player in starting room
                 currentRoom = room.Key;
-                player.Position = generatedRooms[currentRoom].Position + new Vector2(8 * 16, 4 * 16);
+                player.Position = generatedRooms[currentRoom].Position + new Vector2(177, 143);
                 generatedRooms[currentRoom].Visible = true;
                 generatedRooms[currentRoom].firstRoom = true;
                 roomBorder.Position = generatedRooms[currentRoom].Position + new Vector2(176, 144);
