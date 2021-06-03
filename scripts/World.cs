@@ -123,7 +123,9 @@ public class World : Node2D
                     // AddChild(testPotion);
                     // testPotion.Position = camera.GetGlobalMousePosition();
 
-                    TestSpawnEnemyAtMouse<FireFly>("res://scenes/enemies/FireFly.tscn");
+                    TestSpawnNodeAtMouse<Pedestal>("res://scenes/Pedestal.tscn").GenerateItem();
+
+                    // TestSpawnEnemyAtMouse<FireFly>("res://scenes/enemies/FireFly.tscn");
                 }
             }
         }

@@ -27,7 +27,7 @@ public class MeleeAttackBehaviour : AIBehaviour
 
     private void TryAttack()
     {
-        if (mgr.owner.IsQueuedForDeletion())
+        if (!IsInstanceValid(mgr.owner))
             return;
 
         if (mgr.owner.GlobalPosition.DistanceTo(mgr.lastTarget.GlobalPosition) < attackRange && !mgr.owner.isDead)
