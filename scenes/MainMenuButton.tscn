@@ -7,14 +7,14 @@
 [ext_resource path="res://textures/main_menu_button_ifudare_text.png" type="Texture" id=5]
 [ext_resource path="res://materials/ClipRectWith2LayerMix.shader" type="Shader" id=6]
 
-[sub_resource type="ShaderMaterial" id=3]
+[sub_resource type="ShaderMaterial" id=1]
 resource_local_to_scene = true
 shader = ExtResource( 6 )
 shader_param/clip_rect_min = Vector2( 7, 7 )
 shader_param/clip_rect_max = Vector2( 132, 31 )
 shader_param/text_sampler = ExtResource( 3 )
 
-[sub_resource type="RectangleShape2D" id=1]
+[sub_resource type="RectangleShape2D" id=2]
 extents = Vector2( 64.5, 14 )
 
 [node name="MainMenuButton" type="Area2D"]
@@ -29,7 +29,7 @@ mouseOverText = ExtResource( 5 )
 normalText = ExtResource( 3 )
 
 [node name="BgAndText" type="Sprite" parent="."]
-material = SubResource( 3 )
+material = SubResource( 1 )
 texture = ExtResource( 1 )
 
 [node name="Border" type="Sprite" parent="."]
@@ -37,4 +37,4 @@ texture = ExtResource( 2 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
-shape = SubResource( 1 )
+shape = SubResource( 2 )

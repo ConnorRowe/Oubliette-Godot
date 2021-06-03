@@ -97,7 +97,7 @@ public class Minimap : Node2D
 
     private void RoomChanged(LevelGenerator levelGen)
     {
-        currentRoom = levelGen.CurrentRoom;
+        currentRoom = levelGen.CurrentRoomKey;
 
         if (!discoveredRooms.ContainsKey(currentRoom))
         {

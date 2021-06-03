@@ -11,6 +11,8 @@ public class MainMenuButton : Node2D
     [Export]
     private Texture normalText;
     [Export]
+    private Texture borderOverride;
+    [Export]
     private NodePath _cameraPath;
 
 
@@ -31,6 +33,8 @@ public class MainMenuButton : Node2D
     private Vector2 defaultBgClipMin;
     private Vector2 defaultBgClipMax;
 
+    public bool Active = true;
+
     public override void _Ready()
     {
         bgAndText = GetNode<Sprite>("BgAndText");
@@ -41,6 +45,11 @@ public class MainMenuButton : Node2D
         defaultBgClipMin = (Vector2)bgAndTextMat.GetShaderParam("clip_rect_min");
         defaultBgClipMax = (Vector2)bgAndTextMat.GetShaderParam("clip_rect_max");
 
+        if(borderOverride != null)
+        {
+            border.Texture = borderOverride;
+        }
+
         Connect("mouse_entered", this, nameof(MouseOver), new Godot.Collections.Array() { true });
         Connect("mouse_exited", this, nameof(MouseOver), new Godot.Collections.Array() { false });
 
@@ -50,6 +59,9 @@ public class MainMenuButton : Node2D
     public override void _Input(InputEvent evt)
     {
         base._Input(evt);
+
+        if(!Active)
+            return;
 
         if (evt is InputEventMouseButton emb)
         {
@@ -73,6 +85,9 @@ public class MainMenuButton : Node2D
     public override void _Process(float delta)
     {
         base._Process(delta);
+
+        if(!Active)
+            return;
 
         bgAndText.Offset = bgAndText.Offset.LinearInterpolate(bgOffsetGoal, delta * 4);
         border.Offset = border.Offset.LinearInterpolate(fgOffsetGoal, delta * 8);

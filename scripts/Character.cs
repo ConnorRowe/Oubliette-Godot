@@ -169,6 +169,7 @@ public abstract class Character : KinematicBody2D
     private float checkSlideCD = 0.0f;
 
     public HashSet<Buff> Buffs = new HashSet<Buff>();
+    protected string lastDamagedBy = "";
 
     public virtual float GetMaxSpeed()
     {
@@ -193,6 +194,8 @@ public abstract class Character : KinematicBody2D
     private CollisionPolygon2D rightLeftCollider;
 
     // Export
+    [Export]
+    public string damageSourceName = "default";
     [Export]
     NodePath _hitboxPath;
     [Export]
@@ -517,8 +520,10 @@ public abstract class Character : KinematicBody2D
             charSprite.Playing = true;
     }
 
-    public virtual void TakeDamage(int damage = 1, Character source = null)
+    public virtual void TakeDamage(int damage = 1, Character source = null, string sourceName = "")
     {
+        lastDamagedBy = sourceName;
+
         // Resist damage
         damage = damage - Mathf.RoundToInt(currentStats[Stat.ResistDamageFlat]);
 

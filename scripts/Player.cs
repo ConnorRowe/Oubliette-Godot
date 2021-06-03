@@ -20,6 +20,7 @@ public class Player : Character, ICastsSpells
     private float currentMajyka = 100.0f;
     public float staffRot = 0.0f;
     public List<Artefact.ArtefactTextureSet> artefactTextureSets = new List<Artefact.ArtefactTextureSet>();
+    public string KilledBy = "";
     private Vector2 armSocket = Vector2.Zero;
     private Vector2 facingDir = Vector2.Zero;
     private Godot.Collections.Dictionary<Direction, Vector2> staffOrigins = new Godot.Collections.Dictionary<Direction, Vector2>() { { Direction.Up, new Vector2(4.0f, -10.0f) }, { Direction.Right, new Vector2(0.0f, -8.0f) }, { Direction.Down, new Vector2(-4.0f, -10.0f) }, { Direction.Left, new Vector2(0.0f, -10.0f) } };
@@ -61,6 +62,10 @@ public class Player : Character, ICastsSpells
     private NodePath _cameraPath;
     [Export]
     private Shape2D hitBoxTraceShape;
+
+    // Signals
+    [Signal]
+    public delegate void PlayerDied(Player player);
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -120,6 +125,23 @@ public class Player : Character, ICastsSpells
     {
         base._Input(evt);
 
+        if(isDead)
+            return;
+
+        if (Input.IsActionPressed("g_cast_primary_spell"))
+        {
+            if (currentMajyka >= GetSpellCost(primarySpell.majykaCost) && primarySpellCooldown == 0.0f)
+            {
+                // Cast primary spell
+                primarySpell.Cast(this);
+
+                currentMajyka -= GetSpellCost(primarySpell.majykaCost);
+                UpdateMajykaBar();
+
+                primarySpellCooldown = GetMaxPrimarySpellCooldown();
+
+            }
+        }
         if (evt.IsActionPressed("g_cast_secondary_spell"))
         {
             CastSecondarySpell();
@@ -152,6 +174,11 @@ public class Player : Character, ICastsSpells
                 if (evt.IsActionPressed("g_use_potion"))
                 {
                     ConsumeCurrentPotion();
+                }
+                if(keyEvt.Scancode == (int)KeyList.K)
+                {
+                    // suicide
+                    TakeDamage(9999, sourceName: "suicide");
                 }
             }
             else
@@ -235,6 +262,9 @@ public class Player : Character, ICastsSpells
     {
         base._Process(delta);
 
+        if(isDead)
+            return;
+
         if (primarySpellCooldown > 0.0f)
         {
             primarySpellCooldown -= delta;
@@ -262,21 +292,6 @@ public class Player : Character, ICastsSpells
         if (currentMajyka < maxMajyka)
             RegenMajyka(delta);
 
-        if (Input.IsActionPressed("g_cast_primary_spell"))
-        {
-            if (currentMajyka >= GetSpellCost(primarySpell.majykaCost) && primarySpellCooldown == 0.0f)
-            {
-                // Cast primary spell
-                primarySpell.Cast(this);
-
-                currentMajyka -= GetSpellCost(primarySpell.majykaCost);
-                UpdateMajykaBar();
-
-                primarySpellCooldown = GetMaxPrimarySpellCooldown();
-
-            }
-        }
-
         float primarySpellCDPercent = primarySpellCooldown / GetMaxPrimarySpellCooldown();
         if (primarySpellCDPercent < 1.0f)
             majykaBar.UpdateSpellCooldown(primarySpellCDPercent);
@@ -293,6 +308,20 @@ public class Player : Character, ICastsSpells
     public override void _Draw()
     {
         DrawEquippedArtefacts(GetFacingDirection());
+    }
+
+    public override void Die()
+    {
+        base.Die();
+
+        KilledBy = lastDamagedBy;
+
+        EmitSignal(nameof(PlayerDied), this);
+    }
+
+    public override float GetMaxSpeed()
+    {
+        return isDead ? 0.0f : base.GetMaxSpeed();
     }
 
     private void DrawEquippedArtefacts(Direction direction)
@@ -478,11 +507,11 @@ public class Player : Character, ICastsSpells
         canTakeDamage = true;
     }
 
-    public override void TakeDamage(int damage = 1, Character source = null)
+    public override void TakeDamage(int damage = 1, Character source = null, string sourceName = "")
     {
         if (canTakeDamage)
         {
-            base.TakeDamage(damage, source);
+            base.TakeDamage(damage, source, sourceName);
             canTakeDamage = false;
             takeDmgTimer = GetTree().CreateTimer(0.25f, false);
             takeDmgTimer.Connect("timeout", this, nameof(ResetCanTakeDamage));
@@ -566,7 +595,7 @@ public class Player : Character, ICastsSpells
 
     public void OnAreaEntered(Area2D area)
     {
-        if (area is SpillageHazard)
+        if (area is SpillageHazard spillage)
         {
             spillageCount++;
 
@@ -575,7 +604,7 @@ public class Player : Character, ICastsSpells
                 if (spillageDmgTimer != null && spillageDmgTimer.TimeLeft > 0.0f)
                     return;
 
-                SpillageDamage();
+                SpillageDamage(spillage);
             }
         }
     }
@@ -588,11 +617,11 @@ public class Player : Character, ICastsSpells
         }
     }
 
-    private void SpillageDamage()
+    private void SpillageDamage(SpillageHazard spillage)
     {
         if (spillageCount > 0)
         {
-            TakeDamage();
+            TakeDamage(sourceName: spillage.DmgSourceName);
 
             spillageDmgTimer = GetTree().CreateTimer(1.0f, false);
             spillageDmgTimer.Connect("timeout", this, nameof(SpillageDamage));

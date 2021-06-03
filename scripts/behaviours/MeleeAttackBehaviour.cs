@@ -21,15 +21,18 @@ public class MeleeAttackBehaviour : AIBehaviour
     public override void Process(float delta) { }
     public override void OnBehaviourEnd()
     {
-        if(timer != null && timer.IsConnected("timeout", this, nameof(TryAttack)))
+        if (timer != null && timer.IsConnected("timeout", this, nameof(TryAttack)))
             timer.Disconnect("timeout", this, nameof(TryAttack));
     }
 
     private void TryAttack()
     {
+        if (mgr.owner.IsQueuedForDeletion())
+            return;
+
         if (mgr.owner.GlobalPosition.DistanceTo(mgr.lastTarget.GlobalPosition) < attackRange && !mgr.owner.isDead)
         {
-            mgr.lastTarget.TakeDamage(source: mgr.owner);
+            mgr.lastTarget.TakeDamage(source: mgr.owner, sourceName: mgr.owner.damageSourceName);
             mgr.lastTarget.ApplyKnockBack(mgr.owner.dir * 80.0f);
         }
 

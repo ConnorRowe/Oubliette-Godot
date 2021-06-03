@@ -4,6 +4,7 @@ using System;
 public class SpillageHazard : Area2D
 {
     public float lifeTime = 2.0f;
+    public string DmgSourceName = "Spillage";
 
     public override void _Process(float delta)
     {

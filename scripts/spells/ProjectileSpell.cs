@@ -26,7 +26,7 @@ public class ProjectileSpell : BaseSpell
         proj.source = (Character)source;
         proj.SetProjectileColour(source.GetSpellColour(baseColour));
 
-        proj.SetSpellStats(source.GetSpellDamage(damage), source.GetSpellRange(range), source.GetSpellKnockback(knockback), source.GetSpellSpeed(speed));
+        proj.SetSpellStats(source.GetSpellDamage(damage), source.GetSpellRange(range), source.GetSpellKnockback(knockback), source.GetSpellSpeed(speed), (source as Character).damageSourceName + "'s " + Name);
         proj.SetHitCharEvent(HitCharEvent);
 
         return proj;

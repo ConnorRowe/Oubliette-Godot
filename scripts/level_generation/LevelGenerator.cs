@@ -9,8 +9,9 @@ public class LevelGenerator : Node, IProvidesNav
     private bool canPan = false;
     private RandomNumberGenerator rng = new RandomNumberGenerator();
     private Player player;
-    private Point currentRoom = Point.Empty;
-    public Point CurrentRoom { get { return currentRoom; } }
+    private Point currentRoomKey = Point.Empty;
+    public Point CurrentRoomKey { get { return currentRoomKey; } }
+    public Room CurrentRoom { get { return generatedRooms[currentRoomKey]; } }
 
     private List<PackedScene> possibleRooms = new List<PackedScene>();
     private List<PackedScene> treasureRooms = new List<PackedScene>();
@@ -343,11 +344,11 @@ public class LevelGenerator : Node, IProvidesNav
             if (room.Value.roomType == 3)
             {
                 // Put player in starting room
-                currentRoom = room.Key;
-                player.Position = generatedRooms[currentRoom].Position + new Vector2(177, 143);
-                generatedRooms[currentRoom].Visible = true;
-                generatedRooms[currentRoom].firstRoom = true;
-                roomBorder.Position = generatedRooms[currentRoom].Position + new Vector2(176, 144);
+                currentRoomKey = room.Key;
+                player.Position = generatedRooms[currentRoomKey].Position + new Vector2(177, 143);
+                generatedRooms[currentRoomKey].Visible = true;
+                generatedRooms[currentRoomKey].firstRoom = true;
+                roomBorder.Position = generatedRooms[currentRoomKey].Position + new Vector2(176, 144);
             }
         }
 
@@ -358,7 +359,7 @@ public class LevelGenerator : Node, IProvidesNav
 
         // Update minimap
         EmitSignal(nameof(RoomChanged), this);
-        EmitSignal(nameof(RoomCleared), currentRoom.X, currentRoom.Y);
+        EmitSignal(nameof(RoomCleared), currentRoomKey.X, currentRoomKey.Y);
     }
 
     public void RegenerateLevel()
@@ -408,26 +409,26 @@ public class LevelGenerator : Node, IProvidesNav
 
     private void MoveRoom(Direction dir)
     {
-        generatedRooms[currentRoom].Visible = false;
+        generatedRooms[currentRoomKey].Visible = false;
 
-        Point nextRoom = currentRoom;
+        Point nextRoom = currentRoomKey;
         nextRoom.Offset(dir.AsPoint());
 
         player.GlobalPosition = generatedRooms[nextRoom].doors[dir.Opposite()].GlobalPosition + (dir.AsVector() * 20.0f);
 
         generatedRooms[nextRoom].Visible = true;
-        currentRoom = nextRoom;
+        currentRoomKey = nextRoom;
 
-        foreach (AICharacter enemy in generatedRooms[currentRoom].enemies)
+        foreach (AICharacter enemy in generatedRooms[currentRoomKey].enemies)
         {
             enemy.TargetPlayer(player);
         }
 
-        roomBorder.Position = generatedRooms[currentRoom].Position + new Vector2(176, 144);
+        roomBorder.Position = generatedRooms[currentRoomKey].Position + new Vector2(176, 144);
 
         EmitSignal(nameof(RoomChanged), this);
 
-        generatedRooms[currentRoom].RoomEntered();
+        generatedRooms[currentRoomKey].RoomEntered();
     }
 
     private void DoorHit(Direction dir)

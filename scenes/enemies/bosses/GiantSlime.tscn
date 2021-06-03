@@ -31,7 +31,7 @@ void fragment()
 	COLOR = vec4(finalColour.rgb, clamp(abs(alpha) + base_colour.a, 0.0, 1.0));
 }"
 
-[sub_resource type="ShaderMaterial" id=4]
+[sub_resource type="ShaderMaterial" id=2]
 resource_local_to_scene = true
 shader = SubResource( 1 )
 shader_param/colour_override = Color( 1, 0, 0, 1 )
@@ -39,17 +39,17 @@ shader_param/override_lerp = 0.0
 shader_param/outline_colour = Color( 1, 1, 1, 1 )
 shader_param/outline_width = 0.0
 
-[sub_resource type="AtlasTexture" id=5]
+[sub_resource type="AtlasTexture" id=3]
 atlas = ExtResource( 3 )
 region = Rect2( 0, 0, 36, 32 )
 
-[sub_resource type="AtlasTexture" id=2]
+[sub_resource type="AtlasTexture" id=4]
 atlas = ExtResource( 3 )
 region = Rect2( 36, 0, 36, 32 )
 
-[sub_resource type="SpriteFrames" id=3]
+[sub_resource type="SpriteFrames" id=5]
 animations = [ {
-"frames": [ SubResource( 5 ), SubResource( 2 ) ],
+"frames": [ SubResource( 3 ), SubResource( 4 ) ],
 "loop": true,
 "name": "default",
 "speed": 5.0
@@ -98,6 +98,7 @@ tracks/2/keys = {
 
 [node name="GiantSlime" instance=ExtResource( 1 )]
 script = ExtResource( 4 )
+damageSourceName = "a Giant Slime"
 maxHealth = 12
 _animDeath = ""
 
@@ -110,8 +111,8 @@ texture = ExtResource( 2 )
 offset = Vector2( 0, -1 )
 
 [node name="CharSprite" parent="." index="2"]
-material = SubResource( 4 )
-frames = SubResource( 3 )
+material = SubResource( 2 )
+frames = SubResource( 5 )
 offset = Vector2( 0, -16 )
 
 [node name="UpDown" parent="Hitbox" index="0"]

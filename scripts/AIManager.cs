@@ -129,7 +129,9 @@ public class AIManager : Godot.Reference
     public void StopTryTransitionLoop()
     {
         SetCurrentBehaviour("");
-        transitionTimer.Disconnect("timeout", this, nameof(TryTransition));
+
+        if (transitionTimer.IsConnected("timeout", this, nameof(TryTransition)))
+            transitionTimer.Disconnect("timeout", this, nameof(TryTransition));
     }
 
     public static Player CheckForPlayer(Physics2DShapeQueryParameters shapeQuery, Physics2DDirectSpaceState spaceState)

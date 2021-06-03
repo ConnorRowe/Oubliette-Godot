@@ -220,6 +220,17 @@ public class Items : Node
         RegisterSpell(Spells.IceSpike, 1.0f, new LootPool[] { LootPool.GENERAL });
     }
 
+    public void ResetItemPools()
+    {
+        artefactPools = new Dictionary<LootPool, List<Artefact>>() { { LootPool.GENERAL, new List<Artefact>() }, { LootPool.ENEMY, new List<Artefact>() }, { LootPool.WOOD_CHEST, new List<Artefact>() } };
+        spellPools = new Dictionary<LootPool, List<(BaseSpell spell, float weight)>>() { { LootPool.GENERAL, new List<(BaseSpell spell, float weight)>() }, { LootPool.ENEMY, new List<(BaseSpell spell, float weight)>() }, { LootPool.WOOD_CHEST, new List<(BaseSpell, float)>() } };
+        artefactPoolWeightSum = new Dictionary<LootPool, float>() { { LootPool.GENERAL, 0.0f }, { LootPool.ENEMY, 0.0f }, { LootPool.WOOD_CHEST, 0.0f } };
+        spellPoolWeightSum = new Dictionary<LootPool, float>() { { LootPool.GENERAL, 0.0f }, { LootPool.ENEMY, 0.0f }, { LootPool.WOOD_CHEST, 0.0f } };
+
+        RegisterArtefacts();
+        RegisterSpells();
+    }
+
     public override void _Ready()
     {
         base._Ready();

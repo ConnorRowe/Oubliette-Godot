@@ -45,5 +45,6 @@ public class SpillageProjectile : Projectile
 
         newSpillage.GlobalPosition = GlobalPosition + new Vector2(0, 7);
         newSpillage.SetColours(spillageModulate, new Color(0.933333f, 1, 0.878431f));
+        newSpillage.DmgSourceName = source.damageSourceName + "'s Slime Ball's Acid Trail";
     }
 }

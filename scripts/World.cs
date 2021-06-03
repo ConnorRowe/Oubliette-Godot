@@ -1,11 +1,12 @@
 using Godot;
+using System;
 using System.Collections.Generic;
 
 public class World : Node2D
 {
     //Nodes
     private Camera2D camera;
-    private Node2D level;
+    private LevelGenerator levelGenerator;
     private DebugOverlay debugOverlay;
     private Player player;
     private HealthContainer healthContainer;
@@ -14,6 +15,8 @@ public class World : Node2D
     private AudioStreamPlayer musicPlayer;
     private Items items;
     public ArtefactNamePopup artefactNamePopup;
+    private RichTextLabel killedByLabel;
+    private MainMenuButton respawnBtn;
 
     [Export]
     private NodePath _basicAIPath;
@@ -35,12 +38,13 @@ public class World : Node2D
 
     //Other
     public List<Vector2[]> debugLines = new List<Vector2[]>();
+    private string defaultKilledByText = "";
 
     public override void _Ready()
     {
         debugPoint = GD.Load<Texture>("res://textures/2x2_white.png");
         camera = GetNode<Player>("Player").GetNode<Camera2D>("Camera2D");
-        level = GetNodeOrNull<Node2D>(_levelPath);
+        levelGenerator = GetNodeOrNull<LevelGenerator>(_levelPath);
         debugOverlay = GetNode<DebugOverlay>(_debugOverlayPath);
         debugOverlay.world = this;
         player = GetNode<Player>("Player");
@@ -50,9 +54,17 @@ public class World : Node2D
         musicPlayer = GetNode<AudioStreamPlayer>("MusicPlayer");
         items = GetNode<Items>("/root/Items");
         artefactNamePopup = GetNode<ArtefactNamePopup>(_artefactNamePopupPath);
+        killedByLabel = GetNode<RichTextLabel>("CanvasLayer/KilledBy");
+        respawnBtn = GetNode<MainMenuButton>("CanvasLayer/RespawnButton");
+
+        respawnBtn.Active = false;
+        respawnBtn.Connect(nameof(MainMenuButton.Clicked), this, nameof(GoToMainMenu));
 
         player.Connect(nameof(Player.HealthChanged), this, nameof(UpdateHealthUI));
         UpdateHealthUI(player.currentHealth, player.maxHealth);
+        player.Connect(nameof(Player.PlayerDied), this, nameof(PlayerDied));
+
+        defaultKilledByText = killedByLabel.BbcodeText;
 
         globalLighting.Color = defaultGlobalLighting;
         musicPlayer.Play();
@@ -155,7 +167,58 @@ public class World : Node2D
         healthContainer.SetHealth(currentHealth, maxHealth);
     }
 
+    private void PlayerDied(Player player)
+    {
+        // Stop enemy AI
+        foreach (AICharacter enemy in levelGenerator.CurrentRoom.enemies)
+        {
+            enemy.hasTarget = false;
+            enemy.aIManager.SetCurrentBehaviour("idle");
+            enemy.aIManager.StopTryTransitionLoop();
+        }
 
+        // Zoom in on player
+        tween.InterpolateProperty(player.camera, "zoom", new Vector2(0.333f, 0.333f), new Vector2(0.1f, 0.1f), 0.25f, Tween.TransitionType.Cubic, Tween.EaseType.InOut);
+        tween.InterpolateProperty(player.camera, "offset", Vector2.Zero, new Vector2(0, -16), 0.25f);
+        
+        // Hide GUI
+        foreach(Node node in GetNode<CanvasLayer>("CanvasLayer").GetChildren())
+        {
+            if(node is CanvasItem canvasItem && !node.IsInGroup("death_gui"))
+            {
+                tween.InterpolateProperty(canvasItem, "modulate", Colors.White, Colors.Transparent, 0.25f, Tween.TransitionType.Cubic, Tween.EaseType.InOut);
+            }
+        }
+
+        // Dim scene
+        tween.InterpolateProperty(GetNode<WorldEnvironment>("WorldEnvironment").Environment, "tonemap_exposure", 0.59f, 0.25f, 0.5f, Tween.TransitionType.Cubic, Tween.EaseType.InOut);
+
+        // Show death GUI
+        foreach(Node node in GetTree().GetNodesInGroup("death_gui"))
+        {
+            (node as CanvasItem).Visible = true;
+            tween.InterpolateProperty(node, "modulate", Colors.Transparent, Colors.White, 0.25f);
+        }
+        
+        // Activate respawn button
+        respawnBtn.Active = true;
+
+        // Show who killed player
+        GetNode<RichTextLabel>("CanvasLayer/KilledBy").BbcodeText = String.Format(defaultKilledByText, player.KilledBy);
+
+        tween.Start();
+    }
+
+    private void GoToMainMenu()
+    {
+        GetTree().ChangeSceneTo(GD.Load<PackedScene>("res://scenes/MainMenu.tscn"));
+
+        // Reset item pools
+        items.ResetItemPools();
+
+        // Reset worldenvironment resource
+        GetNode<WorldEnvironment>("WorldEnvironment").Environment.TonemapExposure = 0.59f;
+    }
 
     // For testing purposes only. vvv
     private T TestSpawnNodeAtMouse<T>(NodePath scenePath) where T : Node2D

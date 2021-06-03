@@ -130,6 +130,7 @@ animations = [ {
 
 [node name="Slime" instance=ExtResource( 1 )]
 script = ExtResource( 3 )
+damageSourceName = "a Slime"
 _animDeath = "die"
 maxMovementSpeed = 12.0
 

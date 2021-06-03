@@ -21,6 +21,8 @@ public class Projectile : KinematicBody2D
 
     [Export]
     private ParticlesMaterial explodeParticleMaterial;
+    [Export]
+    public string dmgSourceName = "projectile";
 
     public override void _Ready()
     {
@@ -58,7 +60,7 @@ public class Projectile : KinematicBody2D
 
         if (node.Owner is Character character)
         {
-            character.TakeDamage(damage, source);
+            character.TakeDamage(damage, source, dmgSourceName);
             character.ApplyKnockBack(direction * knockback);
             hitCharEvent?.Invoke(character);
         }
@@ -94,12 +96,13 @@ public class Projectile : KinematicBody2D
         QueueFree();
     }
 
-    public void SetSpellStats(int damage, float range, float knockback, float speed)
+    public void SetSpellStats(int damage, float range, float knockback, float speed, string baseDmgSourceName)
     {
         this.damage = damage;
         this.range = range;
         this.knockback = knockback;
         this.speed = speed;
+        this.dmgSourceName = baseDmgSourceName;
     }
 
     public void SetHitCharEvent(Action<Character> hitCharEvent)
