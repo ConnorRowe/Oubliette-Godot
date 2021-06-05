@@ -53,11 +53,17 @@ public class PlayerGib : RigidBody2D
             {
                 float dist = lastPosition.DistanceTo(Position);
                 Vector2 randOffset = new Vector2(rng.RandfRange(-2, 2), rng.RandfRange(-2, 2));
-                if (dist > 1.0f || bloodAmount < 2.0f)
-                    bloodTexture.SweepPlus(lastPosition + randOffset, newPosition, Mathf.Max(Mathf.RoundToInt(dist), 8), bloodSpray.GlobalPosition, 0.25f);
+                if (dist > 1.0f)
+                    if (bloodAmount > 0.5f)
+                        bloodTexture.AddSweepedPlus(lastPosition + randOffset, newPosition, Mathf.Max(Mathf.RoundToInt(dist), 8), bloodSpray.GlobalPosition, 0.25f);
+                    else
+                        bloodTexture.AddSweepedPoints(lastPosition + randOffset, newPosition, Mathf.Max(Mathf.RoundToInt(dist), 8), bloodSpray.GlobalPosition, 0.25f);
                 else
                 {
-                    bloodTexture.AddPlus(newPosition + randOffset, bloodSpray.GlobalPosition, 0.25f);
+                    if (bloodAmount > 0.5f)
+                        bloodTexture.AddPlus(newPosition + randOffset, bloodSpray.GlobalPosition, 0.25f);
+                    else
+                        bloodTexture.AddPoint(newPosition + randOffset, 0.25f);
                 }
 
                 bloodAmount -= delta * 2.0f;

@@ -116,10 +116,16 @@ public class World : Node2D
             float dist = lastPlayerPos.DistanceTo(newPlayerPos);
             Vector2 randOffset = new Vector2(rng.RandfRange(-2, 2), rng.RandfRange(-2, 2));
             if (dist > 1.0f)
-                bloodTexture.SweepPlus(lastPlayerPos + randOffset, newPlayerPos, Mathf.Max(Mathf.RoundToInt(dist), 8), player.Position, 0.25f);
+                if (player.BloodTrailAmount >= 0.5f)
+                    bloodTexture.AddSweepedPlus(lastPlayerPos + randOffset, newPlayerPos, Mathf.Max(Mathf.RoundToInt(dist), 8), player.Position, 0.25f);
+                else
+                    bloodTexture.AddSweepedPoints(lastPlayerPos + randOffset, newPlayerPos, Mathf.Max(Mathf.RoundToInt(dist), 8), player.Position, 0.25f);
             else
             {
-                bloodTexture.AddPlus(newPlayerPos + randOffset, player.Position, 0.25f);
+                if (player.BloodTrailAmount >= 0.5f)
+                    bloodTexture.AddPlus(newPlayerPos + randOffset, player.Position, 0.25f);
+                else
+                    bloodTexture.AddPoint(newPlayerPos + randOffset);
             }
         }
 

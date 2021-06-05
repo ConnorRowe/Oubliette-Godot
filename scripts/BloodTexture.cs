@@ -76,7 +76,7 @@ public class BloodTexture : Sprite
         return newPlus;
     }
 
-    public void SweepPlus(Vector2 start, Vector2 end, int maxPoints, Vector2 removePixel, float alpha = 1.0f)
+    private HashSet<(Vector2 dst, float alpha)> SweepPoints(Vector2 start, Vector2 end, int maxPoints, float alpha = 1.0f)
     {
         var diff_X = end.x - start.x;
         var diff_Y = end.y - start.y;
@@ -84,17 +84,34 @@ public class BloodTexture : Sprite
         var interval_X = diff_X / (maxPoints + 1);
         var interval_Y = diff_Y / (maxPoints + 1);
 
-        HashSet<Vector2> pointSet = new HashSet<Vector2>();
+        HashSet<(Vector2 dst, float alpha)> pointSet = new HashSet<(Vector2 dst, float alpha)>();
         for (int i = 1; i <= maxPoints; i++)
         {
-            pointSet.Add(new Vector2(start.x + interval_X * i, end.y + interval_Y * i));
+            pointSet.Add((new Vector2(start.x + interval_X * i, end.y + interval_Y * i).Round(), alpha));
         }
+
+        return pointSet;
+    }
+
+    public void AddSweepedPoints(Vector2 start, Vector2 end, int maxPoints, Vector2 removePixel, float alpha = 1.0f)
+    {
+        HashSet<(Vector2 dst, float alpha)> pointSet = SweepPoints(start, end, maxPoints, alpha);
+        pointSet.Remove((removePixel.Round(), alpha));
+
+        AddPoints(pointSet);
+    }
+
+    public void AddSweepedPlus(Vector2 start, Vector2 end, int maxPoints, Vector2 removePixel, float alpha = 1.0f)
+    {
+
+        HashSet<(Vector2 dst, float alpha)> pointSet = SweepPoints(start, end, maxPoints, alpha);
+        pointSet.Remove((removePixel.Round(), alpha));
 
         HashSet<(Vector2 dst, float alpha)> plusSet = new HashSet<(Vector2 dst, float alpha)>();
 
-        foreach (Vector2 p in pointSet)
+        foreach ((Vector2 dst, float alpha) p in pointSet)
         {
-            plusSet.UnionWith(MakePlus(p, removePixel, alpha));
+            plusSet.UnionWith(MakePlus(p.dst, removePixel, p.alpha));
         }
 
         AddPoints(plusSet);
