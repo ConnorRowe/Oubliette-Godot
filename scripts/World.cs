@@ -19,8 +19,12 @@ public class World : Node2D
     private MainMenuButton respawnBtn;
     private BloodTexture bloodTexture;
     private Vector2 lastPlayerPos;
+    private OverlayRender charOverlayRender;
+    private Light2D overlayLight;
 
     public BloodTexture @BloodTexture { get { return bloodTexture; } }
+    public OverlayRender @OverlayRender { get { return charOverlayRender; } }
+    public Player @Player { get { return player; } }
 
     [Export]
     private NodePath _basicAIPath;
@@ -65,6 +69,8 @@ public class World : Node2D
         killedByLabel = GetNode<RichTextLabel>("CanvasLayer/KilledBy");
         respawnBtn = GetNode<MainMenuButton>("CanvasLayer/RespawnButton");
         bloodTexture = GetNode<BloodTexture>("BloodTexture");
+        charOverlayRender = GetNode<OverlayRender>("CharOverlayViewport/OverlayRender");
+        overlayLight = GetNode<Light2D>("Player/OverlayLight");
 
         rng.Randomize();
         respawnBtn.Active = false;
@@ -74,6 +80,7 @@ public class World : Node2D
         UpdateHealthUI(player.currentHealth, player.maxHealth);
         player.Connect(nameof(Player.PlayerDied), this, nameof(PlayerDied));
         lastPlayerPos = player.Position;
+        charOverlayRender.AddCharacter(player);
 
         defaultKilledByText = killedByLabel.BbcodeText;
 
@@ -100,6 +107,8 @@ public class World : Node2D
 
         if (!levelGenerator.Done || player.isDead)
             return;
+
+        // overlayLight.RangeLayerMin = Mathf.RoundToInt(player.GlobalPosition.y);
 
         // Check if player stood in strong blood
         bloodTexture.BloodCheckPos = player.Position;
@@ -164,9 +173,12 @@ public class World : Node2D
 
                     // TestSpawnNodeAtMouse<BloodPool>("res://scenes/BloodPool.tscn").Start(bloodTexture);
 
-                    PlayerGib head = TestSpawnNodeAtMouse<PlayerGib>("res://scenes/PlayerGibTorso.tscn");
-                    head.Init(bloodTexture, Vector2.Right * 50.0f, 0f);
-                    head.BounceTween(rng.RandfRange(-16f, -56));
+                    // PlayerGib head = TestSpawnNodeAtMouse<PlayerGib>("res://scenes/PlayerGibTorso.tscn");
+                    // head.Init(bloodTexture, Vector2.Right * 50.0f, 0f);
+                    // head.BounceTween(rng.RandfRange(-16f, -56));
+
+                    AICharacter ff = TestSpawnNodeAtMouse<AICharacter>("res://scenes/enemies/Imp.tscn");
+                    OverlayRender.AddCharacter(ff);
 
                 }
             }

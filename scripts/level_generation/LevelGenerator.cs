@@ -9,6 +9,7 @@ public class LevelGenerator : Node, IProvidesNav
     private bool canPan = false;
     private RandomNumberGenerator rng = new RandomNumberGenerator();
     private Player player;
+    private World world;
     private Point currentRoomKey = Point.Empty;
     public Point CurrentRoomKey { get { return currentRoomKey; } }
     public Room CurrentRoom { get { return generatedRooms[currentRoomKey]; } }
@@ -53,8 +54,9 @@ public class LevelGenerator : Node, IProvidesNav
     {
         rng.Randomize();
 
-        camera = GetParent().GetNode<Camera2D>("Camera2D");
-        player = GetParent().GetNode<Player>("Player");
+        world = GetParent<World>();
+        camera = world.GetNode<Camera2D>("Camera2D");
+        player = world.GetNode<Player>("Player");
         roomBorder = GetNode<Sprite>("RoomBorder");
         wallTiles = GetNode<TileMap>(_wallTileMapPath);
         floorTiles = GetNode<TileMap>(_floorTileMapPath);
@@ -294,6 +296,8 @@ public class LevelGenerator : Node, IProvidesNav
 
                 // Connect enemy die signal to room function
                 newEnemy.Connect(nameof(AICharacter.Died), room.Value, nameof(Room.EnemyDied));
+                // Also connect to function here to remove their overlay
+                newEnemy.Connect(nameof(AICharacter.Died), this, nameof(EnemyDied));
             }
 
             // If boss room spawn a random boss
@@ -430,6 +434,8 @@ public class LevelGenerator : Node, IProvidesNav
             enemy.TargetPlayer(player);
         }
 
+        world.OverlayRender.AddCharacters(generatedRooms[currentRoomKey].enemies.Cast<Character>().ToHashSet());
+
         roomBorder.Position = generatedRooms[currentRoomKey].Position + new Vector2(176, 144);
 
         EmitSignal(nameof(RoomChanged), this);
@@ -451,5 +457,10 @@ public class LevelGenerator : Node, IProvidesNav
     {
         Point roomKey = generatedRooms.First(x => x.Value.Position == room.Position).Key;
         EmitSignal(nameof(RoomCleared), roomKey.X, roomKey.Y);
+    }
+
+    public void EnemyDied(AICharacter aICharacter)
+    {
+        world.OverlayRender.RemoveCharacter(aICharacter);
     }
 }

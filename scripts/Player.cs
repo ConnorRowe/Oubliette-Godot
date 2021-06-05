@@ -119,6 +119,7 @@ public class Player : Character, ICastsSpells
         debug.TrackFunc(nameof(GetSpellRange), this, "RNG", 1);
         debug.TrackFunc(nameof(GetSpellKnockback), this, "KBK", 1);
         debug.TrackFunc(nameof(GetSpellSpeed), this, "SPD", 1);
+        debug.TrackFunc("test", this);
 
         hitAreaShapeQuery = new Physics2DShapeQueryParameters();
         hitAreaShapeQuery.SetShape(hitBoxTraceShape);
@@ -131,6 +132,11 @@ public class Player : Character, ICastsSpells
         checkSlideCollisions = true;
 
         UpdatePotionSlot();
+    }
+
+    public Vector2 test()
+    {
+        return GetGlobalTransformWithCanvas().origin;
     }
 
     public override void _Input(InputEvent evt)

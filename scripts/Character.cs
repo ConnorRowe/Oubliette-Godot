@@ -168,8 +168,12 @@ public abstract class Character : KinematicBody2D
     private float checkSlideMaxCD = 0.15f;
     private float checkSlideCD = 0.0f;
 
+    public float Elevation { get { return elevation; } }
+
     public HashSet<Buff> Buffs = new HashSet<Buff>();
     protected string lastDamagedBy = "";
+
+    public AnimatedSprite CharSprite { get { return charSprite; } }
 
     public virtual float GetMaxSpeed()
     {

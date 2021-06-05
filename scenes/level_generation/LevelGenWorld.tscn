@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=2]
+[gd_scene load_steps=44 format=2]
 
 [ext_resource path="res://font/small_font.tres" type="DynamicFont" id=1]
 [ext_resource path="res://scripts/World.cs" type="Script" id=2]
@@ -35,6 +35,10 @@
 [ext_resource path="res://scenes/BloodTexture.tscn" type="PackedScene" id=33]
 [ext_resource path="res://textures/1x1_white.png" type="Texture" id=34]
 [ext_resource path="res://particle/BloodDrip.shader" type="Shader" id=35]
+[ext_resource path="res://scenes/OverlayRender.tscn" type="PackedScene" id=36]
+
+[sub_resource type="ViewportTexture" id=5]
+viewport_path = NodePath("CharOverlayViewport")
 
 [sub_resource type="CanvasItemMaterial" id=1]
 blend_mode = 3
@@ -56,6 +60,22 @@ shader_param/colour_lerp_b = Color( 0.313726, 1, 0, 1 )
 shader_param/colour_lerp_c = Color( 0, 0.670588, 1, 1 )
 shader_param/fill_texture = ExtResource( 19 )
 
+[sub_resource type="Shader" id=6]
+code = "shader_type canvas_item;
+
+void fragment()
+{
+	COLOR = texture(TEXTURE, UV);
+	
+	if(COLOR.rgb == vec3(0.0, 0.0, 0.0))
+	{
+		COLOR.rgb = vec3(0.05, 0.05, 0.05);
+	}
+}"
+
+[sub_resource type="ShaderMaterial" id=7]
+shader = SubResource( 6 )
+
 [node name="LevelGenWorld" type="YSort"]
 script = ExtResource( 2 )
 _levelPath = NodePath("LevelGenerator")
@@ -65,11 +85,32 @@ _tweenPath = NodePath("Tween")
 defaultGlobalLighting = Color( 0.15, 0.1425, 0.1425, 1 )
 _artefactNamePopupPath = NodePath("CanvasLayer/ArtefactNamePopup")
 
+[node name="CharOverlayViewport" type="Viewport" parent="."]
+size = Vector2( 1024, 600 )
+transparent_bg = true
+hdr = false
+usage = 0
+render_target_v_flip = true
+render_target_update_mode = 3
+
+[node name="OverlayRender" parent="CharOverlayViewport" instance=ExtResource( 36 )]
+
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
 
 [node name="Player" parent="." instance=ExtResource( 8 )]
-position = Vector2( 36, 58 )
+position = Vector2( 114, 197 )
 maxHealth = 8
+
+[node name="OverlayLight" type="Light2D" parent="Player"]
+show_behind_parent = true
+light_mask = 0
+use_parent_material = true
+scale = Vector2( 1, -1 )
+z_index = -1
+texture = SubResource( 5 )
+energy = 0.8
+range_item_cull_mask = 2
+shadow_item_cull_mask = 0
 
 [node name="Background" type="ParallaxBackground" parent="."]
 scroll_ignore_camera_zoom = true
@@ -182,6 +223,7 @@ position = Vector2( 4, 12 )
 position = Vector2( 4, 4 )
 
 [node name="DialogueBox" parent="CanvasLayer" instance=ExtResource( 7 )]
+visible = false
 margin_left = 14.0
 margin_top = 217.0
 margin_right = -525.0
@@ -215,6 +257,8 @@ zoom = Vector2( 2, 2 )
 [node name="Tween" type="Tween" parent="."]
 
 [node name="WallTiles" type="TileMap" parent="."]
+light_mask = 3
+material = SubResource( 7 )
 tile_set = ExtResource( 15 )
 cell_size = Vector2( 16, 16 )
 cell_custom_transform = Transform2D( 16, 0, 0, 16, 0, 0 )
@@ -224,6 +268,7 @@ show_collision = true
 cell_clip_uv = true
 collision_layer = 5
 format = 1
+tile_data = PoolIntArray( 851975, 0, 0, 851976, 0, 1, 851977, 0, 1, 851978, 0, 1, 851979, 0, 1, 851980, 0, 1, 851981, 0, 1, 851982, 0, 1, 851983, 0, 1, 851984, 0, 2, 917511, 0, 65536, 917512, 0, 65537, 917513, 0, 65537, 917514, 0, 65537, 917515, 0, 65537, 917516, 0, 65537, 917517, 0, 65537, 917518, 0, 65537, 917519, 0, 65537, 917520, 0, 65538, 983047, 0, 131072, 983048, 0, 131073, 983049, 0, 131073, 983050, 0, 131073, 983051, 0, 131073, 983052, 0, 131073, 983053, 0, 131073, 983054, 0, 131073, 983055, 0, 131073, 983056, 0, 131074 )
 
 [node name="1x1_white" type="Sprite" parent="."]
 visible = false
@@ -232,6 +277,7 @@ texture = ExtResource( 34 )
 centered = false
 
 [node name="BloodTexture" parent="." instance=ExtResource( 33 )]
+position = Vector2( -18, 5 )
 z_index = -1
 
 [node name="Navigation2D" type="Navigation2D" parent="."]

@@ -60,6 +60,7 @@ tracks/1/keys = {
 }
 
 [node name="AICharacter" type="KinematicBody2D"]
+z_index = 1
 script = ExtResource( 1 )
 _hitboxPath = NodePath("Hitbox")
 _upDownColliderPath = NodePath("Hitbox/UpDown")
@@ -92,10 +93,12 @@ process_material = ExtResource( 7 )
 texture = ExtResource( 6 )
 
 [node name="shadow" type="Sprite" parent="."]
+z_index = -1
 texture = ExtResource( 2 )
 
 [node name="CharSprite" type="AnimatedSprite" parent="."]
 material = ExtResource( 4 )
+z_index = -1
 frames = SubResource( 3 )
 offset = Vector2( 0, -8 )
 

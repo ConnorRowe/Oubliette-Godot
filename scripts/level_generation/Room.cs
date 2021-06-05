@@ -38,7 +38,7 @@ public class Room : Node2D
     public int roomType = -1;
     public int enemyCounter;
     public Dictionary<Direction, AnimatedSprite> doors = new Dictionary<Direction, AnimatedSprite>();
-    public List<AICharacter> enemies = new List<AICharacter>();
+    public HashSet<AICharacter> enemies = new HashSet<AICharacter>();
 
     [Export]
     private NodePath _wallTileMapPath;
@@ -116,7 +116,7 @@ public class Room : Node2D
         }
     }
 
-    public void EnemyDied()
+    public void EnemyDied(AICharacter aICharacter)
     {
         enemyCounter--;
 

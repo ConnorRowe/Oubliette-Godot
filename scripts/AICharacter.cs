@@ -38,7 +38,7 @@ public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
 
     // Signals
     [Signal]
-    public delegate void Died();
+    public delegate void Died(AICharacter aICharacter);
     [Signal]
     public delegate void PlayerIntersected(Player player);
 
@@ -268,7 +268,7 @@ public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
             GlobalPosition = initPos;
         }
 
-        if(hasTarget)
+        if (hasTarget)
             aIManager.TryTransition();
     }
 
@@ -321,7 +321,7 @@ public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
 
         aIManager.SetCurrentBehaviour("dead");
 
-        EmitSignal(nameof(Died));
+        EmitSignal(nameof(Died), this);
     }
 
     public void DetectionAlert()
