@@ -54,4 +54,9 @@ public class OverlayRender : Node2D
     {
         this.characters.UnionWith(characters);
     }
+
+    public void ClearCharacters()
+    {
+        characters.Clear();
+    }
 }

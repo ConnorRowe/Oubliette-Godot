@@ -208,9 +208,9 @@ public class Items : Node
 
     private void RegisterPotions()
     {
-        RegisterPotion(new Potion(new (Stat stat, float amount)[] { (Stat.ResistDamageFlat, 1.0f), (Stat.MagykaCostFlat, -5.0f) }, 10.0f, "Humble Huckleberry", Color.Color8(37, 27, 147), Color.Color8(105, 10, 130), Color.Color8(95, 103, 146)));
+        RegisterPotion(new Potion(new (Stat stat, float amount)[] { (Stat.MagykaCostFlat, -10.0f) }, 10.0f, "Humble Huckleberry", "you feel magical", Color.Color8(37, 27, 147), Color.Color8(105, 10, 130), Color.Color8(95, 103, 146)));
 
-        RegisterPotion(new Potion(new (Stat stat, float amount)[] { (Stat.ReflectDamageFlat, 2.0f) }, 10.0f, "Beverage of Briars", Color.Color8(82, 71, 36), Color.Color8(38, 71, 36), Color.Color8(56, 36, 41)));
+        RegisterPotion(new Potion(new (Stat stat, float amount)[] { (Stat.ReflectDamageFlat, 2.0f) }, 10.0f, "Beverage of Briars", "makes you... thorny", Color.Color8(82, 71, 36), Color.Color8(38, 71, 36), Color.Color8(56, 36, 41)));
     }
 
     private void RegisterSpells()

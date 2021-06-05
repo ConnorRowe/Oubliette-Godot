@@ -289,34 +289,37 @@ public abstract class Character : KinematicBody2D
         UpdateSpriteDirection();
 
         // Update active hitbox collider
-        upDownCollider.Disabled = true;
-        rightLeftCollider.Disabled = true;
+        bool isUpDownColliderDisabled = true;
+        bool isRightLeftColliderDisabled = true;
 
         switch (GetFacingDirection())
         {
             case Direction.Up:
                 {
-                    upDownCollider.Disabled = false;
+                    isUpDownColliderDisabled = false;
                     break;
                 }
             case Direction.Right:
                 {
-                    rightLeftCollider.Disabled = false;
+                    isRightLeftColliderDisabled = false;
                     rightLeftCollider.Scale = new Vector2(1, 1);
                     break;
                 }
             case Direction.Down:
                 {
-                    upDownCollider.Disabled = false;
+                    isUpDownColliderDisabled = false;
                     break;
                 }
             case Direction.Left:
                 {
-                    rightLeftCollider.Disabled = false;
+                    isRightLeftColliderDisabled = false;
                     rightLeftCollider.Scale = new Vector2(-1, 1);
                     break;
                 }
         }
+
+        upDownCollider.SetDeferred("disabled", isUpDownColliderDisabled);
+        rightLeftCollider.SetDeferred("disabled", isRightLeftColliderDisabled);
 
         // Remove expired buffs
         uint time = OS.GetTicksMsec();

@@ -398,7 +398,10 @@ public class LevelGenerator : Node, IProvidesNav
         wallTiles.Clear();
         floorTiles.Clear();
 
-        GetParent<World>().BloodTexture.ResetImage();
+        world.BloodTexture.ResetImage();
+
+        world.OverlayRender.ClearCharacters();
+        world.OverlayRender.AddCharacter(player);
 
         GetParent().GetNode<Minimap>("CanvasLayer/Minimap").ClearMinimap();
 

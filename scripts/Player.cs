@@ -721,6 +721,8 @@ public class Player : Character, ICastsSpells
 
         currentPotion = newPotion;
 
+        world.artefactNamePopup?.DisplayPopup(newPotion.name, newPotion.desc);
+
         UpdatePotionSlot();
 
         pickupCooldown = 0.5f;
@@ -804,6 +806,8 @@ public class Player : Character, ICastsSpells
     {
         if (primarySpell != null)
             DropSpellPickup(primarySpell);
+
+        world.artefactNamePopup?.DisplayPopup("Tome of " + spell.Name, "");
 
         primarySpell = spell;
 

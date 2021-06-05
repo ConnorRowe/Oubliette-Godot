@@ -50,6 +50,7 @@ public class World : Node2D
     private string defaultKilledByText = "";
     public bool DrawPlayerBloodTrail = true;
     public RandomNumberGenerator rng = new RandomNumberGenerator();
+    private bool displayedDeathGUI = false;
 
     public override void _Ready()
     {
@@ -233,6 +234,11 @@ public class World : Node2D
 
     private void PlayerDied(Player player)
     {
+        if (displayedDeathGUI)
+            return;
+
+        displayedDeathGUI = true;
+
         // Stop enemy AI
         foreach (AICharacter enemy in levelGenerator.CurrentRoom.enemies)
         {
