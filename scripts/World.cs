@@ -17,6 +17,10 @@ public class World : Node2D
     public ArtefactNamePopup artefactNamePopup;
     private RichTextLabel killedByLabel;
     private MainMenuButton respawnBtn;
+    private BloodTexture bloodTexture;
+    private Vector2 lastPlayerPos;
+
+    public BloodTexture @BloodTexture { get { return bloodTexture; } }
 
     [Export]
     private NodePath _basicAIPath;
@@ -35,14 +39,18 @@ public class World : Node2D
 
     //Assets
     private Texture debugPoint;
+    private PackedScene bloodPoolScene;
 
     //Other
     public List<Vector2[]> debugLines = new List<Vector2[]>();
     private string defaultKilledByText = "";
+    public bool DrawPlayerBloodTrail = true;
+    public RandomNumberGenerator rng = new RandomNumberGenerator();
 
     public override void _Ready()
     {
         debugPoint = GD.Load<Texture>("res://textures/2x2_white.png");
+        bloodPoolScene = GD.Load<PackedScene>("res://scenes/BloodPool.tscn");
         camera = GetNode<Player>("Player").GetNode<Camera2D>("Camera2D");
         levelGenerator = GetNodeOrNull<LevelGenerator>(_levelPath);
         debugOverlay = GetNode<DebugOverlay>(_debugOverlayPath);
@@ -56,13 +64,16 @@ public class World : Node2D
         artefactNamePopup = GetNode<ArtefactNamePopup>(_artefactNamePopupPath);
         killedByLabel = GetNode<RichTextLabel>("CanvasLayer/KilledBy");
         respawnBtn = GetNode<MainMenuButton>("CanvasLayer/RespawnButton");
+        bloodTexture = GetNode<BloodTexture>("BloodTexture");
 
+        rng.Randomize();
         respawnBtn.Active = false;
         respawnBtn.Connect(nameof(MainMenuButton.Clicked), this, nameof(GoToMainMenu));
 
         player.Connect(nameof(Player.HealthChanged), this, nameof(UpdateHealthUI));
         UpdateHealthUI(player.currentHealth, player.maxHealth);
         player.Connect(nameof(Player.PlayerDied), this, nameof(PlayerDied));
+        lastPlayerPos = player.Position;
 
         defaultKilledByText = killedByLabel.BbcodeText;
 
@@ -81,6 +92,38 @@ public class World : Node2D
         {
             return debugOverlay;
         }
+    }
+
+    public override void _Process(float delta)
+    {
+        base._Process(delta);
+
+        if (!levelGenerator.Done || player.isDead)
+            return;
+
+        // Check if player stood in strong blood
+        bloodTexture.BloodCheckPos = player.Position;
+        if (bloodTexture.CheckAlpha - 0.5f > player.BloodTrailAmount)
+        {
+            player.BloodTrailAmount = bloodTexture.CheckAlpha - 0.2f;
+        }
+
+        Vector2 newPlayerPos = player.Position + -(player.dir * 2.0f);
+
+        // Trail blood
+        if (player.BloodTrailAmount > 0.0f && DrawPlayerBloodTrail)
+        {
+            float dist = lastPlayerPos.DistanceTo(newPlayerPos);
+            Vector2 randOffset = new Vector2(rng.RandfRange(-2, 2), rng.RandfRange(-2, 2));
+            if (dist > 1.0f)
+                bloodTexture.SweepPlus(lastPlayerPos + randOffset, newPlayerPos, Mathf.Max(Mathf.RoundToInt(dist), 8), player.Position, 0.25f);
+            else
+            {
+                bloodTexture.AddPlus(newPlayerPos + randOffset, player.Position, 0.25f);
+            }
+        }
+
+        lastPlayerPos = newPlayerPos;
     }
 
     public override void _Input(InputEvent evt)
@@ -110,26 +153,27 @@ public class World : Node2D
                 }
                 if (emb.ButtonIndex == (int)ButtonList.Middle)
                 {
-                    // Chest chest = GD.Load<PackedScene>("res://scenes/Chest.tscn").Instance<Chest>();
-                    // AddChild(chest);
-                    // chest.Position = camera.GetGlobalMousePosition();
-
-                    // Pedestal pedestal = GD.Load<PackedScene>("res://scenes/Pedestal.tscn").Instance<Pedestal>();
-                    // AddChild(pedestal);
-                    // pedestal.Position = camera.GetGlobalMousePosition();
-                    // pedestal.GenerateItem();
-
-                    // PotionPickup testPotion = items.GetRandomPotionPickup();
-                    // AddChild(testPotion);
-                    // testPotion.Position = camera.GetGlobalMousePosition();
-
-                    TestSpawnNodeAtMouse<Pedestal>("res://scenes/Pedestal.tscn").GenerateItem();
-
+                    // TestSpawnNodeAtMouse<Pedestal>("res://scenes/Pedestal.tscn").GenerateItem();
                     // TestSpawnEnemyAtMouse<FireFly>("res://scenes/enemies/FireFly.tscn");
+
+                    // TestSpawnNodeAtMouse<BloodPool>("res://scenes/BloodPool.tscn").Start(bloodTexture);
+
+                    PlayerGib head = TestSpawnNodeAtMouse<PlayerGib>("res://scenes/PlayerGibTorso.tscn");
+                    head.Init(bloodTexture, Vector2.Right * 50.0f, 0f);
+                    head.BounceTween(rng.RandfRange(-16f, -56));
+
                 }
             }
         }
+        else if (evt is InputEventMouseMotion)
+        {
+            if (Input.IsMouseButtonPressed((int)ButtonList.Middle))
+            {
+
+            }
+        }
     }
+
 
     public override void _Draw()
     {
@@ -182,11 +226,11 @@ public class World : Node2D
         // Zoom in on player
         tween.InterpolateProperty(player.camera, "zoom", new Vector2(0.333f, 0.333f), new Vector2(0.1f, 0.1f), 0.25f, Tween.TransitionType.Cubic, Tween.EaseType.InOut);
         tween.InterpolateProperty(player.camera, "offset", Vector2.Zero, new Vector2(0, -16), 0.25f);
-        
+
         // Hide GUI
-        foreach(Node node in GetNode<CanvasLayer>("CanvasLayer").GetChildren())
+        foreach (Node node in GetNode<CanvasLayer>("CanvasLayer").GetChildren())
         {
-            if(node is CanvasItem canvasItem && !node.IsInGroup("death_gui"))
+            if (node is CanvasItem canvasItem && !node.IsInGroup("death_gui"))
             {
                 tween.InterpolateProperty(canvasItem, "modulate", Colors.White, Colors.Transparent, 0.25f, Tween.TransitionType.Cubic, Tween.EaseType.InOut);
             }
@@ -196,12 +240,12 @@ public class World : Node2D
         tween.InterpolateProperty(GetNode<WorldEnvironment>("WorldEnvironment").Environment, "tonemap_exposure", 0.59f, 0.25f, 0.5f, Tween.TransitionType.Cubic, Tween.EaseType.InOut);
 
         // Show death GUI
-        foreach(Node node in GetTree().GetNodesInGroup("death_gui"))
+        foreach (Node node in GetTree().GetNodesInGroup("death_gui"))
         {
             (node as CanvasItem).Visible = true;
             tween.InterpolateProperty(node, "modulate", Colors.Transparent, Colors.White, 0.25f);
         }
-        
+
         // Activate respawn button
         respawnBtn.Active = true;
 
@@ -220,6 +264,14 @@ public class World : Node2D
 
         // Reset worldenvironment resource
         GetNode<WorldEnvironment>("WorldEnvironment").Environment.TonemapExposure = 0.59f;
+    }
+
+    public void SpawnBloodPool(Vector2 position)
+    {
+        BloodPool newPool = bloodPoolScene.Instance<BloodPool>();
+        newPool.Position = position;
+        AddChild(newPool);
+        newPool.Start(bloodTexture);
     }
 
     // For testing purposes only. vvv

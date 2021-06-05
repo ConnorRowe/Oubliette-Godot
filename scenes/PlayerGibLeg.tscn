@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://scenes/PlayerGibHead.tscn" type="PackedScene" id=1]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 3, 0.5 )
+
+[node name="PlayerGibLeg" instance=ExtResource( 1 )]
+mass = 0.918367
+angular_damp = 100.0
+
+[node name="Sprite" parent="." index="0"]
+rotation = 1.5708
+region_rect = Rect2( 6, 14, 1, 6 )
+
+[node name="Particles2D" parent="Sprite" index="0"]
+position = Vector2( 0, -3 )
+rotation = 3.14159
+
+[node name="CollisionShape2D" parent="." index="1"]
+visible = true
+shape = SubResource( 1 )

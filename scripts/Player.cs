@@ -22,7 +22,7 @@ public class Player : Character, ICastsSpells
     public List<Artefact.ArtefactTextureSet> artefactTextureSets = new List<Artefact.ArtefactTextureSet>();
     public string KilledBy = "";
     private Vector2 armSocket = Vector2.Zero;
-    private Vector2 facingDir = Vector2.Zero;
+    public Vector2 facingDir = Vector2.Zero;
     private Godot.Collections.Dictionary<Direction, Vector2> staffOrigins = new Godot.Collections.Dictionary<Direction, Vector2>() { { Direction.Up, new Vector2(4.0f, -10.0f) }, { Direction.Right, new Vector2(0.0f, -8.0f) }, { Direction.Down, new Vector2(-4.0f, -10.0f) }, { Direction.Left, new Vector2(0.0f, -10.0f) } };
     private Godot.Collections.Dictionary<Direction, Vector2> armOrigins = new Godot.Collections.Dictionary<Direction, Vector2>() { { Direction.Up, new Vector2(2.5f, -11.0f) }, { Direction.Right, new Vector2(-0.5f, -11.0f) }, { Direction.Down, new Vector2(-2.5f, -11.0f) }, { Direction.Left, new Vector2(0.5f, -11.0f) } };
     private Physics2DShapeQueryParameters hitAreaShapeQuery;
@@ -31,6 +31,7 @@ public class Player : Character, ICastsSpells
     private float pickupCooldown = 0.0f;
     public HashSet<(Color colour, float weight)> SpellColourMods = new HashSet<(Color colour, float weight)>();
     private Color primarySpellColourCache;
+    public float BloodTrailAmount = 0.0f;
 
     // Nodes
     public Camera2D camera;
@@ -45,6 +46,8 @@ public class Player : Character, ICastsSpells
     private ItemDisplaySlot potionSlot;
     private ItemDisplaySlot primarySpellSlot;
     private PackedScene spellPickupScene;
+    private SpillageHazard lastSpillage;
+    private PlayerGib headGib;
 
     // Input
     private bool inputMoveUp = false;
@@ -56,6 +59,7 @@ public class Player : Character, ICastsSpells
     private Texture debugPoint;
     private PackedScene projectileScene;
     private PackedScene potionScene;
+    private Stack<PackedScene> deathGibs = new Stack<PackedScene>();
 
     // Export
     [Export]
@@ -80,6 +84,14 @@ public class Player : Character, ICastsSpells
         projectileScene = GD.Load<PackedScene>("res://scenes/Projectile.tscn");
         potionScene = GD.Load<PackedScene>("res://scenes/Potion.tscn");
         spellPickupScene = GD.Load<PackedScene>("res://scenes/SpellPickup.tscn");
+
+        // load player death gibs
+        deathGibs.Push(GD.Load<PackedScene>("res://scenes/PlayerGibHead.tscn"));
+        deathGibs.Push(GD.Load<PackedScene>("res://scenes/PlayerGibArm.tscn"));
+        deathGibs.Push(GD.Load<PackedScene>("res://scenes/PlayerGibArm.tscn"));
+        deathGibs.Push(GD.Load<PackedScene>("res://scenes/PlayerGibTorso.tscn"));
+        deathGibs.Push(GD.Load<PackedScene>("res://scenes/PlayerGibLeg.tscn"));
+        deathGibs.Push(GD.Load<PackedScene>("res://scenes/PlayerGibLeg.tscn"));
 
         majykaBar = GetParent().GetNode<MajykaContainer>("CanvasLayer/MajykaContainer");
         spellParticle = GetNode<Particles2D>("CharSprite/SpellParticle");
@@ -125,7 +137,7 @@ public class Player : Character, ICastsSpells
     {
         base._Input(evt);
 
-        if(isDead)
+        if (isDead)
             return;
 
         if (Input.IsActionPressed("g_cast_primary_spell"))
@@ -175,7 +187,7 @@ public class Player : Character, ICastsSpells
                 {
                     ConsumeCurrentPotion();
                 }
-                if(keyEvt.Scancode == (int)KeyList.K)
+                if (keyEvt.Scancode == (int)KeyList.K)
                 {
                     // suicide
                     TakeDamage(9999, sourceName: "suicide");
@@ -262,8 +274,24 @@ public class Player : Character, ICastsSpells
     {
         base._Process(delta);
 
-        if(isDead)
+        // Follow head gib
+        if (isDead && headGib != null)
+        {
+            camera.Offset = (headGib.GlobalPosition - Position) + new Vector2(0, -16);
+        }
+
+        if (isDead)
             return;
+
+        if (BloodTrailAmount > 0.0f)
+        {
+            BloodTrailAmount -= delta * 2.0f;
+
+            if (BloodTrailAmount < 0.0f)
+            {
+                BloodTrailAmount = 0.0f;
+            }
+        }
 
         if (primarySpellCooldown > 0.0f)
         {
@@ -315,6 +343,39 @@ public class Player : Character, ICastsSpells
         base.Die();
 
         KilledBy = lastDamagedBy;
+
+        staff.RemoveChild(staffLight);
+        AddChild(staffLight);
+        staffLight.Position = Vector2.Zero;
+        staffLight.Color = Colors.White;
+        staffLight.Energy = 1.0f;
+
+        var rng = world.rng;
+
+        BloodTexture bloodTexture = world.BloodTexture;
+        foreach (PackedScene gibScene in deathGibs)
+        {
+            PlayerGib gib = gibScene.Instance<PlayerGib>();
+            if (gib.isHead)
+            {
+                headGib = gib;
+            }
+            world.AddChild(gib);
+            Vector2 gibOffset = new Vector2(rng.Randf(), rng.Randf()).Normalized() * 2.0f;
+            gib.Position = Position + gibOffset;
+            float gibDir = rng.Randf() > 0.5f ? -1.0f : 1.0f;
+            bool shouldBounce = rng.Randf() > 0.25f || gib.isHead;
+            gib.Init(bloodTexture, new Vector2(rng.RandfRange(30.0f, 50.0f) * gibDir, 10.0f), shouldBounce ? (rng.RandfRange(350.0f, 500.0f) * gibDir) : 0.0f);
+            if (shouldBounce)
+            {
+                gib.BounceTween(rng.RandfRange(-16f, -56));
+            }
+
+
+        }
+
+        charSprite.Visible = false;
+        shadowSprite.Visible = false;
 
         EmitSignal(nameof(PlayerDied), this);
     }
@@ -511,6 +572,8 @@ public class Player : Character, ICastsSpells
     {
         if (canTakeDamage)
         {
+            BloodTrailAmount += damage;
+
             base.TakeDamage(damage, source, sourceName);
             canTakeDamage = false;
             takeDmgTimer = GetTree().CreateTimer(0.25f, false);
@@ -604,7 +667,8 @@ public class Player : Character, ICastsSpells
                 if (spillageDmgTimer != null && spillageDmgTimer.TimeLeft > 0.0f)
                     return;
 
-                SpillageDamage(spillage);
+                lastSpillage = spillage;
+                SpillageDamage();
             }
         }
     }
@@ -617,11 +681,11 @@ public class Player : Character, ICastsSpells
         }
     }
 
-    private void SpillageDamage(SpillageHazard spillage)
+    private void SpillageDamage()
     {
         if (spillageCount > 0)
         {
-            TakeDamage(sourceName: spillage.DmgSourceName);
+            TakeDamage(sourceName: lastSpillage.DmgSourceName);
 
             spillageDmgTimer = GetTree().CreateTimer(1.0f, false);
             spillageDmgTimer.Connect("timeout", this, nameof(SpillageDamage));

@@ -12,6 +12,7 @@ public class LevelGenerator : Node, IProvidesNav
     private Point currentRoomKey = Point.Empty;
     public Point CurrentRoomKey { get { return currentRoomKey; } }
     public Room CurrentRoom { get { return generatedRooms[currentRoomKey]; } }
+    public bool Done = false;
 
     private List<PackedScene> possibleRooms = new List<PackedScene>();
     private List<PackedScene> treasureRooms = new List<PackedScene>();
@@ -256,6 +257,7 @@ public class LevelGenerator : Node, IProvidesNav
                     nextRoom.Position = new Vector2(x, y) * nextRoom.Width * 16.0f;
                     nextRoom.Name = "Room_" + generatedRooms.Count;
                     nextRoom.roomType = grid[x, y];
+                    nextRoom.Visible = false;
 
                     generatedRooms.Add(new Point(x, y), nextRoom);
                     GetParent().CallDeferred("add_child", nextRoom);
@@ -360,6 +362,8 @@ public class LevelGenerator : Node, IProvidesNav
         // Update minimap
         EmitSignal(nameof(RoomChanged), this);
         EmitSignal(nameof(RoomCleared), currentRoomKey.X, currentRoomKey.Y);
+
+        Done = true;
     }
 
     public void RegenerateLevel()
@@ -374,6 +378,8 @@ public class LevelGenerator : Node, IProvidesNav
 
         wallTiles.Clear();
         floorTiles.Clear();
+
+        GetParent<World>().BloodTexture.ResetImage();
 
         GetParent().GetNode<Minimap>("CanvasLayer/Minimap").ClearMinimap();
 
