@@ -235,3 +235,6 @@ collision_mask = 16
 [node name="CollisionShape2D" type="CollisionShape2D" parent="FeetArea"]
 position = Vector2( 0, 0.5 )
 shape = SubResource( 24 )
+
+[node name="PlayerAudio" type="AudioStreamPlayer" parent="."]
+bus = "Sound Effects"

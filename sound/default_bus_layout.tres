@@ -1,4 +1,4 @@
-[gd_resource type="AudioBusLayout" load_steps=3 format=2]
+[gd_resource type="AudioBusLayout" load_steps=5 format=2]
 
 [sub_resource type="AudioEffectDistortion" id=1]
 resource_name = "Distortion"
@@ -10,12 +10,23 @@ post_gain = -22.46
 resource_name = "PitchShift"
 pitch_scale = 0.24
 
+[sub_resource type="AudioEffectReverb" id=3]
+resource_name = "Reverb"
+room_size = 0.46
+damping = 0.39
+hipass = 0.04
+wet = 0.27
+
+[sub_resource type="AudioEffectCompressor" id=4]
+resource_name = "Compressor"
+
 [resource]
+bus/0/volume_db = -16.4004
 bus/1/name = "Voice"
 bus/1/solo = false
 bus/1/mute = false
 bus/1/bypass_fx = false
-bus/1/volume_db = -15.795
+bus/1/volume_db = -6.25101
 bus/1/send = "Master"
 bus/1/effect/0/effect = SubResource( 1 )
 bus/1/effect/0/enabled = false
@@ -25,5 +36,15 @@ bus/2/name = "Music"
 bus/2/solo = false
 bus/2/mute = false
 bus/2/bypass_fx = false
-bus/2/volume_db = -13.5101
+bus/2/volume_db = -5.04224
 bus/2/send = "Master"
+bus/3/name = "Sound Effects"
+bus/3/solo = false
+bus/3/mute = false
+bus/3/bypass_fx = false
+bus/3/volume_db = -14.056
+bus/3/send = "Master"
+bus/3/effect/0/effect = SubResource( 3 )
+bus/3/effect/0/enabled = true
+bus/3/effect/1/effect = SubResource( 4 )
+bus/3/effect/1/enabled = true

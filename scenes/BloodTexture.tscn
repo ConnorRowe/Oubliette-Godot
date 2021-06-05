@@ -16,7 +16,6 @@ size = Vector2( 2816, 2816 )
 [node name="BloodTexture" type="Sprite"]
 modulate = Color( 1, 1, 1, 0.796078 )
 material = SubResource( 1 )
-position = Vector2( 0, -2 )
 texture = SubResource( 2 )
 centered = false
 script = ExtResource( 1 )

@@ -65,9 +65,9 @@ public class LevelGenerator : Node, IProvidesNav
         bossRoom = GD.Load<PackedScene>("res://scenes/level_generation/BossRoom.tscn");
         startingRoom = GD.Load<PackedScene>("res://scenes/level_generation/StartingRoom.tscn");
 
-        LoadScenesFromDirectory(rooms_directory, possibleRooms);
-        LoadScenesFromDirectory(treasure_rooms_directory, treasureRooms);
-        LoadScenesFromDirectory(boss_enemies_directory, allBosses);
+        LoadFromDirectory<PackedScene>(rooms_directory, possibleRooms);
+        LoadFromDirectory<PackedScene>(treasure_rooms_directory, treasureRooms);
+        LoadFromDirectory<PackedScene>(boss_enemies_directory, allBosses);
 
         // Generate level
         CallDeferred(nameof(GenerateLevel));
@@ -121,7 +121,17 @@ public class LevelGenerator : Node, IProvidesNav
         }
     }
 
-    private void LoadScenesFromDirectory(string fileDirectory, List<PackedScene> scenesList)
+    public static void LoadFromDirectory<T>(string fileDirectory, List<T> objectList) where T : Godot.Object
+    {
+        HashSet<T> objects = new HashSet<T>();
+        LoadFromDirectory<T>(fileDirectory, objects);
+        foreach (T o in objects)
+        {
+            objectList.Add(o);
+        }
+    }
+
+    public static void LoadFromDirectory<T>(string fileDirectory, HashSet<T> objectSet) where T : Godot.Object
     {
         Directory directory = new Directory();
         directory.Open(fileDirectory);
@@ -130,7 +140,11 @@ public class LevelGenerator : Node, IProvidesNav
         string file = directory.GetNext();
         do
         {
-            scenesList.Add(GD.Load<PackedScene>(fileDirectory + file));
+            // .ignore import files
+            if (file.Substring(file.Length - 7) != ".import")
+            {
+                objectSet.Add(GD.Load<T>(fileDirectory + file));
+            }
             file = directory.GetNext();
         } while (!file.Empty());
 

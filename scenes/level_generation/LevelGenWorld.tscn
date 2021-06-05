@@ -277,7 +277,6 @@ texture = ExtResource( 34 )
 centered = false
 
 [node name="BloodTexture" parent="." instance=ExtResource( 33 )]
-position = Vector2( -18, 5 )
 z_index = -1
 
 [node name="Navigation2D" type="Navigation2D" parent="."]

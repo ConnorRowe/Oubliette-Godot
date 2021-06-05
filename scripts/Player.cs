@@ -48,6 +48,7 @@ public class Player : Character, ICastsSpells
     private PackedScene spellPickupScene;
     private SpillageHazard lastSpillage;
     private PlayerGib headGib;
+    private AudioStreamPlayer playerAudio;
 
     // Input
     private bool inputMoveUp = false;
@@ -60,6 +61,7 @@ public class Player : Character, ICastsSpells
     private PackedScene projectileScene;
     private PackedScene potionScene;
     private Stack<PackedScene> deathGibs = new Stack<PackedScene>();
+    private List<AudioStreamSample> hitSounds = new List<AudioStreamSample>();
 
     // Export
     [Export]
@@ -93,6 +95,9 @@ public class Player : Character, ICastsSpells
         deathGibs.Push(GD.Load<PackedScene>("res://scenes/PlayerGibLeg.tscn"));
         deathGibs.Push(GD.Load<PackedScene>("res://scenes/PlayerGibLeg.tscn"));
 
+        // load player hit sounds
+        LevelGenerator.LoadFromDirectory<AudioStreamSample>("res://sound/sfx/player_hit/", hitSounds);
+
         majykaBar = GetParent().GetNode<MajykaContainer>("CanvasLayer/MajykaContainer");
         spellParticle = GetNode<Particles2D>("CharSprite/SpellParticle");
         spellParticle.Material = new ShaderMaterial();
@@ -105,6 +110,7 @@ public class Player : Character, ICastsSpells
         spellSpawnPoint = GetNode<Node2D>("CharSprite/staff/SpellSpawnPoint");
         potionSlot = world.GetNode<ItemDisplaySlot>("CanvasLayer/PotionSlot");
         primarySpellSlot = world.GetNode<ItemDisplaySlot>("CanvasLayer/PrimarySpellSlot");
+        playerAudio = GetNode<AudioStreamPlayer>("PlayerAudio");
 
         Items items = GetNode<Items>("/root/Items");
         var magicMissile = items.FindSpellPoolEntry(Spells.MagicMissile, Items.LootPool.GENERAL);
@@ -119,7 +125,6 @@ public class Player : Character, ICastsSpells
         debug.TrackFunc(nameof(GetSpellRange), this, "RNG", 1);
         debug.TrackFunc(nameof(GetSpellKnockback), this, "KBK", 1);
         debug.TrackFunc(nameof(GetSpellSpeed), this, "SPD", 1);
-        debug.TrackFunc("test", this);
 
         hitAreaShapeQuery = new Physics2DShapeQueryParameters();
         hitAreaShapeQuery.SetShape(hitBoxTraceShape);
@@ -132,11 +137,6 @@ public class Player : Character, ICastsSpells
         checkSlideCollisions = true;
 
         UpdatePotionSlot();
-    }
-
-    public Vector2 test()
-    {
-        return GetGlobalTransformWithCanvas().origin;
     }
 
     public override void _Input(InputEvent evt)
@@ -579,6 +579,9 @@ public class Player : Character, ICastsSpells
         if (canTakeDamage)
         {
             BloodTrailAmount += damage;
+
+            playerAudio.Stream = hitSounds[world.rng.RandiRange(0, hitSounds.Count - 1)];
+            playerAudio.Play(0);
 
             base.TakeDamage(damage, source, sourceName);
             canTakeDamage = false;
