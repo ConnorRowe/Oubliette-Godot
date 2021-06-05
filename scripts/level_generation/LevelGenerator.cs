@@ -140,11 +140,12 @@ public class LevelGenerator : Node, IProvidesNav
         string file = directory.GetNext();
         do
         {
-            // .ignore import files
-            if (file.Substring(file.Length - 7) != ".import")
-            {
-                objectSet.Add(GD.Load<T>(fileDirectory + file));
-            }
+            // remove .import extension
+            if (file.Substring(file.Length - 7) == ".import")
+                file = file.Substring(0, file.Length - 7);
+
+            objectSet.Add(GD.Load<T>(fileDirectory + file));
+
             file = directory.GetNext();
         } while (!file.Empty());
 
