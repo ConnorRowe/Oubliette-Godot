@@ -169,18 +169,8 @@ public class World : Node2D
                 }
                 if (emb.ButtonIndex == (int)ButtonList.Middle)
                 {
-                    // TestSpawnNodeAtMouse<Pedestal>("res://scenes/Pedestal.tscn").GenerateItem();
-                    // TestSpawnEnemyAtMouse<FireFly>("res://scenes/enemies/FireFly.tscn");
-
-                    // TestSpawnNodeAtMouse<BloodPool>("res://scenes/BloodPool.tscn").Start(bloodTexture);
-
-                    // PlayerGib head = TestSpawnNodeAtMouse<PlayerGib>("res://scenes/PlayerGibTorso.tscn");
-                    // head.Init(bloodTexture, Vector2.Right * 50.0f, 0f);
-                    // head.BounceTween(rng.RandfRange(-16f, -56));
-
-                    AICharacter ff = TestSpawnNodeAtMouse<AICharacter>("res://scenes/enemies/Imp.tscn");
-                    OverlayRender.AddCharacter(ff);
-
+                    // BloodSplat splatTest = TestSpawnNodeAtMouse<BloodSplat>("res://scenes/BloodSplat.tscn");
+                    // splatTest.Init(bloodTexture, new Vector2(rng.RandfRange(-5.0f, 5.0f), rng.RandfRange(-1.0f, 1.0f)));
                 }
             }
         }

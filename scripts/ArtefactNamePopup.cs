@@ -19,7 +19,9 @@ public class ArtefactNamePopup : Node2D
         _artefactNameLabel.Text = name;
         _descLabel.Text = desc;
 
-        _animPlayer.Seek(0.0f);
+        if (_animPlayer.CurrentAnimationPosition > 0.0f)
+            _animPlayer.Seek(0.0f);
+
         _animPlayer.Play("ShowHide");
     }
 }

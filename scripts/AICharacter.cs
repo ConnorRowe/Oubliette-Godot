@@ -10,6 +10,8 @@ public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
     protected Tween tween;
     protected Sprite detectionNotifier;
     public bool hasTarget = false;
+    private PackedScene bloodSplatScene;
+    private PackedScene bloodPoolScene;
 
     public Physics2DShapeQueryParameters shapeQuery;
     public World world;
@@ -35,6 +37,10 @@ public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
     private float detectionRadius = 80;
     [Export(hintString: "How close the character must be to a path point for it to count as reached.")]
     public float PathTolerance = 7.5f;
+    [Export]
+    private Vector2 minMaxBloodSplats = Vector2.Zero;
+    [Export]
+    private bool spawnBloodPoolOnDeath = false;
 
     // Signals
     [Signal]
@@ -60,6 +66,10 @@ public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
         tween = GetNode<Tween>(_tweenPath);
         detectionNotifier = GetNode<Sprite>(_detectionNotifierPath);
         detectionShape.Radius = detectionRadius;
+        bloodSplatScene = GD.Load<PackedScene>("res://scenes/BloodSplat.tscn");
+        bloodPoolScene = GD.Load<PackedScene>("res://scenes/BloodPool.tscn");
+
+        charSprite.Connect("animation_finished", this, nameof(CharAnimationFinished));
 
         shapeQuery = new Physics2DShapeQueryParameters()
         {
@@ -302,9 +312,29 @@ public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
         return shapeQuery;
     }
 
+    protected virtual void CharAnimationFinished()
+    {
+        if (spawnBloodPoolOnDeath && charSprite.Animation == _animDeath)
+        {
+            BloodPool bloodPool = bloodPoolScene.Instance<BloodPool>();
+            world.AddChild(bloodPool);
+            bloodPool.Position = GlobalPosition;
+            bloodPool.Start(world.BloodTexture);
+        }
+    }
+
     public override void Die()
     {
         base.Die();
+
+        int bloodSplats = world.rng.RandiRange(Mathf.RoundToInt(minMaxBloodSplats.x), Mathf.RoundToInt(minMaxBloodSplats.y));
+        for (int i = 0; i < bloodSplats; ++i)
+        {
+            BloodSplat bloodSplat = bloodSplatScene.Instance<BloodSplat>();
+            world.AddChild(bloodSplat);
+            bloodSplat.Position = GlobalPosition;
+            bloodSplat.Init(world.BloodTexture, new Vector2(world.rng.RandfRange(-2.0f, 2.0f), world.rng.RandfRange(-1.0f, 1.0f)));
+        }
 
         if (deathParticles.Texture != null)
         {
