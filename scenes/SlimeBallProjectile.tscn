@@ -1,5 +1,6 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=16 format=2]
 
+[ext_resource path="res://sound/sfx/player_hit/player_hit_5.wav" type="AudioStream" id=1]
 [ext_resource path="res://scenes/SpillageHazard.tscn" type="PackedScene" id=2]
 [ext_resource path="res://textures/64_light_2.png" type="Texture" id=3]
 [ext_resource path="res://particle/AngleCurve.tres" type="Curve" id=4]
@@ -56,6 +57,7 @@ collision_layer = 0
 collision_mask = 8
 script = ExtResource( 6 )
 explodeParticleMaterial = SubResource( 7 )
+baseExplodeSound = ExtResource( 1 )
 spillageScene = ExtResource( 2 )
 spillageModulate = Color( 0.517647, 0.890196, 0.192157, 1 )
 
@@ -78,3 +80,9 @@ texture = ExtResource( 7 )
 amount = 64
 lifetime = 0.5
 local_coords = false
+
+[node name="ExplodePlayer" type="AudioStreamPlayer2D" parent="."]
+volume_db = 24.0
+max_distance = 500.0
+attenuation = 2.37841
+bus = "Spells FX"

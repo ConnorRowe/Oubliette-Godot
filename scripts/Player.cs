@@ -48,7 +48,8 @@ public class Player : Character, ICastsSpells
     private PackedScene spellPickupScene;
     private SpillageHazard lastSpillage;
     private PlayerGib headGib;
-    private AudioStreamPlayer playerAudio;
+    private AudioStreamPlayer hitSoundPlayer;
+    private AudioStreamPlayer spellSoundPlayer;
 
     // Input
     private bool inputMoveUp = false;
@@ -62,6 +63,7 @@ public class Player : Character, ICastsSpells
     private PackedScene potionScene;
     private Stack<PackedScene> deathGibs = new Stack<PackedScene>();
     private List<AudioStreamSample> hitSounds = new List<AudioStreamSample>();
+    private AudioStreamRandomPitch spellCastSound;
 
     // Export
     [Export]
@@ -98,6 +100,10 @@ public class Player : Character, ICastsSpells
         // load player hit sounds
         LevelGenerator.LoadFromDirectory<AudioStreamSample>("res://sound/sfx/player_hit/", hitSounds);
 
+        spellCastSound = new AudioStreamRandomPitch();
+        spellCastSound.AudioStream = GD.Load<AudioStreamSample>("res://sound/sfx/player_spell_cast_mixdown.wav");
+        spellCastSound.RandomPitch = 1.1f;
+
         majykaBar = GetParent().GetNode<MajykaContainer>("CanvasLayer/MajykaContainer");
         spellParticle = GetNode<Particles2D>("CharSprite/SpellParticle");
         spellParticle.Material = new ShaderMaterial();
@@ -110,7 +116,8 @@ public class Player : Character, ICastsSpells
         spellSpawnPoint = GetNode<Node2D>("CharSprite/staff/SpellSpawnPoint");
         potionSlot = world.GetNode<ItemDisplaySlot>("CanvasLayer/PotionSlot");
         primarySpellSlot = world.GetNode<ItemDisplaySlot>("CanvasLayer/PrimarySpellSlot");
-        playerAudio = GetNode<AudioStreamPlayer>("PlayerAudio");
+        hitSoundPlayer = GetNode<AudioStreamPlayer>("HitSoundPlayer");
+        spellSoundPlayer = GetNode<AudioStreamPlayer>("SpellSoundPlayer");
 
         Items items = GetNode<Items>("/root/Items");
         var magicMissile = items.FindSpellPoolEntry(Spells.MagicMissile, Items.LootPool.GENERAL);
@@ -152,6 +159,9 @@ public class Player : Character, ICastsSpells
             {
                 // Cast primary spell
                 primarySpell.Cast(this);
+
+                spellSoundPlayer.Stream = spellCastSound;
+                spellSoundPlayer.Play(0);
 
                 currentMajyka -= GetSpellCost(primarySpell.majykaCost);
                 UpdateMajykaBar();
@@ -549,6 +559,9 @@ public class Player : Character, ICastsSpells
         {
             secondarySpell.Cast(this);
 
+            spellSoundPlayer.Stream = spellCastSound;
+            spellSoundPlayer.Play(0);
+
             currentMajyka -= GetSpellCost(secondarySpell.majykaCost);
             UpdateMajykaBar();
         }
@@ -580,8 +593,8 @@ public class Player : Character, ICastsSpells
         {
             BloodTrailAmount += damage;
 
-            playerAudio.Stream = hitSounds[world.rng.RandiRange(0, hitSounds.Count - 1)];
-            playerAudio.Play(0);
+            hitSoundPlayer.Stream = hitSounds[world.rng.RandiRange(0, hitSounds.Count - 1)];
+            hitSoundPlayer.Play(0);
 
             base.TakeDamage(damage, source, sourceName);
             canTakeDamage = false;

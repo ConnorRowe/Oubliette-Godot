@@ -236,5 +236,7 @@ collision_mask = 16
 position = Vector2( 0, 0.5 )
 shape = SubResource( 24 )
 
-[node name="PlayerAudio" type="AudioStreamPlayer" parent="."]
+[node name="HitSoundPlayer" type="AudioStreamPlayer" parent="."]
 bus = "Sound Effects"
+
+[node name="SpellSoundPlayer" type="AudioStreamPlayer" parent="."]

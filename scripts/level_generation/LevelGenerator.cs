@@ -327,6 +327,7 @@ public class LevelGenerator : Node, IProvidesNav
                 room.Value.enemyCounter++;
 
                 boss.Connect(nameof(AICharacter.Died), room.Value, nameof(Room.EnemyDied));
+                boss.Connect(nameof(AICharacter.Died), this, nameof(EnemyDied));
             }
 
             // Manage ChanceSpawnChild nodes

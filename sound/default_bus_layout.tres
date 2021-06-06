@@ -2,9 +2,7 @@
 
 [sub_resource type="AudioEffectDistortion" id=1]
 resource_name = "Distortion"
-pre_gain = 24.55
-drive = 1.0
-post_gain = -22.46
+drive = 0.32
 
 [sub_resource type="AudioEffectPitchShift" id=2]
 resource_name = "PitchShift"
@@ -21,30 +19,36 @@ wet = 0.27
 resource_name = "Compressor"
 
 [resource]
-bus/0/volume_db = -16.4004
+bus/0/volume_db = -6.57885
 bus/1/name = "Voice"
 bus/1/solo = false
 bus/1/mute = false
 bus/1/bypass_fx = false
-bus/1/volume_db = -6.25101
+bus/1/volume_db = -4.76812
 bus/1/send = "Master"
 bus/1/effect/0/effect = SubResource( 1 )
 bus/1/effect/0/enabled = false
 bus/1/effect/1/effect = SubResource( 2 )
-bus/1/effect/1/enabled = false
+bus/1/effect/1/enabled = true
 bus/2/name = "Music"
 bus/2/solo = false
 bus/2/mute = false
 bus/2/bypass_fx = false
-bus/2/volume_db = -5.04224
+bus/2/volume_db = 1.65377
 bus/2/send = "Master"
 bus/3/name = "Sound Effects"
 bus/3/solo = false
 bus/3/mute = false
 bus/3/bypass_fx = false
-bus/3/volume_db = -14.056
+bus/3/volume_db = -5.32994
 bus/3/send = "Master"
 bus/3/effect/0/effect = SubResource( 3 )
 bus/3/effect/0/enabled = true
 bus/3/effect/1/effect = SubResource( 4 )
 bus/3/effect/1/enabled = true
+bus/4/name = "Spells FX"
+bus/4/solo = false
+bus/4/mute = false
+bus/4/bypass_fx = false
+bus/4/volume_db = -22.5766
+bus/4/send = "Sound Effects"

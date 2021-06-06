@@ -17,12 +17,16 @@ public class Projectile : KinematicBody2D
     public Light2D light;
     public Particles2D particles;
     private Tween tween;
+    private AudioStreamPlayer2D explodePlayer;
+    private AudioStreamRandomPitch explodeSound = new AudioStreamRandomPitch();
     private Action<Character> hitCharEvent = null;
 
     [Export]
     private ParticlesMaterial explodeParticleMaterial;
     [Export]
     public string dmgSourceName = "projectile";
+    [Export]
+    private AudioStreamSample baseExplodeSound;
 
     public override void _Ready()
     {
@@ -31,6 +35,14 @@ public class Projectile : KinematicBody2D
         light = GetNode<Light2D>("Light2D");
         particles = GetNodeOrNull<Particles2D>("Particles2D");
         tween = GetNode<Tween>("Tween");
+        explodePlayer = GetNode<AudioStreamPlayer2D>("ExplodePlayer");
+
+        if (baseExplodeSound != null)
+        {
+            explodeSound.AudioStream = baseExplodeSound;
+            explodeSound.RandomPitch = 1.2f;
+            explodePlayer.Stream = explodeSound;
+        }
     }
 
     public override void _PhysicsProcess(float delta)
@@ -70,6 +82,11 @@ public class Projectile : KinematicBody2D
 
     private void Explode()
     {
+        if (baseExplodeSound != null)
+        {
+            explodePlayer.Play();
+        }
+
         deactivated = true;
         SetPhysicsProcess(false);
 
