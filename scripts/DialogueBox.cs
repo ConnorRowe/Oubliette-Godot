@@ -69,14 +69,19 @@ public class DialogueBox : Control
         Visible = false;
         RectScale = new Vector2(0, 1);
 
+        // List<(string name, string dialogue)> testConvo = new List<(string name, string dialogue)> {
+        // ("Momo", "meow"),
+        // ("Jiji", "meep"),
+        // ("Momo", "i'm gonna find somethin to break"),
+        // ("Jiji", "cool, i'm gonna do a stinky poo"),
+        // ("Momo", "well, good to see we're both conducting important business. good day"),
+        // ("Jiji", "good day"),
+        // ("Momo", "[shake rate=10 level=8]*farts*[/shake]")};
+
         List<(string name, string dialogue)> testConvo = new List<(string name, string dialogue)> {
-        ("Momo", "meow"),
-        ("Jiji", "meep"),
-        ("Momo", "i'm gonna find somethin to break"),
-        ("Jiji", "cool, i'm gonna do a stinky poo"),
-        ("Momo", "well, good to see we're both conducting important business. good day"),
-        ("Jiji", "good day"),
-        ("Momo", "[shake rate=10 level=8]*farts*[/shake]")};
+        ("???", "[shake rate=10 level=8]*a voice booms from beneath*[/shake]"),
+        ("???", "Good luck mortal, you'll need it.")
+        };
 
         QueueText(testConvo);
         NextText();
@@ -129,6 +134,8 @@ public class DialogueBox : Control
                     {
                         ToggleDisplay(true);
                     }
+
+                    GetTree().SetInputAsHandled();
                 }
             }
         }
@@ -136,9 +143,9 @@ public class DialogueBox : Control
 
     public void ToggleDisplay(bool hide)
     {
-        tween.InterpolateProperty(this, "rect_scale", hide? new Vector2(1, 1) : new Vector2(0, 1), hide? new Vector2(0,1) : new Vector2(1, 1), 0.8f, Tween.TransitionType.Bounce);
+        tween.InterpolateProperty(this, "rect_scale", hide ? new Vector2(1, 1) : new Vector2(0, 1), hide ? new Vector2(0, 1) : new Vector2(1, 1), 0.8f, Tween.TransitionType.Expo, hide ? Tween.EaseType.Out : Tween.EaseType.In);
 
-        if(hide)
+        if (hide)
             tween.InterpolateProperty(this, "visible", true, false, 0.01f, delay: 0.8f);
         else
             Visible = true;

@@ -139,9 +139,9 @@ public class Player : Character, ICastsSpells
         UpdatePotionSlot();
     }
 
-    public override void _Input(InputEvent evt)
+    public override void _UnhandledInput(InputEvent evt)
     {
-        base._Input(evt);
+        base._UnhandledInput(evt);
 
         if (isDead)
             return;
