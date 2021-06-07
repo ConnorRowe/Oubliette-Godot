@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/burp_1_mixdown.wav-368d098d122386df335d4477171f937d.sample"
+
+[deps]
+
+source_file="res://sound/sfx/burp/burp_1_mixdown.wav"
+dest_files=[ "res://.import/burp_1_mixdown.wav-368d098d122386df335d4477171f937d.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=true
+edit/normalize=true
+edit/loop=false
+compress/mode=0

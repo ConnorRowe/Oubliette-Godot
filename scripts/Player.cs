@@ -50,6 +50,7 @@ public class Player : Character, ICastsSpells
     private PlayerGib headGib;
     private AudioStreamPlayer hitSoundPlayer;
     private AudioStreamPlayer spellSoundPlayer;
+    private AudioStreamPlayer potionSoundPlayer;
 
     // Input
     private bool inputMoveUp = false;
@@ -64,6 +65,9 @@ public class Player : Character, ICastsSpells
     private Stack<PackedScene> deathGibs = new Stack<PackedScene>();
     private List<AudioStreamSample> hitSounds = new List<AudioStreamSample>();
     private AudioStreamRandomPitch spellCastSound;
+    private AudioStreamRandomPitch gulpSound;
+    private List<AudioStreamSample> burpSounds = new List<AudioStreamSample>();
+    private PackedScene bottleSmashEffectScene;
 
     // Export
     [Export]
@@ -104,6 +108,14 @@ public class Player : Character, ICastsSpells
         spellCastSound.AudioStream = GD.Load<AudioStreamSample>("res://sound/sfx/player_spell_cast_mixdown.wav");
         spellCastSound.RandomPitch = 1.1f;
 
+        gulpSound = new AudioStreamRandomPitch();
+        gulpSound.AudioStream = GD.Load<AudioStreamSample>("res://sound/sfx/gulp_mixdown.wav");
+
+        // load burp sounds
+        LevelGenerator.LoadFromDirectory<AudioStreamSample>("res://sound/sfx/burp/", burpSounds);
+
+        bottleSmashEffectScene = GD.Load<PackedScene>("res://scenes/BottleSmashEffect.tscn");
+
         majykaBar = GetParent().GetNode<MajykaContainer>("CanvasLayer/MajykaContainer");
         spellParticle = GetNode<Particles2D>("CharSprite/SpellParticle");
         spellParticle.Material = new ShaderMaterial();
@@ -118,6 +130,7 @@ public class Player : Character, ICastsSpells
         primarySpellSlot = world.GetNode<ItemDisplaySlot>("CanvasLayer/PrimarySpellSlot");
         hitSoundPlayer = GetNode<AudioStreamPlayer>("HitSoundPlayer");
         spellSoundPlayer = GetNode<AudioStreamPlayer>("SpellSoundPlayer");
+        potionSoundPlayer = GetNode<AudioStreamPlayer>("PotionSoundPlayer");
 
         Items items = GetNode<Items>("/root/Items");
         var magicMissile = items.FindSpellPoolEntry(Spells.MagicMissile, Items.LootPool.GENERAL);
@@ -748,11 +761,40 @@ public class Player : Character, ICastsSpells
         if (currentPotion == null)
             return;
 
+        PlayGulpSound();
+
+        GetTree().CreateTimer(0.25f).Connect("timeout", this, nameof(ThrowEmptyPotion));
+
+        if (world.rng.Randf() <= 0.2f)
+        {
+            GetTree().CreateTimer(1.0f).Connect("timeout", this, nameof(PlayBurpSound));
+        }
+
         ApplyBuff(Stats.Buffs.CreateBuff(currentPotion.name, new List<(Stat stat, float amount)>(currentPotion.buffs), currentPotion.duration));
 
         currentPotion = null;
 
         UpdatePotionSlot();
+    }
+
+    private void ThrowEmptyPotion()
+    {
+        BottleSmashEffect emptyPotion = bottleSmashEffectScene.Instance<BottleSmashEffect>();
+        world.AddChild(emptyPotion);
+        emptyPotion.Position = Position + new Vector2(0, -11);
+        emptyPotion.Start(new Vector2(world.rng.RandfRange(2.0f, 3.5f) * (world.rng.Randf() <= 0.5f ? -1.0f : 1.0f), world.rng.RandfRange(-1.0f, 1.0f)), world.rng.RandfRange(350.0f, 500.0f));
+    }
+
+    public void PlayGulpSound()
+    {
+        potionSoundPlayer.Stream = gulpSound;
+        potionSoundPlayer.Play(0);
+    }
+
+    private void PlayBurpSound()
+    {
+        potionSoundPlayer.Stream = burpSounds[world.rng.RandiRange(0, burpSounds.Count - 1)];
+        potionSoundPlayer.Play(0);
     }
 
     private void UpdatePotionSlot()

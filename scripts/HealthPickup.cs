@@ -8,6 +8,7 @@ public class HealthPickup : BasePickup
         if (player.currentHealth < player.maxHealth && !IsQueuedForDeletion())
         {
             player.Heal(2);
+            player.PlayGulpSound();
 
             QueueFree();
         }

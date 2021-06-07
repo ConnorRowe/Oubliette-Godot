@@ -169,8 +169,8 @@ public class World : Node2D
                 }
                 if (emb.ButtonIndex == (int)ButtonList.Middle)
                 {
-                    // BloodSplat splatTest = TestSpawnNodeAtMouse<BloodSplat>("res://scenes/BloodSplat.tscn");
-                    // splatTest.Init(bloodTexture, new Vector2(rng.RandfRange(-5.0f, 5.0f), rng.RandfRange(-1.0f, 1.0f)));
+                    // BottleSmashEffect bottleTest = TestSpawnNodeAtMouse<BottleSmashEffect>("res://scenes/BottleSmashEffect.tscn");
+                    // bottleTest.Start(new Vector2(rng.RandfRange(2.0f, 3.5f) * (rng.Randf() <= 0.5f ? -1.0f : 1.0f), rng.RandfRange(-1.0f, 1.0f)), rng.RandfRange(350.0f, 500.0f));
                 }
             }
         }

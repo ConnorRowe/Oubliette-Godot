@@ -240,3 +240,6 @@ shape = SubResource( 24 )
 bus = "Sound Effects"
 
 [node name="SpellSoundPlayer" type="AudioStreamPlayer" parent="."]
+
+[node name="PotionSoundPlayer" type="AudioStreamPlayer" parent="."]
+bus = "Sound Effects"

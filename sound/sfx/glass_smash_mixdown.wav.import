@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/glass_smash_mixdown.wav-9d9dea2b8a2b4e5c6f8342f4331e2cdf.sample"
+
+[deps]
+
+source_file="res://sound/sfx/glass_smash_mixdown.wav"
+dest_files=[ "res://.import/glass_smash_mixdown.wav-9d9dea2b8a2b4e5c6f8342f4331e2cdf.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=true
+edit/normalize=true
+edit/loop=false
+compress/mode=0

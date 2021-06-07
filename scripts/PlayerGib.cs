@@ -74,7 +74,6 @@ public class PlayerGib : RigidBody2D
 
         if (!Mathf.IsEqualApprox(fakeRotationVelocity, 0, 0.1f))
         {
-            float velSign = Mathf.Sign(fakeRotationVelocity);
             float dampening = fakeRotationVelocity * 0.9f * delta;
             fakeRotationVelocity -= dampening;
         }
