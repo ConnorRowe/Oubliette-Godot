@@ -21,6 +21,7 @@ public class World : Node2D
     private Vector2 lastPlayerPos;
     private OverlayRender charOverlayRender;
     private Light2D overlayLight;
+    private AudioStreamPlayer sfxPlayer;
 
     public BloodTexture @BloodTexture { get { return bloodTexture; } }
     public OverlayRender @OverlayRender { get { return charOverlayRender; } }
@@ -72,6 +73,7 @@ public class World : Node2D
         bloodTexture = GetNode<BloodTexture>("BloodTexture");
         charOverlayRender = GetNode<OverlayRender>("CharOverlayViewport/OverlayRender");
         overlayLight = GetNode<Light2D>("Player/OverlayLight");
+        sfxPlayer = GetNode<AudioStreamPlayer>("SFXPlayer");
 
         rng.Randomize();
         respawnBtn.Active = false;
@@ -87,6 +89,12 @@ public class World : Node2D
 
         globalLighting.Color = defaultGlobalLighting;
         musicPlayer.Play();
+    }
+
+    public void PlayGlobalSoundEffect(AudioStream audioStream)
+    {
+        sfxPlayer.Stream = audioStream;
+        sfxPlayer.Play(0);
     }
 
     public DebugOverlay GetDebugOverlay()

@@ -38,7 +38,7 @@ public class Player : Character, ICastsSpells
     private Particles2D spellParticle;
     private MajykaContainer majykaBar;
     private Sprite staff;
-    private World world;
+    public World world;
     private Line2D arm;
     private Line2D armOutline;
     private Light2D staffLight;

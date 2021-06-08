@@ -37,21 +37,21 @@
 [ext_resource path="res://particle/BloodDrip.shader" type="Shader" id=35]
 [ext_resource path="res://scenes/OverlayRender.tscn" type="PackedScene" id=36]
 
-[sub_resource type="ViewportTexture" id=5]
+[sub_resource type="ViewportTexture" id=1]
 viewport_path = NodePath("CharOverlayViewport")
 
-[sub_resource type="CanvasItemMaterial" id=1]
+[sub_resource type="CanvasItemMaterial" id=2]
 blend_mode = 3
 
-[sub_resource type="DynamicFont" id=2]
+[sub_resource type="DynamicFont" id=3]
 size = 84
 font_data = ExtResource( 26 )
 
-[sub_resource type="ShaderMaterial" id=3]
+[sub_resource type="ShaderMaterial" id=4]
 shader = ExtResource( 35 )
 shader_param/emission_box_extents = Vector3( 72, 0, 0 )
 
-[sub_resource type="ShaderMaterial" id=4]
+[sub_resource type="ShaderMaterial" id=5]
 resource_local_to_scene = true
 shader = ExtResource( 20 )
 shader_param/time_factor = 0.5
@@ -107,7 +107,7 @@ light_mask = 0
 use_parent_material = true
 scale = Vector2( 1, -1 )
 z_index = -1
-texture = SubResource( 5 )
+texture = SubResource( 1 )
 energy = 0.8
 range_item_cull_mask = 2
 shadow_item_cull_mask = 0
@@ -136,7 +136,7 @@ transform = Transform2D( 2, 0, 0, 2, 0, 0 )
 "death_gui",
 ]]
 visible = false
-material = SubResource( 1 )
+material = SubResource( 2 )
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_right = -512.0
@@ -184,7 +184,7 @@ modulate = Color( 0.619608, 0.054902, 0, 1 )
 anchor_right = 1.0
 anchor_bottom = 1.0
 rect_clip_content = false
-custom_fonts/normal_font = SubResource( 2 )
+custom_fonts/normal_font = SubResource( 3 )
 bbcode_enabled = true
 bbcode_text = "[shake rate=20 level=1]DEAD[/shake]"
 text = "DEAD"
@@ -196,7 +196,7 @@ __meta__ = {
 [node name="Particles2D" type="Particles2D" parent="CanvasLayer/DeadControl/Dead"]
 position = Vector2( 71.5, 61 )
 lifetime = 4.0
-process_material = SubResource( 3 )
+process_material = SubResource( 4 )
 texture = ExtResource( 28 )
 
 [node name="RespawnButton" parent="CanvasLayer" groups=[
@@ -239,7 +239,7 @@ position = Vector2( 87.5, 4.5 )
 texture = ExtResource( 23 )
 
 [node name="PotionSlot" parent="CanvasLayer" instance=ExtResource( 18 )]
-material = SubResource( 4 )
+material = SubResource( 5 )
 position = Vector2( 4, 52 )
 
 [node name="ArtefactNamePopup" parent="CanvasLayer" instance=ExtResource( 21 )]
@@ -298,3 +298,6 @@ bus = "Music"
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource( 22 )
+
+[node name="SFXPlayer" type="AudioStreamPlayer" parent="."]
+bus = "Sound Effects"

@@ -9,10 +9,12 @@ public class Pedestal : StaticBody2D, IIntersectsPlayerHitArea
     private bool hasGeneratedItem = false;
     private bool itemTaken = false;
     private bool isHoldingSpell = false;
+    private AudioStream artefactPickupSound;
 
     public override void _Ready()
     {
         ItemSprite = GetNode<Sprite>("Sprite/ItemSprite");
+        artefactPickupSound = GD.Load<AudioStream>("res://sound/sfx/item_pickup_mixdown.wav");
     }
 
     void IIntersectsPlayerHitArea.PlayerHit(Player player)
@@ -22,7 +24,10 @@ public class Pedestal : StaticBody2D, IIntersectsPlayerHitArea
             if (isHoldingSpell)
                 player.PickUpPrimarySpell(CurrentSpell);
             else
+            {
+                player.world.PlayGlobalSoundEffect(artefactPickupSound);
                 CurrentArtefact.PlayerPickUp(player);
+            }
 
             ItemSprite.Visible = false;
             itemTaken = true;

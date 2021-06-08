@@ -162,7 +162,6 @@ texture = null
 material = SubResource( 2 )
 frames = SubResource( 21 )
 animation = "leftright"
-frame = 1
 playing = true
 
 [node name="Hitbox" parent="." index="6"]
