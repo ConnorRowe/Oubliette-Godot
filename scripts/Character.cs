@@ -170,7 +170,7 @@ public abstract class Character : KinematicBody2D
 
     public float Elevation { get { return elevation; } }
 
-    public HashSet<Buff> Buffs = new HashSet<Buff>();
+    public HashSet<Buff> TimedBuffs = new HashSet<Buff>();
     protected string lastDamagedBy = "";
 
     public AnimatedSprite CharSprite { get { return charSprite; } }
@@ -323,14 +323,14 @@ public abstract class Character : KinematicBody2D
 
         // Remove expired buffs
         uint time = OS.GetTicksMsec();
-        foreach (Buff buff in Buffs)
+        foreach (Buff buff in TimedBuffs)
         {
             if (buff.duration > 0 && buff.startTime + buff.duration < time)
             {
                 buff.notifyExpired?.BuffExpired();
             }
         }
-        int removedBuffCount = Buffs.RemoveWhere((Buff buff) => { return buff.duration > 0 && buff.startTime + buff.duration < time; });
+        int removedBuffCount = TimedBuffs.RemoveWhere((Buff buff) => { return buff.duration > 0 && buff.startTime + buff.duration < time; });
         if (removedBuffCount > 0)
         {
             RecalcStats();
@@ -595,10 +595,10 @@ public abstract class Character : KinematicBody2D
         externalVelocity += vel;
     }
 
-    public void ApplyBuff(Buff buff)
+    public void ApplyTimedBuff(Buff buff)
     {
         bool containsBuff = false;
-        foreach (Buff b in Buffs)
+        foreach (Buff b in TimedBuffs)
         {
             if (b.name == buff.name)
             {
@@ -609,28 +609,28 @@ public abstract class Character : KinematicBody2D
 
         if (containsBuff)
         {
-            Buffs.RemoveWhere((b) => { return b.name == buff.name; });
+            TimedBuffs.RemoveWhere((b) => { return b.name == buff.name; });
         }
 
-        Buffs.Add(buff);
+        TimedBuffs.Add(buff);
 
         RecalcStats();
     }
 
-    public void ApplyBuffs(Buff[] buffs)
+    public void ApplyTimedBuffs(Buff[] buffs)
     {
         foreach (Buff buff in buffs)
         {
-            ApplyBuff(buff);
+            ApplyTimedBuff(buff);
         }
 
         RecalcStats();
     }
 
-    public void RecalcStats()
+    public virtual void RecalcStats()
     {
         currentStats = new Dictionary<Stat, float>(baseStats);
-        foreach (Buff buff in Buffs)
+        foreach (Buff buff in TimedBuffs)
         {
             foreach ((Stat stat, float amount) in buff.stats)
             {

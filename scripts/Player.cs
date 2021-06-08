@@ -32,6 +32,7 @@ public class Player : Character, ICastsSpells
     public HashSet<(Color colour, float weight)> SpellColourMods = new HashSet<(Color colour, float weight)>();
     private Color primarySpellColourCache;
     public float BloodTrailAmount = 0.0f;
+    public HashSet<BuffTracker> PerRoomBuffs = new HashSet<BuffTracker>();
 
     // Nodes
     public Camera2D camera;
@@ -45,12 +46,12 @@ public class Player : Character, ICastsSpells
     private Node2D spellSpawnPoint;
     private ItemDisplaySlot potionSlot;
     private ItemDisplaySlot primarySpellSlot;
-    private PackedScene spellPickupScene;
     private SpillageHazard lastSpillage;
     private PlayerGib headGib;
     private AudioStreamPlayer hitSoundPlayer;
     private AudioStreamPlayer spellSoundPlayer;
     private AudioStreamPlayer potionSoundPlayer;
+    private GridContainer buffTrackerContainer;
 
     // Input
     private bool inputMoveUp = false;
@@ -62,12 +63,14 @@ public class Player : Character, ICastsSpells
     private Texture debugPoint;
     private PackedScene projectileScene;
     private PackedScene potionScene;
+    private PackedScene spellPickupScene;
     private Stack<PackedScene> deathGibs = new Stack<PackedScene>();
     private List<AudioStreamSample> hitSounds = new List<AudioStreamSample>();
     private AudioStreamRandomPitch spellCastSound;
     private AudioStreamRandomPitch gulpSound;
     private List<AudioStreamSample> burpSounds = new List<AudioStreamSample>();
     private PackedScene bottleSmashEffectScene;
+    private PackedScene buffTrackerScene;
 
     // Export
     [Export]
@@ -92,6 +95,7 @@ public class Player : Character, ICastsSpells
         projectileScene = GD.Load<PackedScene>("res://scenes/Projectile.tscn");
         potionScene = GD.Load<PackedScene>("res://scenes/Potion.tscn");
         spellPickupScene = GD.Load<PackedScene>("res://scenes/SpellPickup.tscn");
+        buffTrackerScene = GD.Load<PackedScene>("res://scenes/BuffTracker.tscn");
 
         // load player death gibs
         deathGibs.Push(GD.Load<PackedScene>("res://scenes/PlayerGibHead.tscn"));
@@ -131,6 +135,7 @@ public class Player : Character, ICastsSpells
         hitSoundPlayer = GetNode<AudioStreamPlayer>("HitSoundPlayer");
         spellSoundPlayer = GetNode<AudioStreamPlayer>("SpellSoundPlayer");
         potionSoundPlayer = GetNode<AudioStreamPlayer>("PotionSoundPlayer");
+        buffTrackerContainer = world.GetNode<GridContainer>("CanvasLayer/BuffTrackerContainer");
 
         Items items = GetNode<Items>("/root/Items");
         var magicMissile = items.FindSpellPoolEntry(Spells.MagicMissile, Items.LootPool.GENERAL);
@@ -770,7 +775,15 @@ public class Player : Character, ICastsSpells
             GetTree().CreateTimer(1.0f).Connect("timeout", this, nameof(PlayBurpSound));
         }
 
-        ApplyBuff(Stats.Buffs.CreateBuff(currentPotion.name, new List<(Stat stat, float amount)>(currentPotion.buffs), currentPotion.duration));
+        BuffTracker tracker = ApplyPerRoomBuff(currentPotion.name, new HashSet<(Stat stat, float amount)>(currentPotion.stats), currentPotion.duration);
+
+        tracker.ItemIcon.Texture = potionSlot.Texture;
+
+        tracker.ItemIcon.Material = (ShaderMaterial)potionSlot.Material.Duplicate();
+        ShaderMaterial mat = (ShaderMaterial)tracker.ItemIcon.Material;
+        mat.SetShaderParam("colour_lerp_a", currentPotion.lerpColours[0]);
+        mat.SetShaderParam("colour_lerp_b", currentPotion.lerpColours[1]);
+        mat.SetShaderParam("colour_lerp_c", currentPotion.lerpColours[2]);
 
         currentPotion = null;
 
@@ -879,5 +892,66 @@ public class Player : Character, ICastsSpells
         world.AddChild(droppedSpell);
         droppedSpell.Position = Position + new Vector2(dir * -8.0f);
         droppedSpell.ApplyCentralImpulse(dir * -80.0f);
+    }
+
+    public BuffTracker ApplyPerRoomBuff(string source, HashSet<(Stat stat, float amount)> stats, int duration)
+    {
+        foreach (BuffTracker buffTracker in PerRoomBuffs)
+        {
+            if (buffTracker.sourceName == source)
+            {
+                buffTracker.QueueFree();
+            }
+        }
+
+        PerRoomBuffs.RemoveWhere(b => { return b.sourceName == source; });
+
+        BuffTracker newBuffTracker = buffTrackerScene.Instance<BuffTracker>();
+        newBuffTracker.Init(source, stats, duration);
+
+        buffTrackerContainer.AddChild(newBuffTracker);
+
+        PerRoomBuffs.Add(newBuffTracker);
+
+        buffTrackerContainer.Columns = Mathf.Min(PerRoomBuffs.Count, 5);
+
+        RecalcStats();
+
+        return newBuffTracker;
+    }
+
+    public override void RecalcStats()
+    {
+        base.RecalcStats();
+
+        foreach (BuffTracker buffTracker in PerRoomBuffs)
+        {
+            foreach ((Stat stat, float amount) in buffTracker.stats)
+            {
+                currentStats[stat] = currentStats[stat] + amount;
+            }
+        }
+    }
+
+    public void ClearedRoom()
+    {
+        // Decrement per room buffs and clear ones with 0 charges left
+
+        foreach (BuffTracker buffTracker in PerRoomBuffs)
+        {
+            buffTracker.Charges--;
+
+            if (buffTracker.Charges <= 0)
+            {
+                buffTracker.QueueFree();
+            }
+        }
+
+        int removed = PerRoomBuffs.RemoveWhere(b => b.Charges <= 0);
+
+        if (removed > 0)
+        {
+            RecalcStats();
+        }
     }
 }

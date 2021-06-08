@@ -22,7 +22,7 @@ public class BuffSpell : BaseSpell
 
     public override void Cast(ICastsSpells source)
     {
-        (source as Character).ApplyBuff(Buffs.CreateBuff(Name, new List<(Stat stat, float amount)>(buffs), duration, this));
+        (source as Character).ApplyTimedBuff(Buffs.CreateBuff(Name, new List<(Stat stat, float amount)>(buffs), duration, this));
 
         if (source is Player player)
         {

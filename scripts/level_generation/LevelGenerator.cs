@@ -476,6 +476,11 @@ public class LevelGenerator : Node, IProvidesNav
     {
         Point roomKey = generatedRooms.First(x => x.Value.Position == room.Position).Key;
         EmitSignal(nameof(RoomCleared), roomKey.X, roomKey.Y);
+
+        if (!room.ClearedByDefault)
+        {
+            player.ClearedRoom();
+        }
     }
 
     public void EnemyDied(AICharacter aICharacter)

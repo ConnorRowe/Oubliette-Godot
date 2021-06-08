@@ -8,7 +8,7 @@ public class ElementalFruit : BasePickup
         if (player.currentHealth < player.maxHealth)
         {
             player.Heal(4);
-            player.ApplyBuff(Buffs.CreateBuff("elemental fruit", new List<(Stat stat, float amount)>() { (Stat.MagykaCostMultiplier, 0.5f), (Stat.MoveSpeedMultiplier, 1.5f) }, 10.0f));
+            player.ApplyTimedBuff(Buffs.CreateBuff("elemental fruit", new List<(Stat stat, float amount)>() { (Stat.MagykaCostMultiplier, 0.5f), (Stat.MoveSpeedMultiplier, 1.5f) }, 10.0f));
             QueueFree();
         }
     }

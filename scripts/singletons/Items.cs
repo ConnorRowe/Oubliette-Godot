@@ -179,7 +179,7 @@ public class Items : Node
         RegisterArtefact(new Artefact("Black Bile of a Long Dead God", "raw godly power", rarityWeight: 0.3f, GD.Load<Texture>("res://textures/dark_potion.png"),
         (Player p) =>
         {
-            p.ApplyBuff(Buffs.CreateBuff("Black Bile of a Long Dead God",
+            p.ApplyTimedBuff(Buffs.CreateBuff("Black Bile of a Long Dead God",
         new List<(Stat stat, float amount)>() { (Stat.DamageMultiplier, 2.0f), (Stat.KnockbackMultiplier, -1.0f) }, 0));
         }, new Artefact.ArtefactTextureSet(new Vector2(-2, -17), null, GD.Load<Texture>("res://textures/black_eyes_down.png"), GD.Load<Texture>("res://textures/black_eyes_leftright.png"))),
         new LootPool[] { LootPool.GENERAL });
@@ -187,7 +187,7 @@ public class Items : Node
         RegisterArtefact(new Artefact("Amanita Muscaria", "this time without deer piss", rarityWeight: 0.5f, GD.Load<Texture>("res://textures/amanita_muscaria.png"),
         (Player p) =>
         {
-            p.ApplyBuff(Buffs.CreateBuff("Amanita Muscaria",
+            p.ApplyTimedBuff(Buffs.CreateBuff("Amanita Muscaria",
         new List<(Stat stat, float amount)>() { (Stat.DamageFlat, 1.0f), (Stat.RangeMultiplier, 1.25f), (Stat.MagykaCostMultiplier, 0.75f) }, 0));
         }, Artefact.emptyTexSet), new LootPool[] { LootPool.GENERAL });
 
@@ -195,7 +195,7 @@ public class Items : Node
         (Player p) =>
         {
             p.MixInSpellColour(new Color(0.546667f, 1, 0.15f), 1.0f);
-            p.ApplyBuff(Buffs.CreateBuff("Grunty's Hat",
+            p.ApplyTimedBuff(Buffs.CreateBuff("Grunty's Hat",
         new List<(Stat stat, float amount)>() { (Stat.SpellSpeedMultiplier, 1.5f), (Stat.RangeMultiplier, 2.0f), (Stat.MagykaCostMultiplier, -0.5f), (Stat.CooldownMultplier, -0.5f) }, 0));
         }, new Artefact.ArtefactTextureSet(new Vector2(-3, -22), GD.Load<Texture>("res://textures/witch_hat_equip_updown.png"), GD.Load<Texture>("res://textures/witch_hat_equip_updown.png"), GD.Load<Texture>("res://textures/witch_hat_equip_leftright.png"))
         ), new LootPool[] { LootPool.GENERAL });
@@ -208,9 +208,9 @@ public class Items : Node
 
     private void RegisterPotions()
     {
-        RegisterPotion(new Potion(new (Stat stat, float amount)[] { (Stat.MagykaCostFlat, -10.0f) }, 10.0f, "Humble Huckleberry", "you feel magical", Color.Color8(37, 27, 147), Color.Color8(105, 10, 130), Color.Color8(95, 103, 146)));
+        RegisterPotion(new Potion(new (Stat stat, float amount)[] { (Stat.MagykaCostFlat, -10.0f) }, 3, "Humble Huckleberry", "you feel magical", Color.Color8(37, 27, 147), Color.Color8(105, 10, 130), Color.Color8(95, 103, 146)));
 
-        RegisterPotion(new Potion(new (Stat stat, float amount)[] { (Stat.ReflectDamageFlat, 2.0f) }, 10.0f, "Beverage of Briars", "makes you... thorny", Color.Color8(82, 71, 36), Color.Color8(38, 71, 36), Color.Color8(56, 36, 41)));
+        RegisterPotion(new Potion(new (Stat stat, float amount)[] { (Stat.ReflectDamageFlat, 2.0f) }, 5, "Beverage of Briars", "makes you... thorny", Color.Color8(82, 71, 36), Color.Color8(38, 71, 36), Color.Color8(56, 36, 41)));
     }
 
     private void RegisterSpells()

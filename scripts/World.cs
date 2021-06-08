@@ -179,6 +179,8 @@ public class World : Node2D
                 {
                     // BottleSmashEffect bottleTest = TestSpawnNodeAtMouse<BottleSmashEffect>("res://scenes/BottleSmashEffect.tscn");
                     // bottleTest.Start(new Vector2(rng.RandfRange(2.0f, 3.5f) * (rng.Randf() <= 0.5f ? -1.0f : 1.0f), rng.RandfRange(-1.0f, 1.0f)), rng.RandfRange(350.0f, 500.0f));
+
+                    TestSpawnNodeAtMouse<Chest>("res://scenes/Chest.tscn");
                 }
             }
         }

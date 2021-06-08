@@ -245,6 +245,26 @@ position = Vector2( 4, 52 )
 [node name="ArtefactNamePopup" parent="CanvasLayer" instance=ExtResource( 21 )]
 position = Vector2( 88.5, 16.5 )
 
+[node name="BuffTrackerContainer" type="GridContainer" parent="CanvasLayer"]
+anchor_left = 0.53
+anchor_top = 0.004
+anchor_right = 0.53
+anchor_bottom = 0.004
+margin_left = -194.22
+margin_top = -0.4
+margin_right = -104.22
+margin_bottom = 49.6
+grow_horizontal = 0
+rect_min_size = Vector2( 90, 50 )
+size_flags_horizontal = 10
+size_flags_vertical = 3
+custom_constants/vseparation = 1
+custom_constants/hseparation = 2
+columns = 5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="LevelGenerator" parent="." instance=ExtResource( 5 )]
 possibleEnemies = [ ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 11 ), ExtResource( 10 ), ExtResource( 24 ) ]
 _wallTileMapPath = NodePath("../WallTiles")

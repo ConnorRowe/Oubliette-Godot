@@ -4,7 +4,6 @@ using System.Collections.Generic;
 public class ItemGlowEffect : Node2D
 {
     private HashSet<Sprite> sprites = new HashSet<Sprite>();
-    private RandomNumberGenerator rng = new RandomNumberGenerator();
     private float count;
 
     [Export]
@@ -23,8 +22,6 @@ public class ItemGlowEffect : Node2D
                 sprites.Add(sprite);
             }
         }
-
-        rng.Randomize();
     }
 
     public override void _Process(float delta)
