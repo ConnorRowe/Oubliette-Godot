@@ -13,7 +13,8 @@ config_version=4
 config/name="Oubliette"
 run/main_scene="res://scenes/MainMenu.tscn"
 boot_splash/use_filter=false
-config/icon="res://icon.png"
+config/icon="res://icon_128.png"
+config/windows_native_icon="res://win_icon.ico"
 
 [audio]
 
