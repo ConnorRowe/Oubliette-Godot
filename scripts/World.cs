@@ -14,7 +14,7 @@ public class World : Node2D
     private Tween tween;
     private AudioStreamPlayer musicPlayer;
     private Items items;
-    public ArtefactNamePopup artefactNamePopup;
+    public ArtefactNamePopup artefactNamePopup { get; set; }
     private RichTextLabel killedByLabel;
     private MainMenuButton respawnBtn;
     private BloodTexture bloodTexture;
@@ -47,10 +47,10 @@ public class World : Node2D
     private PackedScene bloodPoolScene;
 
     //Other
-    public List<Vector2[]> debugLines = new List<Vector2[]>();
+    public List<Vector2[]> debugLines { get; set; } = new List<Vector2[]>();
     private string defaultKilledByText = "";
-    public bool DrawPlayerBloodTrail = true;
-    public RandomNumberGenerator rng = new RandomNumberGenerator();
+    public bool DrawPlayerBloodTrail { get; set; } = true;
+    public RandomNumberGenerator rng { get; set; } = new RandomNumberGenerator();
     private bool displayedDeathGUI = false;
 
     public override void _Ready()
@@ -281,13 +281,15 @@ public class World : Node2D
 
     private void GoToMainMenu()
     {
-        GetTree().ChangeSceneTo(GD.Load<PackedScene>("res://scenes/MainMenu.tscn"));
-
         // Reset item pools
         items.ResetItemPools();
 
         // Reset worldenvironment resource
         GetNode<WorldEnvironment>("WorldEnvironment").Environment.TonemapExposure = 0.59f;
+
+        GetTree().ChangeSceneTo(GD.Load<PackedScene>("res://scenes/MainMenu.tscn"));
+
+        QueueFree();
     }
 
     public void SpawnBloodPool(Vector2 position)

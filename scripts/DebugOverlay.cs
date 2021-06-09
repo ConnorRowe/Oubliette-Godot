@@ -56,12 +56,12 @@ public class DebugOverlay : Node2D
 
         if (ShowFPS)
         {
-            DrawRightAlignShadowedString(Engine.GetFramesPerSecond().ToString() + "fps", ind);
+            DrawRightAlignShadowedString($"{Engine.GetFramesPerSecond().ToString()} fps", ind);
             ind++;
         }
         if (ShowMemory)
         {
-            DrawRightAlignShadowedString("Memory: " + ToFileSize(OS.GetStaticMemoryUsage()), ind);
+            DrawRightAlignShadowedString($"Memory: {ToFileSize(OS.GetStaticMemoryUsage())}", ind);
             ind++;
         }
         foreach (TrackedStat stat in _trackedStats)
@@ -72,10 +72,10 @@ public class DebugOverlay : Node2D
                 {
                     if ((stat.isFunc ? statObj.Call(stat.propertyName, stat.args) : statObj.Get(stat.propertyName)) is Color color)
                     {
-                        DrawColourProperty((stat.nameOverride == "" ? stat.propertyName : stat.nameOverride) + ": ", ind, color);
+                        DrawColourProperty($"{(stat.nameOverride == "" ? stat.propertyName : stat.nameOverride)}: ", ind, color);
                     }
                     else
-                        DrawRightAlignShadowedString((stat.nameOverride == "" ? stat.propertyName : stat.nameOverride) + ": " + (stat.isFunc ? statObj.Call(stat.propertyName, stat.args).ToString() : statObj.Get(stat.propertyName).ToString()), ind);
+                        DrawRightAlignShadowedString($"{(stat.nameOverride == "" ? stat.propertyName : stat.nameOverride)}: {(stat.isFunc ? statObj.Call(stat.propertyName, stat.args).ToString() : statObj.Get(stat.propertyName).ToString())}", ind);
 
                     ind++;
                 }
@@ -83,7 +83,7 @@ public class DebugOverlay : Node2D
                 {
                     if ((stat.isFunc ? statObj.Call(stat.propertyName.ToLower(), stat.args) : statObj.Get(stat.propertyName.ToLower())) != null)
                     {
-                        DrawRightAlignShadowedString((stat.nameOverride == "" ? stat.propertyName : stat.nameOverride) + ": " + (stat.isFunc ? statObj.Call(stat.propertyName.ToLower(), stat.args).ToString() : statObj.Get(stat.propertyName.ToLower().ToString())), ind);
+                        DrawRightAlignShadowedString($"{(stat.nameOverride == "" ? stat.propertyName : stat.nameOverride)}: {(stat.isFunc ? statObj.Call(stat.propertyName.ToLower(), stat.args).ToString() : statObj.Get(stat.propertyName.ToLower().ToString()))}", ind);
                         ind++;
                     }
                 }
@@ -139,15 +139,11 @@ public class DebugOverlay : Node2D
         {
             if (value <= (Math.Pow(1024, i + 1)))
             {
-                return ThreeNonZeroDigits(value /
-                    Math.Pow(1024, i)) +
-                    " " + suffixes[i];
+                return $"{ThreeNonZeroDigits(value / Math.Pow(1024, i))} {suffixes[i]}";
             }
         }
 
-        return ThreeNonZeroDigits(value /
-            Math.Pow(1024, suffixes.Length - 1)) +
-            " " + suffixes[suffixes.Length - 1];
+        return $"{ThreeNonZeroDigits(value / Math.Pow(1024, suffixes.Length - 1))} {suffixes[suffixes.Length - 1]}";
     }
     private string ThreeNonZeroDigits(double value)
     {

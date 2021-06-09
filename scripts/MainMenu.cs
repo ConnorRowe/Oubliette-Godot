@@ -21,6 +21,8 @@ public class MainMenu : Node2D
     private void Play()
     {
         GetTree().ChangeSceneTo(nextScene);
+
+        QueueFree();
     }
 
     private void Quit()

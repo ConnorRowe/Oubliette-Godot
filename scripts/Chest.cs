@@ -35,6 +35,11 @@ public class Chest : RigidBody2D, IIntersectsPlayerHitArea
             else
                 pickups.Add(items.GetRandomPickup(Items.LootPool.WOOD_CHEST));
         }
+
+        foreach (BasePickup pickup in pickups)
+        {
+            GetParent().GetParent().CallDeferred("add_child", pickup);
+        }
     }
 
     void IIntersectsPlayerHitArea.PlayerHit(Player player)
