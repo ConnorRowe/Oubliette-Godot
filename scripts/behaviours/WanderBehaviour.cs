@@ -12,10 +12,10 @@ namespace Oubliette.AI
 
         public override void OnBehaviourStart()
         {
-            timer = mgr.owner.GetTree().CreateTimer(0.5f);
+            timer = mgr.Owner.GetTree().CreateTimer(0.5f);
             timer.Connect("timeout", this, nameof(PickRandomPoint));
 
-            mgr.owner.maxSpeed = 8.0f;
+            mgr.Owner.MaxSpeed = 8.0f;
         }
 
         public override void Process(float delta) { }
@@ -23,8 +23,8 @@ namespace Oubliette.AI
         {
             timer.Disconnect("timeout", this, nameof(PickRandomPoint));
 
-            mgr.owner.maxSpeed = (mgr.owner as AICharacter).ogMaxSpeed;
-            (mgr.owner as AICharacter).DetectionAlert();
+            mgr.Owner.MaxSpeed = (mgr.Owner as AICharacter).OgMaxSpeed;
+            (mgr.Owner as AICharacter).DetectionAlert();
         }
 
         public override Vector2 Steer()
@@ -49,7 +49,7 @@ namespace Oubliette.AI
 
             do
             {
-                newPath = (mgr.owner as AICharacter).world.GetNavPath(mgr.owner.GlobalPosition, mgr.owner.GlobalPosition + new Vector2(mgr.rng.RandfRange(-20, 20), mgr.rng.RandfRange(-20, 20)));
+                newPath = (mgr.Owner as AICharacter).World.GetNavPath(mgr.Owner.GlobalPosition, mgr.Owner.GlobalPosition + new Vector2(mgr.rng.RandfRange(-20, 20), mgr.rng.RandfRange(-20, 20)));
 
                 --tries;
             } while (tries > 0 && newPath.Length > 0);
@@ -59,7 +59,7 @@ namespace Oubliette.AI
                 SetPath(newPath);
             }
 
-            timer = mgr.owner.GetTree().CreateTimer(mgr.rng.RandfRange(1.5f, 4.0f));
+            timer = mgr.Owner.GetTree().CreateTimer(mgr.rng.RandfRange(1.5f, 4.0f));
             timer.Connect("timeout", this, nameof(PickRandomPoint));
         }
 

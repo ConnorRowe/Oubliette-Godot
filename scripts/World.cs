@@ -83,7 +83,7 @@ namespace Oubliette
             respawnBtn.Connect(nameof(MainMenuButton.Clicked), this, nameof(GoToMainMenu));
 
             player.Connect(nameof(Player.HealthChanged), this, nameof(UpdateHealthUI));
-            UpdateHealthUI(player.currentHealth, player.maxHealth);
+            UpdateHealthUI(player.CurrentHealth, player.MaxHealth);
             player.Connect(nameof(Player.PlayerDied), this, nameof(PlayerDied));
             lastPlayerPos = player.Position;
             charOverlayRender.AddCharacter(player);
@@ -117,7 +117,7 @@ namespace Oubliette
         {
             base._Process(delta);
 
-            if (!levelGenerator.Done || player.isDead)
+            if (!levelGenerator.Done || player.IsDead)
                 return;
 
             // overlayLight.RangeLayerMin = Mathf.RoundToInt(player.GlobalPosition.y);
@@ -129,7 +129,7 @@ namespace Oubliette
                 player.BloodTrailAmount = bloodTexture.CheckAlpha - 0.2f;
             }
 
-            Vector2 newPlayerPos = player.Position + -(player.dir * 2.0f);
+            Vector2 newPlayerPos = player.Position + -(player.Dir * 2.0f);
 
             // Trail blood
             if (player.BloodTrailAmount > 0.0f && DrawPlayerBloodTrail)
@@ -243,11 +243,11 @@ namespace Oubliette
             displayedDeathGUI = true;
 
             // Stop enemy AI
-            foreach (AICharacter enemy in levelGenerator.CurrentRoom.enemies)
+            foreach (AI.AICharacter enemy in levelGenerator.CurrentRoom.enemies)
             {
                 enemy.hasTarget = false;
-                enemy.aIManager.SetCurrentBehaviour("idle");
-                enemy.aIManager.StopTryTransitionLoop();
+                enemy.AIManager.SetCurrentBehaviour("idle");
+                enemy.AIManager.StopTryTransitionLoop();
             }
 
             // Zoom in on player
@@ -313,13 +313,13 @@ namespace Oubliette
             return instance;
         }
 
-        private T TestSpawnEnemyAtMouse<T>(string scenePath) where T : AICharacter
+        private T TestSpawnEnemyAtMouse<T>(string scenePath) where T : AI.AICharacter
         {
             T enemy = GD.Load<PackedScene>(scenePath).Instance<T>();
             AddChild(enemy);
             enemy.Position = camera.GetGlobalMousePosition();
             enemy.TargetPlayer(player);
-            enemy.navProvider = GetNode<LevelGenerator>("LevelGenerator");
+            enemy.NavProvider = GetNode<LevelGenerator>("LevelGenerator");
 
             return enemy;
         }

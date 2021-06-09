@@ -5,19 +5,19 @@ namespace Oubliette.AI
 {
     public class AIManager : Godot.Reference
     {
-        public static uint visibilityLayer = 0b0100;
-        public static uint tilesLayer = 0b0001;
+        public static uint VisibilityLayer { get; set; } = 0b0100;
+        public static uint TilesLayer { get; set; } = 0b0001;
 
-        public readonly World world;
-        public readonly Character owner;
-        public Godot.Collections.Dictionary<string, AIBehaviour> Behaviours = new Godot.Collections.Dictionary<string, AIBehaviour>();
-        public Func<AIBehaviour.TransitionTestResult>[] globalTransitions = new Func<AIBehaviour.TransitionTestResult>[] { };
-
-        public string CurrentBehaviour = "";
-        public Character lastTarget;
-        public Vector2 targetPosCache = Vector2.Zero;
-        public RandomNumberGenerator rng = new RandomNumberGenerator();
-        public bool CanTryTransition = true;
+        public readonly World World;
+        public readonly Character Owner;
+        public Godot.Collections.Dictionary<string, AIBehaviour> Behaviours { get; set; } = new Godot.Collections.Dictionary<string, AIBehaviour>();
+        public Func<AIBehaviour.TransitionTestResult>[] GlobalTransitions { get; set; } = new Func<AIBehaviour.TransitionTestResult>[] { };
+        public string CurrentBehaviour { get; set; } = "";
+        public Character LastTarget { get; set; }
+        public Vector2 TargetPosCache { get; set; } = Vector2.Zero;
+        public RandomNumberGenerator rng { get; set; } = new RandomNumberGenerator();
+        public bool CanTryTransition { get; set; } = true;
+        public Func<Vector2> SteerOverride { get; set; } = null;
 
         private SceneTreeTimer transitionTimer;
 
@@ -29,8 +29,8 @@ namespace Oubliette.AI
         public AIManager() { }
         public AIManager(Character owner, World world)
         {
-            this.owner = owner;
-            this.world = world;
+            this.Owner = owner;
+            this.World = world;
 
             transitionTimer = owner.GetTree().CreateTimer(0.5f);
             transitionTimer.Connect("timeout", this, nameof(TryTransition));
@@ -43,7 +43,7 @@ namespace Oubliette.AI
             if (CurrentBehaviour.Empty())
                 return;
 
-            transitionTimer = owner.GetTree().CreateTimer(0.5f);
+            transitionTimer = Owner.GetTree().CreateTimer(0.5f);
             transitionTimer.Connect("timeout", this, nameof(TryTransition));
 
             if (!CanTryTransition)
@@ -66,7 +66,7 @@ namespace Oubliette.AI
             }
 
             // Global Transitions
-            foreach (Func<AIBehaviour.TransitionTestResult> transitionTest in globalTransitions)
+            foreach (Func<AIBehaviour.TransitionTestResult> transitionTest in GlobalTransitions)
             {
                 AIBehaviour.TransitionTestResult result = transitionTest();
 
@@ -104,6 +104,9 @@ namespace Oubliette.AI
 
         public Vector2 Steer()
         {
+            if (SteerOverride != null)
+                return SteerOverride();
+
             if (!CurrentBehaviour.Empty())
             {
                 return Behaviours[CurrentBehaviour].Steer();

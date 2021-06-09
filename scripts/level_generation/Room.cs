@@ -40,7 +40,7 @@ namespace Oubliette.LevelGen
         public int roomType = -1;
         public int enemyCounter;
         public Dictionary<Direction, AnimatedSprite> doors = new Dictionary<Direction, AnimatedSprite>();
-        public HashSet<AICharacter> enemies = new HashSet<AICharacter>();
+        public HashSet<AI.AICharacter> enemies = new HashSet<AI.AICharacter>();
 
         [Export]
         private NodePath _wallTileMapPath;
@@ -118,7 +118,7 @@ namespace Oubliette.LevelGen
             }
         }
 
-        public void EnemyDied(AICharacter aICharacter)
+        public void EnemyDied(AI.AICharacter aICharacter)
         {
             enemyCounter--;
 

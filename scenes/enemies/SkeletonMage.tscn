@@ -357,8 +357,8 @@ shader_param/color_ramp = SubResource( 9 )
 
 [node name="SkeletonMage" instance=ExtResource( 3 )]
 script = ExtResource( 5 )
-damageSourceName = "a Risen Mage"
-maxHealth = 4
+DamageSourceName = "a Risen Mage"
+MaxHealth = 4
 attackSpeed = 2.0
 attackRange = 160.0
 detectionRadius = 160.0

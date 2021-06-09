@@ -320,8 +320,8 @@ shader_param/color_ramp = SubResource( 11 )
 
 [node name="FireFly" instance=ExtResource( 1 )]
 script = ExtResource( 5 )
-damageSourceName = "a Firefly"
-maxHealth = 3
+DamageSourceName = "a Firefly"
+MaxHealth = 2
 _animDeath = ""
 maxMovementSpeed = 28.0
 PathTolerance = 4.0

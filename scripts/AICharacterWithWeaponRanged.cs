@@ -1,8 +1,7 @@
 using Godot;
 using System;
-using Oubliette.AI;
 
-namespace Oubliette
+namespace Oubliette.AI
 {
     public class AICharacterWithWeaponRanged : AICharacterWithWeapon
     {
@@ -23,17 +22,17 @@ namespace Oubliette
 
             weaponParticles = GetNode<Particles2D>(_weaponParticlesPath);
 
-            ProjectileBehaviour projBehaviour = new ProjectileBehaviour(aIManager, currentSpell as ProjectileSpell, new Func<AIBehaviour.TransitionTestResult>[] {
+            ProjectileBehaviour projBehaviour = new ProjectileBehaviour(AIManager, currentSpell as ProjectileSpell, new Func<AIBehaviour.TransitionTestResult>[] {
             
             // attack_target -> follow_target
             () => {
-                return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) > attackRange, "follow_target");
+                return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(AIManager.LastTarget.GlobalPosition) > attackRange, "follow_target");
             },
             // attack_target -> path_to_last_pos
             () => {
                 // If target is not visible
                 Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-                return new AIBehaviour.TransitionTestResult(!AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}), "path_to_last_pos");
+                return new AIBehaviour.TransitionTestResult(!AIManager.TraceToTarget(GlobalPosition, AIManager.LastTarget, spaceState, AIManager.VisibilityLayer, new Godot.Collections.Array() {this}), "path_to_last_pos");
             },
 
             // // attack -> path_to_last_pos
@@ -51,19 +50,19 @@ namespace Oubliette
             // }
         });
 
-            aIManager.RemoveBehaviour("attack_target");
-            aIManager.AddBehaviour("attack_target", projBehaviour);
+            AIManager.RemoveBehaviour("attack_target");
+            AIManager.AddBehaviour("attack_target", projBehaviour);
 
-            aIManager.Connect(nameof(AIManager.BehaviourChanged), this, nameof(BehaviourChanged));
+            AIManager.Connect(nameof(AIManager.BehaviourChanged), this, nameof(BehaviourChanged));
         }
 
         public override void _Process(float delta)
         {
             base._Process(delta);
 
-            if (aIManager.CurrentBehaviour == "attack_target")
+            if (AIManager.CurrentBehaviour == "attack_target")
             {
-                dir = GlobalPosition.DirectionTo(aIManager.lastTarget.GlobalPosition);
+                Dir = GlobalPosition.DirectionTo(AIManager.LastTarget.GlobalPosition);
             }
         }
 
@@ -93,13 +92,13 @@ namespace Oubliette
         {
             isCharging = false;
 
-            aIManager.EmitSignal(nameof(AIManager.Fire));
+            AIManager.EmitSignal(nameof(AIManager.Fire));
 
             SetShownParticles(0);
 
-            aIManager.TryTransition();
+            AIManager.TryTransition();
 
-            if (aIManager.CurrentBehaviour == "attack_target")
+            if (AIManager.CurrentBehaviour == "attack_target")
             {
                 ChargeSpell();
             }

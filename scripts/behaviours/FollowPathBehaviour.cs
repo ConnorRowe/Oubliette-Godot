@@ -24,7 +24,7 @@ namespace Oubliette.AI
         {
             if (cacheTargetPos)
             {
-                mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
+                mgr.TargetPosCache = mgr.LastTarget.GlobalPosition;
             }
         }
         public override void OnBehaviourEnd()
@@ -34,7 +34,7 @@ namespace Oubliette.AI
 
         public override Vector2 Steer()
         {
-            return SteerToNextPoint(path, (mgr.owner as AICharacter).PathTolerance);
+            return SteerToNextPoint(path, (mgr.Owner as AICharacter).PathTolerance);
         }
 
         public void UpdatePath()
@@ -42,7 +42,7 @@ namespace Oubliette.AI
             Vector2[] pathArray = getPath();
             path = new Godot.Collections.Array<Vector2>(pathArray);
 
-            timer = mgr.owner.GetTree().CreateTimer(0.5f);
+            timer = mgr.Owner.GetTree().CreateTimer(0.5f);
             timer.Connect("timeout", this, nameof(UpdatePath));
 
             // mgr.world.GetDebugOverlay().TrackLine(pathArray);

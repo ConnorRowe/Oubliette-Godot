@@ -24,7 +24,7 @@ namespace Oubliette.AI
 
         public override void Process(float delta)
         {
-            mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
+            mgr.TargetPosCache = mgr.LastTarget.GlobalPosition;
         }
 
         public override Vector2 Steer()

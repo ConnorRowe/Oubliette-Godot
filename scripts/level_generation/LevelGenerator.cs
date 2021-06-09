@@ -303,33 +303,33 @@ namespace Oubliette.LevelGen
                 // Spawn enemies
                 foreach (Node2D point in room.Value.GetNode("EnemySpawnPoints").GetChildren())
                 {
-                    AICharacter newEnemy = RandomEnemyInstance();
+                    AI.AICharacter newEnemy = RandomEnemyInstance();
                     room.Value.AddChild(newEnemy);
-                    newEnemy.navProvider = this;
-                    newEnemy.initPos = room.Value.Position + point.Position;
+                    newEnemy.NavProvider = this;
+                    newEnemy.InitPos = room.Value.Position + point.Position;
 
                     room.Value.enemies.Add(newEnemy);
                     room.Value.enemyCounter++;
 
                     // Connect enemy die signal to room function
-                    newEnemy.Connect(nameof(AICharacter.Died), room.Value, nameof(Room.EnemyDied));
+                    newEnemy.Connect(nameof(AI.AICharacter.Died), room.Value, nameof(Room.EnemyDied));
                     // Also connect to function here to remove their overlay
-                    newEnemy.Connect(nameof(AICharacter.Died), this, nameof(EnemyDied));
+                    newEnemy.Connect(nameof(AI.AICharacter.Died), this, nameof(EnemyDied));
                 }
 
                 // If boss room spawn a random boss
                 if (room.Value.roomType == 2)
                 {
-                    AICharacter boss = allBosses[rng.RandiRange(0, allBosses.Count - 1)].Instance<AICharacter>();
+                    AI.AICharacter boss = allBosses[rng.RandiRange(0, allBosses.Count - 1)].Instance<AI.AICharacter>();
                     room.Value.AddChild(boss);
-                    boss.navProvider = this;
-                    boss.initPos = room.Value.Position + new Vector2(177, 143);
+                    boss.NavProvider = this;
+                    boss.InitPos = room.Value.Position + new Vector2(177, 143);
 
                     room.Value.enemies.Add(boss);
                     room.Value.enemyCounter++;
 
-                    boss.Connect(nameof(AICharacter.Died), room.Value, nameof(Room.EnemyDied));
-                    boss.Connect(nameof(AICharacter.Died), this, nameof(EnemyDied));
+                    boss.Connect(nameof(AI.AICharacter.Died), room.Value, nameof(Room.EnemyDied));
+                    boss.Connect(nameof(AI.AICharacter.Died), this, nameof(EnemyDied));
                 }
 
                 // Manage ChanceSpawnChild nodes
@@ -392,7 +392,7 @@ namespace Oubliette.LevelGen
         {
             foreach (Node node in GetParent().GetChildren())
             {
-                if (node is Room || node is AICharacter || node is BasePickup)
+                if (node is Room || node is AI.AICharacter || node is BasePickup)
                 {
                     node.QueueFree();
                 }
@@ -433,9 +433,9 @@ namespace Oubliette.LevelGen
             return roomScenesList[rng.RandiRange(0, roomScenesList.Count - 1)].Instance<Room>();
         }
 
-        private AICharacter RandomEnemyInstance()
+        private AI.AICharacter RandomEnemyInstance()
         {
-            return possibleEnemies[rng.RandiRange(0, possibleEnemies.Count - 1)].Instance<AICharacter>();
+            return possibleEnemies[rng.RandiRange(0, possibleEnemies.Count - 1)].Instance<AI.AICharacter>();
         }
 
         private void MoveRoom(Direction dir)
@@ -450,7 +450,7 @@ namespace Oubliette.LevelGen
             generatedRooms[nextRoom].Visible = true;
             currentRoomKey = nextRoom;
 
-            foreach (AICharacter enemy in generatedRooms[currentRoomKey].enemies)
+            foreach (AI.AICharacter enemy in generatedRooms[currentRoomKey].enemies)
             {
                 enemy.TargetPlayer(player);
             }
@@ -485,7 +485,7 @@ namespace Oubliette.LevelGen
             }
         }
 
-        public void EnemyDied(AICharacter aICharacter)
+        public void EnemyDied(AI.AICharacter aICharacter)
         {
             world.OverlayRender.RemoveCharacter(aICharacter);
         }

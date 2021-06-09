@@ -11,7 +11,7 @@ namespace Oubliette.AI
 
         public override void Process(float delta)
         {
-            mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
+            mgr.TargetPosCache = mgr.LastTarget.GlobalPosition;
         }
 
         public override void OnBehaviourEnd() { }
@@ -23,17 +23,17 @@ namespace Oubliette.AI
 
         private Vector2 GetDirectionTowardsTarget()
         {
-            return (mgr.lastTarget.GlobalPosition - mgr.owner.GlobalPosition).Normalized();
+            return (mgr.LastTarget.GlobalPosition - mgr.Owner.GlobalPosition).Normalized();
         }
 
         private bool CanSeePlayer()
         {
-            return AIManager.TraceToTarget(mgr.owner.GlobalPosition, mgr.lastTarget, mgr.owner.GetWorld2d().DirectSpaceState, AIManager.visibilityLayer, new Godot.Collections.Array() { mgr.owner });
+            return AIManager.TraceToTarget(mgr.Owner.GlobalPosition, mgr.LastTarget, mgr.Owner.GetWorld2d().DirectSpaceState, AIManager.VisibilityLayer, new Godot.Collections.Array() { mgr.Owner });
         }
 
         private bool IsDirectionObstructed()
         {
-            return AIManager.TraceToTarget(mgr.owner.GlobalPosition, mgr.lastTarget, mgr.owner.GetWorld2d().DirectSpaceState, AIManager.tilesLayer, new Godot.Collections.Array() { mgr.owner });
+            return AIManager.TraceToTarget(mgr.Owner.GlobalPosition, mgr.LastTarget, mgr.Owner.GetWorld2d().DirectSpaceState, AIManager.TilesLayer, new Godot.Collections.Array() { mgr.Owner });
         }
     }
 }

@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Oubliette
+namespace Oubliette.AI
 {
     public class FireFly : AICharacter
     {
@@ -10,7 +10,7 @@ namespace Oubliette
         private Curve flicker;
         private ShaderMaterial spriteMat;
         private ShaderMaterial deathBubblesMat;
-        private MultiSpreadProjectileSpell deathRattleSpell = new MultiSpreadProjectileSpell(3, Mathf.Tau / 3.0f, "fireflyspell", 1, 40.0f, 20.0f, 50.0f, 0.0f, new Color(0.921569f, 0.427451f, 0.098039f), null, null, "res://scenes/ProjectileSmall.tscn");
+        private MultiSpreadProjectileSpell deathRattleSpell = new MultiSpreadProjectileSpell(3, Mathf.Tau / 3.0f, "Firebolt", 1, 40.0f, 20.0f, 50.0f, 0.0f, new Color(0.921569f, 0.427451f, 0.098039f), null, null, "res://scenes/ProjectileSmall.tscn");
 
         public override void _Ready()
         {

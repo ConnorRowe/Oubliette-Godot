@@ -28,7 +28,7 @@ namespace Oubliette
             proj.source = (Character)source;
             proj.SetProjectileColour(source.GetSpellColour(baseColour));
 
-            proj.SetSpellStats(source.GetSpellDamage(damage), source.GetSpellRange(range), source.GetSpellKnockback(knockback), source.GetSpellSpeed(speed), (source as Character).damageSourceName + "'s " + Name);
+            proj.SetSpellStats(source.GetSpellDamage(damage), source.GetSpellRange(range), source.GetSpellKnockback(knockback), source.GetSpellSpeed(speed), $"{(source as Character).DamageSourceName}'s {Name}");
             proj.SetHitCharEvent(HitCharEvent);
 
             return proj;

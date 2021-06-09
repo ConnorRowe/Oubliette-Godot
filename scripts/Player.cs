@@ -161,7 +161,7 @@ namespace Oubliette
             hitAreaShapeQuery.CollisionLayer = 512;
             hitAreaShapeQuery.Exclude = new Godot.Collections.Array() { this };
 
-            checkSlideCollisions = true;
+            CheckSlideCollisions = true;
 
             UpdatePotionSlot();
         }
@@ -170,7 +170,7 @@ namespace Oubliette
         {
             base._UnhandledInput(evt);
 
-            if (isDead)
+            if (IsDead)
                 return;
 
             if (Input.IsActionPressed("g_cast_primary_spell"))
@@ -311,12 +311,12 @@ namespace Oubliette
             base._Process(delta);
 
             // Follow head gib
-            if (isDead && headGib != null)
+            if (IsDead && headGib != null)
             {
                 camera.Offset = (headGib.GlobalPosition - Position) + new Vector2(0, -16);
             }
 
-            if (isDead)
+            if (IsDead)
                 return;
 
             if (BloodTrailAmount > 0.0f)
@@ -418,7 +418,7 @@ namespace Oubliette
 
         public override float GetMaxSpeed()
         {
-            return isDead ? 0.0f : base.GetMaxSpeed();
+            return IsDead ? 0.0f : base.GetMaxSpeed();
         }
 
         private void DrawEquippedArtefacts(Direction direction)
@@ -506,7 +506,7 @@ namespace Oubliette
             Vector2 rayStart = this.GlobalPosition + new Vector2(0, -9);
             Vector2 rayEnd = rayStart;
 
-            switch (GetDirection(dir))
+            switch (GetDirection(Dir))
             {
                 case Direction.Up:
                     {
@@ -749,7 +749,7 @@ namespace Oubliette
                 droppedPotion.potion = currentPotion;
                 world.AddChild(droppedPotion);
                 droppedPotion.Position = Position;
-                droppedPotion.ApplyCentralImpulse(dir * 60f);
+                droppedPotion.ApplyCentralImpulse(Dir * 60f);
             }
 
             currentPotion = newPotion;
@@ -892,8 +892,8 @@ namespace Oubliette
             SpellPickup droppedSpell = spellPickupScene.Instance<SpellPickup>();
             droppedSpell.SetSpell(spell);
             world.AddChild(droppedSpell);
-            droppedSpell.Position = Position + new Vector2(dir * -8.0f);
-            droppedSpell.ApplyCentralImpulse(dir * -80.0f);
+            droppedSpell.Position = Position + new Vector2(Dir * -8.0f);
+            droppedSpell.ApplyCentralImpulse(Dir * -80.0f);
         }
 
         public BuffTracker ApplyPerRoomBuff(string source, HashSet<(Stat stat, float amount)> stats, int duration)

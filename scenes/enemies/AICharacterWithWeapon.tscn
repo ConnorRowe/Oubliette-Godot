@@ -135,8 +135,8 @@ animations = [ {
 
 [node name="AICharacterWithWeapon" instance=ExtResource( 2 )]
 script = ExtResource( 1 )
-damageSourceName = "a Risen Warrior"
-maxHealth = 3
+DamageSourceName = "a Risen Warrior"
+MaxHealth = 3
 _animDown = "down"
 _animLeftRight = "leftright"
 _animUp = "up"

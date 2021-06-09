@@ -15,38 +15,38 @@ namespace Oubliette.AI
 
         public override void OnBehaviourStart()
         {
-            (mgr.owner as Snail).ResetChargeCooldown();
-            (mgr.owner as Snail).IsCharging = true;
+            (mgr.Owner as Snail).ResetChargeCooldown();
+            (mgr.Owner as Snail).IsCharging = true;
             shouldStop = false;
 
-            if (!mgr.owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
+            if (!mgr.Owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
             {
-                mgr.owner.Connect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
+                mgr.Owner.Connect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
             }
 
-            if (!mgr.owner.IsConnected(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer)))
+            if (!mgr.Owner.IsConnected(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer)))
             {
-                mgr.owner.Connect(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer));
+                mgr.Owner.Connect(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer));
             }
         }
 
         public override void Process(float delta)
         {
-            mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
+            mgr.TargetPosCache = mgr.LastTarget.GlobalPosition;
         }
 
         public override void OnBehaviourEnd()
         {
-            (mgr.owner as Snail).IsCharging = false;
+            (mgr.Owner as Snail).IsCharging = false;
 
-            if (mgr.owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
+            if (mgr.Owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
             {
-                mgr.owner.Disconnect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
+                mgr.Owner.Disconnect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
             }
 
-            if (!mgr.owner.IsConnected(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer)))
+            if (!mgr.Owner.IsConnected(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer)))
             {
-                mgr.owner.Disconnect(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer));
+                mgr.Owner.Disconnect(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer));
             }
         }
 
@@ -74,7 +74,7 @@ namespace Oubliette.AI
             {
                 if (node is Player player)
                 {
-                    player.TakeDamage(1, mgr.owner);
+                    player.TakeDamage(1, mgr.Owner);
                 }
 
                 if (node is Character character)
@@ -82,10 +82,10 @@ namespace Oubliette.AI
                     character.ApplyKnockBack(getDirection().AsVector() * 200.0f);
                 }
 
-                mgr.owner.ApplyKnockBack(getDirection().Opposite().AsVector() * 100.0f);
+                mgr.Owner.ApplyKnockBack(getDirection().Opposite().AsVector() * 100.0f);
 
                 shouldStop = true;
-                (mgr.owner as Snail).IsCharging = false;
+                (mgr.Owner as Snail).IsCharging = false;
             }
         }
     }

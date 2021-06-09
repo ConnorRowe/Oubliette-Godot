@@ -29,18 +29,18 @@ namespace Oubliette.AI
 
         private void TryAttack()
         {
-            if (!IsInstanceValid(mgr.owner))
+            if (!IsInstanceValid(mgr.Owner))
                 return;
 
-            if (mgr.owner.GlobalPosition.DistanceTo(mgr.lastTarget.GlobalPosition) < attackRange && !mgr.owner.isDead)
+            if (mgr.Owner.GlobalPosition.DistanceTo(mgr.LastTarget.GlobalPosition) < attackRange && !mgr.Owner.IsDead)
             {
-                mgr.lastTarget.TakeDamage(source: mgr.owner, sourceName: mgr.owner.damageSourceName);
-                mgr.lastTarget.ApplyKnockBack(mgr.owner.dir * 80.0f);
+                mgr.LastTarget.TakeDamage(source: mgr.Owner, sourceName: mgr.Owner.DamageSourceName);
+                mgr.LastTarget.ApplyKnockBack(mgr.Owner.Dir * 80.0f);
             }
 
-            if (!mgr.owner.isDead)
+            if (!mgr.Owner.IsDead)
             {
-                timer = mgr.owner.GetTree().CreateTimer(attackSpeed);
+                timer = mgr.Owner.GetTree().CreateTimer(attackSpeed);
                 timer.Connect("timeout", this, nameof(TryAttack));
             }
         }

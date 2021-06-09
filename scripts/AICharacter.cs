@@ -1,26 +1,25 @@
 using Godot;
 using System;
-using Oubliette.AI;
 
-namespace Oubliette
+namespace Oubliette.AI
 {
     public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
     {
-        public AIManager aIManager;
+        public AIManager AIManager { get; set; }
         protected Particles2D deathParticles;
         private CircleShape2D detectionShape = new CircleShape2D();
         protected Label debugLabel;
         protected Tween tween;
         protected Sprite detectionNotifier;
-        public bool hasTarget = false;
+        public bool hasTarget { get; set; } = false;
         private PackedScene bloodSplatScene;
         private PackedScene bloodPoolScene;
 
-        public Physics2DShapeQueryParameters shapeQuery;
-        public World world;
-        public float ogMaxSpeed;
-        public IProvidesNav navProvider;
-        public Vector2 initPos = Vector2.Zero;
+        public Physics2DShapeQueryParameters ShapeQuery { get; set; }
+        public World World { get; set; }
+        public float OgMaxSpeed { get; set; }
+        public IProvidesNav NavProvider { get; set; }
+        public Vector2 InitPos { get; set; } = Vector2.Zero;
 
         // Export
         [Export]
@@ -56,13 +55,13 @@ namespace Oubliette
         {
             base._Ready();
 
-            this.maxSpeed = maxMovementSpeed;
-            ogMaxSpeed = this.maxSpeed;
+            this.MaxSpeed = maxMovementSpeed;
+            OgMaxSpeed = this.MaxSpeed;
 
             if (GetParent() is World)
-                world = GetParent<World>();
+                World = GetParent<World>();
             else if (GetParent().GetParent() is World)
-                world = GetParent().GetParent<World>();
+                World = GetParent().GetParent<World>();
 
             debugLabel = GetNode<Label>("debugLabel");
             deathParticles = GetNode<Particles2D>(_deathParticlesPath);
@@ -74,7 +73,7 @@ namespace Oubliette
 
             charSprite.Connect("animation_finished", this, nameof(CharAnimationFinished));
 
-            shapeQuery = new Physics2DShapeQueryParameters()
+            ShapeQuery = new Physics2DShapeQueryParameters()
             {
                 CollisionLayer = 512,
                 Transform = new Transform2D(0.0f, this.GlobalPosition),
@@ -84,9 +83,9 @@ namespace Oubliette
                 CollideWithBodies = true,
             };
 
-            shapeQuery.SetShape(detectionShape);
+            ShapeQuery.SetShape(detectionShape);
 
-            aIManager = new AIManager(this, world);
+            AIManager = new AIManager(this, World);
 
             Godot.Collections.Dictionary<string, AIBehaviour> behaviors = new Godot.Collections.Dictionary<string, AIBehaviour>();
 
@@ -212,12 +211,12 @@ namespace Oubliette
 
             // behaviours for generated levels
 
-            behaviors.Add("idle", new NoBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] {
+            behaviors.Add("idle", new NoBehaviour(AIManager, new Func<AIBehaviour.TransitionTestResult>[] {
             // idle -> attack_target
             () => {
                 // If has target, target is within range, target is visible and no tiles block path
                 Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-                return new AIBehaviour.TransitionTestResult(hasTarget && GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) <= attackRange && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}) && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.tilesLayer, new Godot.Collections.Array() {this}), "attack_target");
+                return new AIBehaviour.TransitionTestResult(hasTarget && GlobalPosition.DistanceTo(AIManager.LastTarget.GlobalPosition) <= attackRange && AIManager.TraceToTarget(GlobalPosition, AIManager.LastTarget, spaceState, AIManager.VisibilityLayer, new Godot.Collections.Array() {this}) && AIManager.TraceToTarget(GlobalPosition, AIManager.LastTarget, spaceState, AIManager.TilesLayer, new Godot.Collections.Array() {this}), "attack_target");
             },
             // idle -> follow_target
             () => {
@@ -225,94 +224,94 @@ namespace Oubliette
             }
         }));
 
-            behaviors.Add("follow_target", new FollowTargetBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] {
+            behaviors.Add("follow_target", new FollowTargetBehaviour(AIManager, new Func<AIBehaviour.TransitionTestResult>[] {
             // follow_target -> attack_target
             () => {
                 // If target is within range, target is visible and no tiles block path
                 Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-                return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) <= attackRange && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}) && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.tilesLayer, new Godot.Collections.Array() {this}), "attack_target");
+                return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(AIManager.LastTarget.GlobalPosition) <= attackRange && AIManager.TraceToTarget(GlobalPosition, AIManager.LastTarget, spaceState, AIManager.VisibilityLayer, new Godot.Collections.Array() {this}) && AIManager.TraceToTarget(GlobalPosition, AIManager.LastTarget, spaceState, AIManager.TilesLayer, new Godot.Collections.Array() {this}), "attack_target");
             },
             // follow_target -> path_to_last_pos
             () => {
                 // If target is not visible
                 Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-                return new AIBehaviour.TransitionTestResult(!AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}), "path_to_last_pos");
+                return new AIBehaviour.TransitionTestResult(!AIManager.TraceToTarget(GlobalPosition, AIManager.LastTarget, spaceState, AIManager.VisibilityLayer, new Godot.Collections.Array() {this}), "path_to_last_pos");
             },
         }));
 
-            behaviors.Add("path_to_last_pos", new FollowPathBehaviour(aIManager, () =>
+            behaviors.Add("path_to_last_pos", new FollowPathBehaviour(AIManager, () =>
             {
-                return AIManager.GetNavPathGlobal(GlobalPosition, aIManager.targetPosCache, navProvider.GetNavigation());
+                return AIManager.GetNavPathGlobal(GlobalPosition, AIManager.TargetPosCache, NavProvider.GetNavigation());
             }, new Func<AIBehaviour.TransitionTestResult>[] {
             // path_to_last_pos -> attack_target
             () => {
                 // If target is within range, target is visible and no tiles block path
                 Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-                return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) <= attackRange && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}) && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.tilesLayer, new Godot.Collections.Array() {this}), "attack_target");
+                return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(AIManager.LastTarget.GlobalPosition) <= attackRange && AIManager.TraceToTarget(GlobalPosition, AIManager.LastTarget, spaceState, AIManager.VisibilityLayer, new Godot.Collections.Array() {this}) && AIManager.TraceToTarget(GlobalPosition, AIManager.LastTarget, spaceState, AIManager.TilesLayer, new Godot.Collections.Array() {this}), "attack_target");
             },
             // path_to_last_pos -> follow_target
             () => {
                 // If player is visible and no tiles block path
                 Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-                return new AIBehaviour.TransitionTestResult(AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}) && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.tilesLayer, new Godot.Collections.Array() {this}), "follow_target");
+                return new AIBehaviour.TransitionTestResult(AIManager.TraceToTarget(GlobalPosition, AIManager.LastTarget, spaceState, AIManager.VisibilityLayer, new Godot.Collections.Array() {this}) && AIManager.TraceToTarget(GlobalPosition, AIManager.LastTarget, spaceState, AIManager.TilesLayer, new Godot.Collections.Array() {this}), "follow_target");
             },
             }));
 
-            behaviors.Add("attack_target", new MeleeAttackBehaviour(aIManager, attackSpeed, attackRange, new Func<AIBehaviour.TransitionTestResult>[] {
+            behaviors.Add("attack_target", new MeleeAttackBehaviour(AIManager, attackSpeed, attackRange, new Func<AIBehaviour.TransitionTestResult>[] {
             // attack_target -> follow_target
             () => {
-                return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) > attackRange, "follow_target");
+                return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(AIManager.LastTarget.GlobalPosition) > attackRange, "follow_target");
             },
             // attack_target -> path_to_last_pos
             () => {
                 // If target is not visible
                 Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-                return new AIBehaviour.TransitionTestResult(!AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}), "path_to_last_pos");
+                return new AIBehaviour.TransitionTestResult(!AIManager.TraceToTarget(GlobalPosition, AIManager.LastTarget, spaceState, AIManager.VisibilityLayer, new Godot.Collections.Array() {this}), "path_to_last_pos");
             },
         }));
 
-            behaviors.Add("dead", new NoBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] { }));
+            behaviors.Add("dead", new NoBehaviour(AIManager, new Func<AIBehaviour.TransitionTestResult>[] { }));
 
-            aIManager.Behaviours = behaviors;
-            aIManager.SetCurrentBehaviour("idle");
+            AIManager.Behaviours = behaviors;
+            AIManager.SetCurrentBehaviour("idle");
 
-            if (initPos != Vector2.Zero)
+            if (InitPos != Vector2.Zero)
             {
-                GlobalPosition = initPos;
+                GlobalPosition = InitPos;
             }
 
             if (hasTarget)
-                aIManager.TryTransition();
+                AIManager.TryTransition();
         }
 
         public override Vector2 GetInputAxis(float delta)
         {
-            return aIManager.Steer();
+            return AIManager.Steer();
         }
 
         public override void _Process(float delta)
         {
             base._Process(delta);
 
-            aIManager.Process(delta);
+            AIManager.Process(delta);
 
-            debugLabel.Text = aIManager.CurrentBehaviour;
+            debugLabel.Text = AIManager.CurrentBehaviour;
         }
 
         public override void _ExitTree()
         {
             // Stop AIManager
-            aIManager.StopTryTransitionLoop();
-            aIManager.Dispose();
+            AIManager.StopTryTransitionLoop();
+            AIManager.Dispose();
             tween.StopAll();
             base._ExitTree();
         }
 
         private Physics2DShapeQueryParameters GetDetectionShapeQuery()
         {
-            shapeQuery.Transform = new Transform2D(0.0f, this.GlobalPosition);
+            ShapeQuery.Transform = new Transform2D(0.0f, this.GlobalPosition);
 
-            return shapeQuery;
+            return ShapeQuery;
         }
 
         protected virtual void CharAnimationFinished()
@@ -320,9 +319,9 @@ namespace Oubliette
             if (spawnBloodPoolOnDeath && charSprite.Animation == _animDeath)
             {
                 BloodPool bloodPool = bloodPoolScene.Instance<BloodPool>();
-                world.AddChild(bloodPool);
+                World.AddChild(bloodPool);
                 bloodPool.Position = GlobalPosition;
-                bloodPool.Start(world.BloodTexture);
+                bloodPool.Start(World.BloodTexture);
             }
         }
 
@@ -330,13 +329,13 @@ namespace Oubliette
         {
             base.Die();
 
-            int bloodSplats = world.rng.RandiRange(Mathf.RoundToInt(minMaxBloodSplats.x), Mathf.RoundToInt(minMaxBloodSplats.y));
+            int bloodSplats = World.rng.RandiRange(Mathf.RoundToInt(minMaxBloodSplats.x), Mathf.RoundToInt(minMaxBloodSplats.y));
             for (int i = 0; i < bloodSplats; ++i)
             {
                 BloodSplat bloodSplat = bloodSplatScene.Instance<BloodSplat>();
-                world.AddChild(bloodSplat);
+                World.AddChild(bloodSplat);
                 bloodSplat.Position = GlobalPosition;
-                bloodSplat.Init(world.BloodTexture, new Vector2(world.rng.RandfRange(-2.0f, 2.0f), world.rng.RandfRange(-1.0f, 1.0f)));
+                bloodSplat.Init(World.BloodTexture, new Vector2(World.rng.RandfRange(-2.0f, 2.0f), World.rng.RandfRange(-1.0f, 1.0f)));
             }
 
             if (deathParticles.Texture != null)
@@ -352,7 +351,7 @@ namespace Oubliette
 
             GetNode<CollisionShape2D>("CollisionShape2D").SetDeferred("disabled", true);
 
-            aIManager.SetCurrentBehaviour("dead");
+            AIManager.SetCurrentBehaviour("dead");
 
             EmitSignal(nameof(Died), this);
         }
@@ -373,9 +372,9 @@ namespace Oubliette
         public void TargetPlayer(Player player)
         {
             hasTarget = true;
-            aIManager.lastTarget = player;
+            AIManager.LastTarget = player;
 
-            aIManager.TryTransition();
+            AIManager.TryTransition();
         }
 
         Vector2 ICastsSpells.GetSpellDirection()
@@ -385,7 +384,7 @@ namespace Oubliette
 
         protected virtual Vector2 GetSpellDirection()
         {
-            return dir;
+            return Dir;
         }
 
         Vector2 ICastsSpells.GetSpellSpawnPos()

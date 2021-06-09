@@ -19,22 +19,22 @@ namespace Oubliette
 
             Godot.Collections.Dictionary<string, AIBehaviour> snailBehaviors = new Godot.Collections.Dictionary<string, AIBehaviour>();
 
-            snailBehaviors.Add("idle", new NoBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] {
+            snailBehaviors.Add("idle", new NoBehaviour(AIManager, new Func<AIBehaviour.TransitionTestResult>[] {
             // idle -> wander
             () => {
                 return new AIBehaviour.TransitionTestResult(hasTarget, "wander");
             }
         }));
 
-            snailBehaviors.Add("wander", new WanderStraightBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] {
+            snailBehaviors.Add("wander", new WanderStraightBehaviour(AIManager, new Func<AIBehaviour.TransitionTestResult>[] {
             // wander -> charge
             () => {
                 // If has target, charge cooldown <= 0, target is visible, and positions are lined up
-                return new AIBehaviour.TransitionTestResult(hasTarget && chargeCD <= 0.0f && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, GetWorld2d().DirectSpaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}) && DoPositionsLineUp(GlobalPosition, aIManager.lastTarget.GlobalPosition), "charge");
+                return new AIBehaviour.TransitionTestResult(hasTarget && chargeCD <= 0.0f && AIManager.TraceToTarget(GlobalPosition, AIManager.LastTarget, GetWorld2d().DirectSpaceState, AIManager.VisibilityLayer, new Godot.Collections.Array() {this}) && DoPositionsLineUp(GlobalPosition, AIManager.LastTarget.GlobalPosition), "charge");
             }
         }));
 
-            snailBehaviors.Add("charge", new ChargeBehaviour(aIManager, () => { return chargeDirection; }, new Func<AIBehaviour.TransitionTestResult>[] {
+            snailBehaviors.Add("charge", new ChargeBehaviour(AIManager, () => { return chargeDirection; }, new Func<AIBehaviour.TransitionTestResult>[] {
             // charge -> wander
             () => {
                 // if has target, and is not charging
@@ -42,11 +42,11 @@ namespace Oubliette
             }
          }));
 
-            snailBehaviors.Add("dead", new NoBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] { }));
+            snailBehaviors.Add("dead", new NoBehaviour(AIManager, new Func<AIBehaviour.TransitionTestResult>[] { }));
 
-            aIManager.Behaviours = snailBehaviors;
+            AIManager.Behaviours = snailBehaviors;
 
-            checkSlideCollisions = true;
+            CheckSlideCollisions = true;
             acceleration = 0.25f;
         }
 

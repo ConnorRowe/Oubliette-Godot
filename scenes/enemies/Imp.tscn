@@ -109,35 +109,35 @@ atlas = ExtResource( 2 )
 region = Rect2( 112, 0, 16, 16 )
 
 [sub_resource type="AtlasTexture" id=20]
-atlas = ExtResource( 5 )
+atlas = ExtResource( 4 )
 region = Rect2( 0, 0, 16, 16 )
 
 [sub_resource type="AtlasTexture" id=21]
-atlas = ExtResource( 5 )
+atlas = ExtResource( 4 )
 region = Rect2( 16, 0, 16, 16 )
 
 [sub_resource type="AtlasTexture" id=22]
-atlas = ExtResource( 5 )
+atlas = ExtResource( 4 )
 region = Rect2( 32, 0, 16, 16 )
 
 [sub_resource type="AtlasTexture" id=23]
-atlas = ExtResource( 5 )
+atlas = ExtResource( 4 )
 region = Rect2( 48, 0, 16, 16 )
 
 [sub_resource type="AtlasTexture" id=24]
-atlas = ExtResource( 4 )
+atlas = ExtResource( 5 )
 region = Rect2( 0, 0, 16, 16 )
 
 [sub_resource type="AtlasTexture" id=25]
-atlas = ExtResource( 4 )
+atlas = ExtResource( 5 )
 region = Rect2( 16, 0, 16, 16 )
 
 [sub_resource type="AtlasTexture" id=26]
-atlas = ExtResource( 4 )
+atlas = ExtResource( 5 )
 region = Rect2( 32, 0, 16, 16 )
 
 [sub_resource type="AtlasTexture" id=27]
-atlas = ExtResource( 4 )
+atlas = ExtResource( 5 )
 region = Rect2( 48, 0, 16, 16 )
 
 [sub_resource type="SpriteFrames" id=28]
@@ -153,19 +153,19 @@ animations = [ {
 "speed": 8.0
 }, {
 "frames": [ SubResource( 20 ), SubResource( 21 ), SubResource( 22 ), SubResource( 23 ) ],
-"loop": false,
-"name": "die",
-"speed": 10.0
-}, {
-"frames": [ SubResource( 24 ), SubResource( 25 ), SubResource( 26 ), SubResource( 27 ) ],
 "loop": true,
 "name": "walk_up",
 "speed": 8.0
+}, {
+"frames": [ SubResource( 24 ), SubResource( 25 ), SubResource( 26 ), SubResource( 27 ) ],
+"loop": false,
+"name": "die",
+"speed": 10.0
 } ]
 
 [node name="Imp" instance=ExtResource( 1 )]
-damageSourceName = "an Imp"
-maxHealth = 3
+DamageSourceName = "an Imp"
+MaxHealth = 2
 _animDown = "walk_down"
 _animLeftRight = "walk_right"
 _animUp = "walk_up"

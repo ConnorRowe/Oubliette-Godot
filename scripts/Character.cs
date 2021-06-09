@@ -158,37 +158,37 @@ namespace Oubliette
         private Dictionary<Stat, float> baseStats = Stats.Buffs.DefaultStats();
         public Dictionary<Stat, float> currentStats = Stats.Buffs.DefaultStats();
 
-        public float maxSpeed = 64f;
+        public float MaxSpeed { get; set; } = 64f;
         protected float speed = 0f;
         protected float acceleration = 5f;
         protected float friction = 8f;
         protected float elevation = 0f;
         protected float jumpVelocity = 0f;
-        public int currentHealth = 0;
-        public bool isDead = false;
-        public bool checkSlideCollisions = false;
-        private float checkSlideMaxCD = 0.15f;
+        public int CurrentHealth { get; set; } = 0;
+        public bool IsDead { get; set; } = false;
+        public bool CheckSlideCollisions { get; set; } = false;
+        private float CheckSlideMaxCD = 0.15f;
         private float checkSlideCD = 0.0f;
 
         public float Elevation { get { return elevation; } }
 
-        public HashSet<Buff> TimedBuffs = new HashSet<Buff>();
+        public HashSet<Buff> TimedBuffs { get; set; } = new HashSet<Buff>();
         protected string lastDamagedBy = "";
 
         public AnimatedSprite CharSprite { get { return charSprite; } }
 
         public virtual float GetMaxSpeed()
         {
-            return maxSpeed * currentStats[Stat.MoveSpeedMultiplier];
+            return MaxSpeed * currentStats[Stat.MoveSpeedMultiplier];
         }
 
         public virtual float GetAcceleration() { return acceleration; }
 
         // Directions must be normalised
-        public Vector2 dir = new Vector2();
-        public Vector2 inputDir = new Vector2();
-        public Vector2 movementVelocity = new Vector2();
-        public Vector2 externalVelocity = new Vector2();
+        public Vector2 Dir { get; set; } = new Vector2();
+        public Vector2 InputDir { get; set; } = new Vector2();
+        public Vector2 MovementVelocity { get; set; } = new Vector2();
+        public Vector2 ExternalVelocity { get; set; } = new Vector2();
 
 
         // Nodes
@@ -201,7 +201,7 @@ namespace Oubliette
 
         // Export
         [Export]
-        public string damageSourceName = "default";
+        public string DamageSourceName { get; set; } = "default";
         [Export]
         NodePath _hitboxPath;
         [Export]
@@ -215,10 +215,9 @@ namespace Oubliette
         [Export]
         private NodePath _animationPlayerPath;
         [Export]
-        public int maxHealth = 12;
+        public int MaxHealth { get; set; } = 12;
         [Export]
         private bool renderElevation = false;
-
 
         // Sprite animations
         [Export]
@@ -249,9 +248,9 @@ namespace Oubliette
             upDownCollider = GetNode<CollisionPolygon2D>(_upDownColliderPath);
             rightLeftCollider = GetNode<CollisionPolygon2D>(_rightLeftColliderPath);
 
-            currentHealth = maxHealth;
+            CurrentHealth = MaxHealth;
 
-            EmitSignal(nameof(HealthChanged), currentHealth, maxHealth);
+            EmitSignal(nameof(HealthChanged), CurrentHealth, MaxHealth);
         }
 
         public override void _Process(float delta)
@@ -259,11 +258,11 @@ namespace Oubliette
             base._Process(delta);
 
             // Get input direction
-            inputDir = GetInputAxis(delta);
+            InputDir = GetInputAxis(delta);
 
             // Remember last input direction (Lets character sprite remain facing last direction moved)
-            if (inputDir.Length() > 0)
-                dir = inputDir;
+            if (InputDir.Length() > 0)
+                Dir = InputDir;
 
             // Render elevation
             if (renderElevation)
@@ -273,7 +272,7 @@ namespace Oubliette
                 shadowSprite.Scale = new Vector2(shadowScale, shadowScale);
             }
 
-            if (isDead)
+            if (IsDead)
                 return;
 
             //Set idle or moving
@@ -343,7 +342,7 @@ namespace Oubliette
         {
             base._PhysicsProcess(delta);
 
-            if (inputDir.Length() > 0)
+            if (InputDir.Length() > 0)
             {
                 if (speed < GetMaxSpeed())
                 {
@@ -356,7 +355,7 @@ namespace Oubliette
                 }
 
                 // Cant move as fast in the air
-                movementVelocity += dir * speed * (IsAirborne() ? 0.025f : 1f);
+                MovementVelocity += Dir * speed * (IsAirborne() ? 0.025f : 1f);
             }
             else if (!IsAirborne()) // Friction only applied if not airborne
             {
@@ -369,23 +368,23 @@ namespace Oubliette
                     speed = 0;
                 }
 
-                movementVelocity = movementVelocity.Normalized() * speed;
+                MovementVelocity = MovementVelocity.Normalized() * speed;
             }
 
-            if (movementVelocity.Length() > GetMaxSpeed())
+            if (MovementVelocity.Length() > GetMaxSpeed())
             {
-                movementVelocity = movementVelocity.Normalized() * GetMaxSpeed();
+                MovementVelocity = MovementVelocity.Normalized() * GetMaxSpeed();
             }
 
-            Vector2 finalVelocity = movementVelocity + externalVelocity;
+            Vector2 finalVelocity = MovementVelocity + ExternalVelocity;
 
             // Apply movement velocity
             Vector2 slideVelocity = MoveAndSlide(finalVelocity * delta * 100.0f, infiniteInertia: false);
 
             // Report slide collision
-            if (checkSlideCollisions && checkSlideCD <= 0.0f)
+            if (CheckSlideCollisions && checkSlideCD <= 0.0f)
             {
-                checkSlideCD = checkSlideMaxCD;
+                checkSlideCD = CheckSlideMaxCD;
 
                 int slideCount = GetSlideCount();
 
@@ -399,7 +398,7 @@ namespace Oubliette
             }
 
             // Dampen external velocity over time
-            externalVelocity -= externalVelocity.Normalized() * externalVelocity.Length() * 0.9f * (delta * 8.0f);
+            ExternalVelocity -= ExternalVelocity.Normalized() * ExternalVelocity.Length() * 0.9f * (delta * 8.0f);
 
 
             // Apply jump stuff
@@ -431,7 +430,7 @@ namespace Oubliette
 
         public bool IsMoving()
         {
-            return movementVelocity.Length() > 0;
+            return MovementVelocity.Length() > 0;
         }
 
         protected Direction GetDirection(Vector2 v)
@@ -466,13 +465,13 @@ namespace Oubliette
 
         public virtual Direction GetFacingDirection()
         {
-            return GetDirection(dir);
+            return GetDirection(Dir);
         }
 
         // Tuple(animation name, FlipH, freeze frame if >= 0)
         public virtual (string name, bool flipH, int freezeFrame) GetSpriteAnimation()
         {
-            if (isDead)
+            if (IsDead)
                 return (_animDeath, false, -1);
 
             (string name, bool flipH, int freezeFrame) anim = ("", false, -1);
@@ -505,7 +504,7 @@ namespace Oubliette
                     }
             }
 
-            if (movementVelocity.Length() <= 0.001f)
+            if (MovementVelocity.Length() <= 0.001f)
             {
                 anim.freezeFrame = 0;
             }
@@ -540,8 +539,8 @@ namespace Oubliette
             if (source != null && source != this && currentStats[Stat.ReflectDamageFlat] > 0.0f)
                 source.TakeDamage(Mathf.RoundToInt(currentStats[Stat.ReflectDamageFlat]), null);
 
-            currentHealth -= damage;
-            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+            CurrentHealth -= damage;
+            CurrentHealth = Mathf.Clamp(CurrentHealth, 0, MaxHealth);
 
             animPlayer.CurrentAnimation = _animTakeDmg;
 
@@ -554,9 +553,9 @@ namespace Oubliette
                 animPlayer.Play();
             }
 
-            if (damage > 0) { EmitSignal(nameof(HealthChanged), currentHealth, maxHealth); }
+            if (damage > 0) { EmitSignal(nameof(HealthChanged), CurrentHealth, MaxHealth); }
 
-            if (currentHealth <= 0)
+            if (CurrentHealth <= 0)
             {
                 Die();
             }
@@ -564,22 +563,22 @@ namespace Oubliette
 
         public virtual void Heal(int healing)
         {
-            currentHealth += healing;
-            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+            CurrentHealth += healing;
+            CurrentHealth = Mathf.Clamp(CurrentHealth, 0, MaxHealth);
 
-            EmitSignal(nameof(HealthChanged), currentHealth, maxHealth);
+            EmitSignal(nameof(HealthChanged), CurrentHealth, MaxHealth);
         }
 
         public void AdjustMaxHealth(int adjustment, bool affectCurrentHealth)
         {
-            maxHealth += adjustment;
+            MaxHealth += adjustment;
 
             if (affectCurrentHealth)
-                currentHealth += adjustment;
+                CurrentHealth += adjustment;
 
-            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+            CurrentHealth = Mathf.Clamp(CurrentHealth, 0, MaxHealth);
 
-            EmitSignal(nameof(HealthChanged), currentHealth, maxHealth);
+            EmitSignal(nameof(HealthChanged), CurrentHealth, MaxHealth);
         }
 
         public virtual void Die()
@@ -589,12 +588,12 @@ namespace Oubliette
 
             hitbox.Layers = 0;
 
-            isDead = true;
+            IsDead = true;
         }
 
-        public void ApplyKnockBack(Vector2 vel)
+        public virtual void ApplyKnockBack(Vector2 vel)
         {
-            externalVelocity += vel;
+            ExternalVelocity += vel;
         }
 
         public void ApplyTimedBuff(Buff buff)

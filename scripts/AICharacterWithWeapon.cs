@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-namespace Oubliette
+namespace Oubliette.AI
 {
     public class AICharacterWithWeapon : AICharacter
     {
@@ -49,13 +49,13 @@ namespace Oubliette
         {
             base._Process(delta);
 
-            if (!isDead)
+            if (!IsDead)
             {
                 Direction fDir = GetFacingDirection();
-                weaponRot = Mathf.Atan2(dir.y, dir.x) + (weaponRotOffset * (fDir == Direction.Up || fDir == Direction.Left ? -1.0f : 1.0f));
+                weaponRot = Mathf.Atan2(Dir.y, Dir.x) + (weaponRotOffset * (fDir == Direction.Up || fDir == Direction.Left ? -1.0f : 1.0f));
 
                 weapon.Rotation = weaponRot;
-                weapon.Position = weaponOrigins[fDir] + (dir * weaponRotDistance);
+                weapon.Position = weaponOrigins[fDir] + (Dir * weaponRotDistance);
                 weapon.ShowBehindParent = fDir == Direction.Up;
 
                 weapon.FlipV = (fDir == Direction.Up || fDir == Direction.Left);
@@ -77,7 +77,7 @@ namespace Oubliette
             base.Die();
 
             float dropDist = 16.0f;
-            wepFallPos = weapon.Position + new Vector2(aIManager.rng.RandfRange(-dropDist, dropDist), aIManager.rng.RandfRange(-dropDist, dropDist));
+            wepFallPos = weapon.Position + new Vector2(AIManager.rng.RandfRange(-dropDist, dropDist), AIManager.rng.RandfRange(-dropDist, dropDist));
 
             float duration = 0.35f;
 

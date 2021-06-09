@@ -20,7 +20,7 @@ namespace Oubliette.AI
 
         public override void Process(float delta)
         {
-            mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
+            mgr.TargetPosCache = mgr.LastTarget.GlobalPosition;
         }
 
         public override Vector2 Steer()
@@ -34,7 +34,7 @@ namespace Oubliette.AI
 
         private void FireProjectile()
         {
-            projectileSpell.Cast(mgr.owner as ICastsSpells);
+            projectileSpell.Cast(mgr.Owner as ICastsSpells);
         }
     }
 }

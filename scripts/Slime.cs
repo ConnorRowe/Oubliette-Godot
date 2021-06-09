@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Oubliette
+namespace Oubliette.AI
 {
     public class Slime : AICharacter
     {
@@ -40,7 +40,7 @@ namespace Oubliette
 
             newSpillage.GlobalPosition = GlobalPosition + new Vector2(0, -7);
             newSpillage.SetColours(new Color(0.431373f, 1, 0), new Color(0.933333f, 1, 0.878431f));
-            newSpillage.DmgSourceName = damageSourceName + "'s Acid Trail";
+            newSpillage.DmgSourceName = DamageSourceName + "'s Acid Trail";
         }
     }
 }

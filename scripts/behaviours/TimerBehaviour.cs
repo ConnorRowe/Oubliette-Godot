@@ -15,12 +15,12 @@ namespace Oubliette.AI
         public override void OnBehaviourStart()
         {
             mgr.CanTryTransition = false;
-            mgr.owner.GetTree().CreateTimer(cooldownTime).Connect("timeout", this, nameof(Timeout));
+            mgr.Owner.GetTree().CreateTimer(cooldownTime).Connect("timeout", this, nameof(Timeout));
         }
 
         public override void Process(float delta)
         {
-            mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
+            mgr.TargetPosCache = mgr.LastTarget.GlobalPosition;
         }
 
         public override Vector2 Steer()

@@ -13,9 +13,9 @@ namespace Oubliette.AI
         {
             currentDirection = DirectionExt.FromInt(mgr.rng.RandiRange(0, 3));
 
-            if (!mgr.owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
+            if (!mgr.Owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
             {
-                mgr.owner.Connect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
+                mgr.Owner.Connect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
             }
         }
 
@@ -26,9 +26,9 @@ namespace Oubliette.AI
 
         public override void OnBehaviourEnd()
         {
-            if (mgr.owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
+            if (mgr.Owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
             {
-                mgr.owner.Disconnect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
+                mgr.Owner.Disconnect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
             }
         }
 

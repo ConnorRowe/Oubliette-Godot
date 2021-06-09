@@ -66,6 +66,7 @@ namespace Oubliette.LevelGen
             foreach (BasePickup pickup in pickups)
             {
                 pickup.Position = Position + (new Vector2(rng.Randi(), rng.Randi()).Normalized() * 3.0f);
+                GetParent().GetParent().RemoveChild(pickup);
                 GetParent().AddChild(pickup);
             }
 

@@ -5,7 +5,7 @@ namespace Oubliette
     {
         public override void PlayerHit(Player player)
         {
-            if (player.currentHealth < player.maxHealth && !IsQueuedForDeletion())
+            if (player.CurrentHealth < player.MaxHealth && !IsQueuedForDeletion())
             {
                 player.Heal(2);
                 player.PlayGulpSound();
