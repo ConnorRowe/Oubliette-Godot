@@ -1,37 +1,40 @@
 using Godot;
 using System;
 
-public class ProjectileBehaviour : AIBehaviour
+namespace Oubliette.AI
 {
-    ProjectileSpell projectileSpell;
-
-    public ProjectileBehaviour(AIManager manager, ProjectileSpell projectileSpell, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
+    public class ProjectileBehaviour : AIBehaviour
     {
-        this.projectileSpell = projectileSpell;
+        ProjectileSpell projectileSpell;
 
-        mgr.Connect(nameof(AIManager.Fire), this, nameof(FireProjectile));
-    }
+        public ProjectileBehaviour(AIManager manager, ProjectileSpell projectileSpell, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
+        {
+            this.projectileSpell = projectileSpell;
 
-    public override void OnBehaviourStart()
-    {
-    }
+            mgr.Connect(nameof(AIManager.Fire), this, nameof(FireProjectile));
+        }
 
-    public override void Process(float delta)
-    {
-        mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
-    }
+        public override void OnBehaviourStart()
+        {
+        }
 
-    public override Vector2 Steer()
-    {
-        return Vector2.Zero;
-    }
+        public override void Process(float delta)
+        {
+            mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
+        }
 
-    public override void OnBehaviourEnd()
-    {
-    }
+        public override Vector2 Steer()
+        {
+            return Vector2.Zero;
+        }
 
-    private void FireProjectile()
-    {
-        projectileSpell.Cast(mgr.owner as ICastsSpells);
+        public override void OnBehaviourEnd()
+        {
+        }
+
+        private void FireProjectile()
+        {
+            projectileSpell.Cast(mgr.owner as ICastsSpells);
+        }
     }
 }

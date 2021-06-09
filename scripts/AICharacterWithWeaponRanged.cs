@@ -1,26 +1,29 @@
 using Godot;
 using System;
+using Oubliette.AI;
 
-public class AICharacterWithWeaponRanged : AICharacterWithWeapon
+namespace Oubliette
 {
-    private bool isCharging = false;
-    private Particles2D weaponParticles;
-    private BaseSpell currentSpell;
-
-    [Export]
-    private NodePath _weaponParticlesPath;
-    [Export]
-    private float projHueAdjust = 0.0f;
-
-    public override void _Ready()
+    public class AICharacterWithWeaponRanged : AICharacterWithWeapon
     {
-        base._Ready();
+        private bool isCharging = false;
+        private Particles2D weaponParticles;
+        private BaseSpell currentSpell;
 
-        currentSpell = Spells.Shadowbolt;
+        [Export]
+        private NodePath _weaponParticlesPath;
+        [Export]
+        private float projHueAdjust = 0.0f;
 
-        weaponParticles = GetNode<Particles2D>(_weaponParticlesPath);
+        public override void _Ready()
+        {
+            base._Ready();
 
-        ProjectileBehaviour projBehaviour = new ProjectileBehaviour(aIManager, currentSpell as ProjectileSpell, new Func<AIBehaviour.TransitionTestResult>[] {
+            currentSpell = Spells.Shadowbolt;
+
+            weaponParticles = GetNode<Particles2D>(_weaponParticlesPath);
+
+            ProjectileBehaviour projBehaviour = new ProjectileBehaviour(aIManager, currentSpell as ProjectileSpell, new Func<AIBehaviour.TransitionTestResult>[] {
             
             // attack_target -> follow_target
             () => {
@@ -48,88 +51,89 @@ public class AICharacterWithWeaponRanged : AICharacterWithWeapon
             // }
         });
 
-        aIManager.RemoveBehaviour("attack_target");
-        aIManager.AddBehaviour("attack_target", projBehaviour);
+            aIManager.RemoveBehaviour("attack_target");
+            aIManager.AddBehaviour("attack_target", projBehaviour);
 
-        aIManager.Connect(nameof(AIManager.BehaviourChanged), this, nameof(BehaviourChanged));
-    }
-
-    public override void _Process(float delta)
-    {
-        base._Process(delta);
-
-        if (aIManager.CurrentBehaviour == "attack_target")
-        {
-            dir = GlobalPosition.DirectionTo(aIManager.lastTarget.GlobalPosition);
-        }
-    }
-
-    private void BehaviourChanged(string behaviour)
-    {
-        if (!isCharging && behaviour == "attack_target")
-        {
-            ChargeSpell();
+            aIManager.Connect(nameof(AIManager.BehaviourChanged), this, nameof(BehaviourChanged));
         }
 
-        isCharging = false;
-    }
-
-    private void ChargeSpell()
-    {
-        tween.Remove(this, nameof(SetShownParticles));
-        tween.Remove(this, nameof(Fire));
-
-        tween.InterpolateMethod(this, nameof(SetShownParticles), 0, 32, this.attackSpeed, Tween.TransitionType.Quad);
-        tween.InterpolateCallback(this, this.attackSpeed, nameof(Fire));
-        tween.Start();
-
-        isCharging = true;
-    }
-
-    private void Fire()
-    {
-        isCharging = false;
-
-        aIManager.EmitSignal(nameof(AIManager.Fire));
-
-        SetShownParticles(0);
-
-        aIManager.TryTransition();
-
-        if (aIManager.CurrentBehaviour == "attack_target")
+        public override void _Process(float delta)
         {
-            ChargeSpell();
+            base._Process(delta);
+
+            if (aIManager.CurrentBehaviour == "attack_target")
+            {
+                dir = GlobalPosition.DirectionTo(aIManager.lastTarget.GlobalPosition);
+            }
         }
-    }
 
-    private void SetShownParticles(int num)
-    {
-        (weaponParticles.ProcessMaterial as ShaderMaterial)?.SetShaderParam("number_particles_shown", num);
-    }
+        private void BehaviourChanged(string behaviour)
+        {
+            if (!isCharging && behaviour == "attack_target")
+            {
+                ChargeSpell();
+            }
 
-    public override Vector2 GetSpellSpawnPos()
-    {
-        return weaponParticles.GlobalPosition;
-    }
+            isCharging = false;
+        }
 
-    public override float GetSpellRange(float baseRange)
-    {
-        return 999.0f;
-    }
+        private void ChargeSpell()
+        {
+            tween.Remove(this, nameof(SetShownParticles));
+            tween.Remove(this, nameof(Fire));
 
-    public override void Die()
-    {
-        // stop spell from charging and firing
-        tween.StopAll();
-        weaponParticles.QueueFree();
+            tween.InterpolateMethod(this, nameof(SetShownParticles), 0, 32, this.attackSpeed, Tween.TransitionType.Quad);
+            tween.InterpolateCallback(this, this.attackSpeed, nameof(Fire));
+            tween.Start();
 
-        tween.InterpolateMethod(this, nameof(SetWeaponGlow), 20.0f, 1.0f, 4.0f, Tween.TransitionType.Cubic, Tween.EaseType.In);
+            isCharging = true;
+        }
 
-        base.Die();
-    }
+        private void Fire()
+        {
+            isCharging = false;
 
-    private void SetWeaponGlow(float intensity)
-    {
-        (weapon.Material as ShaderMaterial).SetShaderParam("intensity", intensity);
+            aIManager.EmitSignal(nameof(AIManager.Fire));
+
+            SetShownParticles(0);
+
+            aIManager.TryTransition();
+
+            if (aIManager.CurrentBehaviour == "attack_target")
+            {
+                ChargeSpell();
+            }
+        }
+
+        private void SetShownParticles(int num)
+        {
+            (weaponParticles.ProcessMaterial as ShaderMaterial)?.SetShaderParam("number_particles_shown", num);
+        }
+
+        public override Vector2 GetSpellSpawnPos()
+        {
+            return weaponParticles.GlobalPosition;
+        }
+
+        public override float GetSpellRange(float baseRange)
+        {
+            return 999.0f;
+        }
+
+        public override void Die()
+        {
+            // stop spell from charging and firing
+            tween.StopAll();
+            weaponParticles.QueueFree();
+
+            tween.InterpolateMethod(this, nameof(SetWeaponGlow), 20.0f, 1.0f, 4.0f, Tween.TransitionType.Cubic, Tween.EaseType.In);
+
+            base.Die();
+        }
+
+        private void SetWeaponGlow(float intensity)
+        {
+            (weapon.Material as ShaderMaterial).SetShaderParam("intensity", intensity);
+        }
     }
 }

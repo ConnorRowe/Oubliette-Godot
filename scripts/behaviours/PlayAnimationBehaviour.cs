@@ -1,41 +1,44 @@
 using Godot;
 using System;
 
-public class PlayAnimationBehaviour : AIBehaviour
+namespace Oubliette.AI
 {
-    AnimationPlayer animationPlayer;
-    string animationName;
-
-    public PlayAnimationBehaviour(AIManager manager, AnimationPlayer animationPlayer, string animationName, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
+    public class PlayAnimationBehaviour : AIBehaviour
     {
-        this.animationPlayer = animationPlayer;
-        this.animationName = animationName;
+        AnimationPlayer animationPlayer;
+        string animationName;
 
-        animationPlayer.Connect("animation_finished", this, nameof(AnimationFinished));
-    }
+        public PlayAnimationBehaviour(AIManager manager, AnimationPlayer animationPlayer, string animationName, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
+        {
+            this.animationPlayer = animationPlayer;
+            this.animationName = animationName;
 
-    public override void OnBehaviourStart()
-    {
-        mgr.CanTryTransition = false;
-        animationPlayer.Play(animationName);
-    }
+            animationPlayer.Connect("animation_finished", this, nameof(AnimationFinished));
+        }
 
-    public override void Process(float delta)
-    {
-        mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
-    }
+        public override void OnBehaviourStart()
+        {
+            mgr.CanTryTransition = false;
+            animationPlayer.Play(animationName);
+        }
 
-    public override Vector2 Steer()
-    {
-        return Vector2.Zero;
-    }
+        public override void Process(float delta)
+        {
+            mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
+        }
 
-    public override void OnBehaviourEnd()
-    {
-    }
+        public override Vector2 Steer()
+        {
+            return Vector2.Zero;
+        }
 
-    public void AnimationFinished(string animationName)
-    {
-        mgr.CanTryTransition = true;
+        public override void OnBehaviourEnd()
+        {
+        }
+
+        public void AnimationFinished(string animationName)
+        {
+            mgr.CanTryTransition = true;
+        }
     }
 }

@@ -1,32 +1,34 @@
 using Godot;
-using System;
 
-public class MainMenu : Node2D
+namespace Oubliette
 {
-    private MainMenuButton playButton;
-    private MainMenuButton quitButton;
-
-    [Export]
-    private PackedScene nextScene;
-
-    public override void _Ready()
+    public class MainMenu : Node2D
     {
-        playButton = GetNode<MainMenuButton>("PlayButton");
-        quitButton = GetNode<MainMenuButton>("QuitButton");
+        private MainMenuButton playButton;
+        private MainMenuButton quitButton;
 
-        playButton.Connect(nameof(MainMenuButton.Clicked), this, nameof(Play));
-        quitButton.Connect(nameof(MainMenuButton.Clicked), this, nameof(Quit));
-    }
+        [Export]
+        private PackedScene nextScene;
 
-    private void Play()
-    {
-        GetTree().ChangeSceneTo(nextScene);
+        public override void _Ready()
+        {
+            playButton = GetNode<MainMenuButton>("PlayButton");
+            quitButton = GetNode<MainMenuButton>("QuitButton");
 
-        QueueFree();
-    }
+            playButton.Connect(nameof(MainMenuButton.Clicked), this, nameof(Play));
+            quitButton.Connect(nameof(MainMenuButton.Clicked), this, nameof(Quit));
+        }
 
-    private void Quit()
-    {
-        GetTree().Notification(MainLoop.NotificationWmQuitRequest);
+        private void Play()
+        {
+            GetTree().ChangeSceneTo(nextScene);
+
+            QueueFree();
+        }
+
+        private void Quit()
+        {
+            GetTree().Notification(MainLoop.NotificationWmQuitRequest);
+        }
     }
 }

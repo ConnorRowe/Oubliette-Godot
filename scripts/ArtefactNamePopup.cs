@@ -1,27 +1,29 @@
 using Godot;
-using System;
 
-public class ArtefactNamePopup : Node2D
+namespace Oubliette
 {
-    private Label _artefactNameLabel;
-    private Label _descLabel;
-    private AnimationPlayer _animPlayer;
-
-    public override void _Ready()
+    public class ArtefactNamePopup : Node2D
     {
-        _artefactNameLabel = GetNode<Label>("Background/ArtefactName");
-        _descLabel = GetNode<Label>("Background/ArtefactName/Description");
-        _animPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-    }
+        private Label _artefactNameLabel;
+        private Label _descLabel;
+        private AnimationPlayer _animPlayer;
 
-    public void DisplayPopup(string name, string desc)
-    {
-        _artefactNameLabel.Text = name;
-        _descLabel.Text = desc;
+        public override void _Ready()
+        {
+            _artefactNameLabel = GetNode<Label>("Background/ArtefactName");
+            _descLabel = GetNode<Label>("Background/ArtefactName/Description");
+            _animPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+        }
 
-        if (_animPlayer.CurrentAnimation != "" && _animPlayer.CurrentAnimationPosition > 0.0f)
-            _animPlayer.Seek(0.0f);
+        public void DisplayPopup(string name, string desc)
+        {
+            _artefactNameLabel.Text = name;
+            _descLabel.Text = desc;
 
-        _animPlayer.Play("ShowHide");
+            if (_animPlayer.CurrentAnimation != "" && _animPlayer.CurrentAnimationPosition > 0.0f)
+                _animPlayer.Seek(0.0f);
+
+            _animPlayer.Play("ShowHide");
+        }
     }
 }

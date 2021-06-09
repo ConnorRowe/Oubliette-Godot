@@ -1,21 +1,25 @@
-public class SpellPickup : BasePickup
+
+namespace Oubliette
 {
-    private BaseSpell spell;
-
-    public void SetSpell(BaseSpell spell)
+    public class SpellPickup : BasePickup
     {
-        this.spell = spell;
+        private BaseSpell spell;
 
-        MainSprite.Texture = spell.Icon;
-    }
-
-    public override void PlayerHit(Player player)
-    {
-        if (!IsQueuedForDeletion())
+        public void SetSpell(BaseSpell spell)
         {
-            player.PickUpPrimarySpell(spell);
+            this.spell = spell;
 
-            QueueFree();
+            MainSprite.Texture = spell.Icon;
+        }
+
+        public override void PlayerHit(Player player)
+        {
+            if (!IsQueuedForDeletion())
+            {
+                player.PickUpPrimarySpell(spell);
+
+                QueueFree();
+            }
         }
     }
 }

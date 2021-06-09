@@ -1,6 +1,7 @@
 using Godot;
-using System;
 
+namespace Oubliette
+{
 public class SpillageProjectile : Projectile
 {
     private Vector2 lastPosition;
@@ -47,4 +48,5 @@ public class SpillageProjectile : Projectile
         newSpillage.SetColours(spillageModulate, new Color(0.933333f, 1, 0.878431f));
         newSpillage.DmgSourceName = source.damageSourceName + "'s Slime Ball's Acid Trail";
     }
+}
 }

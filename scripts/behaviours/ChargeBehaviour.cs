@@ -1,89 +1,92 @@
 using Godot;
 using System;
 
-public class ChargeBehaviour : MovementBehaviour
+namespace Oubliette.AI
 {
-    Func<Direction> getDirection;
-    bool shouldStop = false;
-
-    public ChargeBehaviour(AIManager manager, Func<Direction> getDirection, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
+    public class ChargeBehaviour : MovementBehaviour
     {
-        this.getDirection = getDirection;
-    }
+        Func<Direction> getDirection;
+        bool shouldStop = false;
 
-    public override void OnBehaviourStart()
-    {
-        (mgr.owner as Snail).ResetChargeCooldown();
-        (mgr.owner as Snail).IsCharging = true;
-        shouldStop = false;
-
-        if (!mgr.owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
+        public ChargeBehaviour(AIManager manager, Func<Direction> getDirection, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
         {
-            mgr.owner.Connect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
+            this.getDirection = getDirection;
         }
 
-        if (!mgr.owner.IsConnected(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer)))
+        public override void OnBehaviourStart()
         {
-            mgr.owner.Connect(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer));
-        }
-    }
+            (mgr.owner as Snail).ResetChargeCooldown();
+            (mgr.owner as Snail).IsCharging = true;
+            shouldStop = false;
 
-    public override void Process(float delta)
-    {
-        mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
-    }
-
-    public override void OnBehaviourEnd()
-    {
-        (mgr.owner as Snail).IsCharging = false;
-
-        if (mgr.owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
-        {
-            mgr.owner.Disconnect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
-        }
-
-        if (!mgr.owner.IsConnected(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer)))
-        {
-            mgr.owner.Disconnect(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer));
-        }
-    }
-
-    public override Vector2 Steer()
-    {
-        if (shouldStop)
-            return Vector2.Zero;
-
-        return getDirection().AsVector();
-    }
-
-    private void SlideCollision(KinematicCollision2D collision)
-    {
-        StopCharge(collision.Collider as Node);
-    }
-
-    private void HitPlayer(Player player)
-    {
-        StopCharge(player);
-    }
-
-    private void StopCharge(Node node)
-    {
-        if (!shouldStop)
-        {
-            if (node is Player player)
+            if (!mgr.owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
             {
-                player.TakeDamage(1, mgr.owner);
+                mgr.owner.Connect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
             }
 
-            if (node is Character character)
+            if (!mgr.owner.IsConnected(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer)))
             {
-                character.ApplyKnockBack(getDirection().AsVector() * 200.0f);
+                mgr.owner.Connect(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer));
             }
+        }
 
-            mgr.owner.ApplyKnockBack(getDirection().Opposite().AsVector() * 100.0f);
+        public override void Process(float delta)
+        {
+            mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
+        }
 
-            shouldStop = true;
+        public override void OnBehaviourEnd()
+        {
             (mgr.owner as Snail).IsCharging = false;
+
+            if (mgr.owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
+            {
+                mgr.owner.Disconnect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
+            }
+
+            if (!mgr.owner.IsConnected(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer)))
+            {
+                mgr.owner.Disconnect(nameof(AICharacter.PlayerIntersected), this, nameof(HitPlayer));
+            }
+        }
+
+        public override Vector2 Steer()
+        {
+            if (shouldStop)
+                return Vector2.Zero;
+
+            return getDirection().AsVector();
+        }
+
+        private void SlideCollision(KinematicCollision2D collision)
+        {
+            StopCharge(collision.Collider as Node);
+        }
+
+        private void HitPlayer(Player player)
+        {
+            StopCharge(player);
+        }
+
+        private void StopCharge(Node node)
+        {
+            if (!shouldStop)
+            {
+                if (node is Player player)
+                {
+                    player.TakeDamage(1, mgr.owner);
+                }
+
+                if (node is Character character)
+                {
+                    character.ApplyKnockBack(getDirection().AsVector() * 200.0f);
+                }
+
+                mgr.owner.ApplyKnockBack(getDirection().Opposite().AsVector() * 100.0f);
+
+                shouldStop = true;
+                (mgr.owner as Snail).IsCharging = false;
+            }
         }
     }
 }

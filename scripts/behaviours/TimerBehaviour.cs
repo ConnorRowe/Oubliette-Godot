@@ -1,39 +1,42 @@
 using Godot;
 using System;
 
-public class TimerBehaviour : AIBehaviour
+namespace Oubliette.AI
 {
-    private float cooldownTime;
-
-    public TimerBehaviour(AIManager manager, float cooldownTime, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
+    public class TimerBehaviour : AIBehaviour
     {
-        this.cooldownTime = cooldownTime;
-    }
+        private float cooldownTime;
 
-    public override void OnBehaviourStart()
-    {
-        mgr.CanTryTransition = false;
-        mgr.owner.GetTree().CreateTimer(cooldownTime).Connect("timeout", this, nameof(Timeout));
-    }
+        public TimerBehaviour(AIManager manager, float cooldownTime, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
+        {
+            this.cooldownTime = cooldownTime;
+        }
 
-    public override void Process(float delta)
-    {
-        mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
-    }
+        public override void OnBehaviourStart()
+        {
+            mgr.CanTryTransition = false;
+            mgr.owner.GetTree().CreateTimer(cooldownTime).Connect("timeout", this, nameof(Timeout));
+        }
 
-    public override Vector2 Steer()
-    {
-        return Vector2.Zero;
-    }
+        public override void Process(float delta)
+        {
+            mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
+        }
 
-    public override void OnBehaviourEnd()
-    {
-    }
+        public override Vector2 Steer()
+        {
+            return Vector2.Zero;
+        }
 
-    private void Timeout()
-    {
-        mgr.CanTryTransition = true;
+        public override void OnBehaviourEnd()
+        {
+        }
 
-        GD.Print("giant slime timeout");
+        private void Timeout()
+        {
+            mgr.CanTryTransition = true;
+
+            GD.Print("giant slime timeout");
+        }
     }
 }

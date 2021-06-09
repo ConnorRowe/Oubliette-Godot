@@ -1,215 +1,218 @@
 using Godot;
 using System;
+using Oubliette.AI;
 
-public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
+namespace Oubliette
 {
-    public AIManager aIManager;
-    protected Particles2D deathParticles;
-    private CircleShape2D detectionShape = new CircleShape2D();
-    protected Label debugLabel;
-    protected Tween tween;
-    protected Sprite detectionNotifier;
-    public bool hasTarget = false;
-    private PackedScene bloodSplatScene;
-    private PackedScene bloodPoolScene;
-
-    public Physics2DShapeQueryParameters shapeQuery;
-    public World world;
-    public float ogMaxSpeed;
-    public IProvidesNav navProvider;
-    public Vector2 initPos = Vector2.Zero;
-
-    // Export
-    [Export]
-    private NodePath _deathParticlesPath;
-    [Export]
-    private NodePath _tweenPath;
-    [Export]
-    private NodePath _detectionNotifierPath;
-
-    [Export(hintString: "How fast the character can run")]
-    private float maxMovementSpeed = 64f;
-    [Export(hintString: "How frequent the character can attack")]
-    protected float attackSpeed = 1.0f;
-    [Export(hintString: "How close the character has to be to its target to attack")]
-    protected float attackRange = 10.0f;
-    [Export(hintString: "The radius of its detection sphere")]
-    private float detectionRadius = 80;
-    [Export(hintString: "How close the character must be to a path point for it to count as reached.")]
-    public float PathTolerance = 7.5f;
-    [Export]
-    private Vector2 minMaxBloodSplats = Vector2.Zero;
-    [Export]
-    private bool spawnBloodPoolOnDeath = false;
-
-    // Signals
-    [Signal]
-    public delegate void Died(AICharacter aICharacter);
-    [Signal]
-    public delegate void PlayerIntersected(Player player);
-
-
-    public override void _Ready()
+    public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
     {
-        base._Ready();
+        public AIManager aIManager;
+        protected Particles2D deathParticles;
+        private CircleShape2D detectionShape = new CircleShape2D();
+        protected Label debugLabel;
+        protected Tween tween;
+        protected Sprite detectionNotifier;
+        public bool hasTarget = false;
+        private PackedScene bloodSplatScene;
+        private PackedScene bloodPoolScene;
 
-        this.maxSpeed = maxMovementSpeed;
-        ogMaxSpeed = this.maxSpeed;
+        public Physics2DShapeQueryParameters shapeQuery;
+        public World world;
+        public float ogMaxSpeed;
+        public IProvidesNav navProvider;
+        public Vector2 initPos = Vector2.Zero;
 
-        if (GetParent() is World)
-            world = GetParent<World>();
-        else if (GetParent().GetParent() is World)
-            world = GetParent().GetParent<World>();
+        // Export
+        [Export]
+        private NodePath _deathParticlesPath;
+        [Export]
+        private NodePath _tweenPath;
+        [Export]
+        private NodePath _detectionNotifierPath;
 
-        debugLabel = GetNode<Label>("debugLabel");
-        deathParticles = GetNode<Particles2D>(_deathParticlesPath);
-        tween = GetNode<Tween>(_tweenPath);
-        detectionNotifier = GetNode<Sprite>(_detectionNotifierPath);
-        detectionShape.Radius = detectionRadius;
-        bloodSplatScene = GD.Load<PackedScene>("res://scenes/BloodSplat.tscn");
-        bloodPoolScene = GD.Load<PackedScene>("res://scenes/BloodPool.tscn");
+        [Export(hintString: "How fast the character can run")]
+        private float maxMovementSpeed = 64f;
+        [Export(hintString: "How frequent the character can attack")]
+        protected float attackSpeed = 1.0f;
+        [Export(hintString: "How close the character has to be to its target to attack")]
+        protected float attackRange = 10.0f;
+        [Export(hintString: "The radius of its detection sphere")]
+        private float detectionRadius = 80;
+        [Export(hintString: "How close the character must be to a path point for it to count as reached.")]
+        public float PathTolerance = 7.5f;
+        [Export]
+        private Vector2 minMaxBloodSplats = Vector2.Zero;
+        [Export]
+        private bool spawnBloodPoolOnDeath = false;
 
-        charSprite.Connect("animation_finished", this, nameof(CharAnimationFinished));
+        // Signals
+        [Signal]
+        public delegate void Died(AICharacter aICharacter);
+        [Signal]
+        public delegate void PlayerIntersected(Player player);
 
-        shapeQuery = new Physics2DShapeQueryParameters()
+
+        public override void _Ready()
         {
-            CollisionLayer = 512,
-            Transform = new Transform2D(0.0f, this.GlobalPosition),
-            ShapeRid = detectionShape.GetRid(),
-            Exclude = new Godot.Collections.Array { this },
-            CollideWithAreas = true,
-            CollideWithBodies = true,
-        };
+            base._Ready();
 
-        shapeQuery.SetShape(detectionShape);
+            this.maxSpeed = maxMovementSpeed;
+            ogMaxSpeed = this.maxSpeed;
 
-        aIManager = new AIManager(this, world);
+            if (GetParent() is World)
+                world = GetParent<World>();
+            else if (GetParent().GetParent() is World)
+                world = GetParent().GetParent<World>();
 
-        Godot.Collections.Dictionary<string, AIBehaviour> behaviors = new Godot.Collections.Dictionary<string, AIBehaviour>();
+            debugLabel = GetNode<Label>("debugLabel");
+            deathParticles = GetNode<Particles2D>(_deathParticlesPath);
+            tween = GetNode<Tween>(_tweenPath);
+            detectionNotifier = GetNode<Sprite>(_detectionNotifierPath);
+            detectionShape.Radius = detectionRadius;
+            bloodSplatScene = GD.Load<PackedScene>("res://scenes/BloodSplat.tscn");
+            bloodPoolScene = GD.Load<PackedScene>("res://scenes/BloodPool.tscn");
 
-        // old behaviours that worked in overworld
-        // behaviors.Add("wander", new WanderBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] {
+            charSprite.Connect("animation_finished", this, nameof(CharAnimationFinished));
 
-        //     // wander -> attack
-        //     () => {
-        //         return new AIBehaviour.TransitionTestResult(aIManager.lastTarget != null && GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) <= attackRange, "attack");
-        //     },
+            shapeQuery = new Physics2DShapeQueryParameters()
+            {
+                CollisionLayer = 512,
+                Transform = new Transform2D(0.0f, this.GlobalPosition),
+                ShapeRid = detectionShape.GetRid(),
+                Exclude = new Godot.Collections.Array { this },
+                CollideWithAreas = true,
+                CollideWithBodies = true,
+            };
 
-        //     // wander -> follow_target
-        //     () => {
-        //     AIBehaviour.TransitionTestResult result = new AIBehaviour.TransitionTestResult(false, "follow_target");
+            shapeQuery.SetShape(detectionShape);
 
-        //     Player player = AIManager.CheckForPlayer(GetDetectionShapeQuery(), GetWorld2d().DirectSpaceState);
+            aIManager = new AIManager(this, world);
 
-        //     // Player is in range and visible
-        //     if(player != null  && AIManager.TraceToTarget(GlobalPosition, player, GetWorld2d().DirectSpaceState, AIManager.visibilityLayer, new Godot.Collections.Array() { this }))
-        //     {
-        //         aIManager.lastTarget = player;
-        //         result.Success = true;
-        //     }
+            Godot.Collections.Dictionary<string, AIBehaviour> behaviors = new Godot.Collections.Dictionary<string, AIBehaviour>();
 
-        //     return result;
-        // }}));
+            // old behaviours that worked in overworld
+            // behaviors.Add("wander", new WanderBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] {
 
-        // behaviors.Add("follow_target", new FollowTargetBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] {
+            //     // wander -> attack
+            //     () => {
+            //         return new AIBehaviour.TransitionTestResult(aIManager.lastTarget != null && GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) <= attackRange, "attack");
+            //     },
 
-        //     // follow_target -> attack
-        //     () => {
-        //         return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) <= attackRange, "attack");
-        //     },
+            //     // wander -> follow_target
+            //     () => {
+            //     AIBehaviour.TransitionTestResult result = new AIBehaviour.TransitionTestResult(false, "follow_target");
 
-        //     // follow_target -> path_to_target
-        //     () => {
+            //     Player player = AIManager.CheckForPlayer(GetDetectionShapeQuery(), GetWorld2d().DirectSpaceState);
 
-        //         // If player is visible but tiles block path
-        //         Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-        //         return new AIBehaviour.TransitionTestResult(AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}) && !AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.tilesLayer, new Godot.Collections.Array() {this}), "path_to_target");
-        //     },
+            //     // Player is in range and visible
+            //     if(player != null  && AIManager.TraceToTarget(GlobalPosition, player, GetWorld2d().DirectSpaceState, AIManager.visibilityLayer, new Godot.Collections.Array() { this }))
+            //     {
+            //         aIManager.lastTarget = player;
+            //         result.Success = true;
+            //     }
 
-        //     // follow_target -> path_to_last_pos
-        //     () => {
-        //         // If player is not visible
-        //         Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-        //         return new AIBehaviour.TransitionTestResult(!AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}), "path_to_last_pos");
-        //     }
-        // }));
+            //     return result;
+            // }}));
 
-        // behaviors.Add("path_to_target", new FollowPathBehaviour(aIManager, () =>
-        // {
+            // behaviors.Add("follow_target", new FollowTargetBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] {
 
-        //     return navProvider.GetNavigation().GetSimplePath(GlobalPosition, aIManager.lastTarget.GlobalPosition);
-        // }, new Func<AIBehaviour.TransitionTestResult>[] {
+            //     // follow_target -> attack
+            //     () => {
+            //         return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) <= attackRange, "attack");
+            //     },
 
-        //     // path_to_target -> attack
-        //     () => {
-        //         return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) <= attackRange, "attack");
-        //     },
+            //     // follow_target -> path_to_target
+            //     () => {
 
-        //     // path_to_target -> follow_target
-        //     () => {
-        //         // If player is visible and no tiles block path
-        //         Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-        //         return new AIBehaviour.TransitionTestResult(AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}) && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.tilesLayer, new Godot.Collections.Array() {this}), "follow_target");
-        //     },
+            //         // If player is visible but tiles block path
+            //         Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
+            //         return new AIBehaviour.TransitionTestResult(AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}) && !AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.tilesLayer, new Godot.Collections.Array() {this}), "path_to_target");
+            //     },
 
-        //     // path_to_target -> path_to_last_pos
-        //     () => {
-        //         // If player is not visible
-        //         Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-        //         return new AIBehaviour.TransitionTestResult(!AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}), "path_to_last_pos");
-        //     }
-        // })
-        // { cacheTargetPos = true });
+            //     // follow_target -> path_to_last_pos
+            //     () => {
+            //         // If player is not visible
+            //         Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
+            //         return new AIBehaviour.TransitionTestResult(!AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}), "path_to_last_pos");
+            //     }
+            // }));
 
-        // behaviors.Add("path_to_last_pos", new FollowPathBehaviour(aIManager, () =>
-        // {
-        //     return navProvider.GetNavigation().GetSimplePath(GlobalPosition, aIManager.targetPosCache);
-        // }, new Func<AIBehaviour.TransitionTestResult>[] {
+            // behaviors.Add("path_to_target", new FollowPathBehaviour(aIManager, () =>
+            // {
 
-        //     // path_to_last_pos -> follow_target
-        //     () => {
-        // // If player is visible and no tiles block path
-        // Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-        // return new AIBehaviour.TransitionTestResult(AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}) && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.tilesLayer, new Godot.Collections.Array() {this}), "follow_target");
-        //     },
+            //     return navProvider.GetNavigation().GetSimplePath(GlobalPosition, aIManager.lastTarget.GlobalPosition);
+            // }, new Func<AIBehaviour.TransitionTestResult>[] {
 
-        //     // path_to_last_pos -> wander
-        //     () => {
-        //         // If close to targetPosCache
-        //         return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.targetPosCache) <= 10.0f, "wander");
-        //     }
-        // }));
+            //     // path_to_target -> attack
+            //     () => {
+            //         return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) <= attackRange, "attack");
+            //     },
 
-        // behaviors.Add("attack", new MeleeAttackBehaviour(aIManager, this.attackSpeed, this.attackRange, new Func<AIBehaviour.TransitionTestResult>[] {
+            //     // path_to_target -> follow_target
+            //     () => {
+            //         // If player is visible and no tiles block path
+            //         Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
+            //         return new AIBehaviour.TransitionTestResult(AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}) && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.tilesLayer, new Godot.Collections.Array() {this}), "follow_target");
+            //     },
 
-        //     // attack -> follow_target
-        //     () => {
-        //         // If player is too far away but still visible
-        //         Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-        //         return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) > attackRange && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}), "follow_target");
-        //     },
+            //     // path_to_target -> path_to_last_pos
+            //     () => {
+            //         // If player is not visible
+            //         Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
+            //         return new AIBehaviour.TransitionTestResult(!AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}), "path_to_last_pos");
+            //     }
+            // })
+            // { cacheTargetPos = true });
 
-        //     // attack -> wander
-        //     () => {
-        //         // If player is too far away or player is not visible
-        //         Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
-        //         return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) > attackRange || !AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}), "wander");
-        //     }
-        // }));
+            // behaviors.Add("path_to_last_pos", new FollowPathBehaviour(aIManager, () =>
+            // {
+            //     return navProvider.GetNavigation().GetSimplePath(GlobalPosition, aIManager.targetPosCache);
+            // }, new Func<AIBehaviour.TransitionTestResult>[] {
 
-        // behaviors.Add("dead", new NoBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] { }));
+            //     // path_to_last_pos -> follow_target
+            //     () => {
+            // // If player is visible and no tiles block path
+            // Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
+            // return new AIBehaviour.TransitionTestResult(AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}) && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.tilesLayer, new Godot.Collections.Array() {this}), "follow_target");
+            //     },
 
-        // aIManager.globalTransitions = new Func<AIBehaviour.TransitionTestResult>[] {() =>
-        // {
-        //     return new AIBehaviour.TransitionTestResult(this.isDead, "dead");
-        // }};
+            //     // path_to_last_pos -> wander
+            //     () => {
+            //         // If close to targetPosCache
+            //         return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.targetPosCache) <= 10.0f, "wander");
+            //     }
+            // }));
 
-        // aIManager.Behaviours = behaviors;
-        // aIManager.SetCurrentBehaviour("wander");
+            // behaviors.Add("attack", new MeleeAttackBehaviour(aIManager, this.attackSpeed, this.attackRange, new Func<AIBehaviour.TransitionTestResult>[] {
 
-        // behaviours for generated levels
+            //     // attack -> follow_target
+            //     () => {
+            //         // If player is too far away but still visible
+            //         Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
+            //         return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) > attackRange && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}), "follow_target");
+            //     },
 
-        behaviors.Add("idle", new NoBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] {
+            //     // attack -> wander
+            //     () => {
+            //         // If player is too far away or player is not visible
+            //         Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
+            //         return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) > attackRange || !AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}), "wander");
+            //     }
+            // }));
+
+            // behaviors.Add("dead", new NoBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] { }));
+
+            // aIManager.globalTransitions = new Func<AIBehaviour.TransitionTestResult>[] {() =>
+            // {
+            //     return new AIBehaviour.TransitionTestResult(this.isDead, "dead");
+            // }};
+
+            // aIManager.Behaviours = behaviors;
+            // aIManager.SetCurrentBehaviour("wander");
+
+            // behaviours for generated levels
+
+            behaviors.Add("idle", new NoBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] {
             // idle -> attack_target
             () => {
                 // If has target, target is within range, target is visible and no tiles block path
@@ -222,7 +225,7 @@ public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
             }
         }));
 
-        behaviors.Add("follow_target", new FollowTargetBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] {
+            behaviors.Add("follow_target", new FollowTargetBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] {
             // follow_target -> attack_target
             () => {
                 // If target is within range, target is visible and no tiles block path
@@ -237,10 +240,10 @@ public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
             },
         }));
 
-        behaviors.Add("path_to_last_pos", new FollowPathBehaviour(aIManager, () =>
-        {
-            return AIManager.GetNavPathGlobal(GlobalPosition, aIManager.targetPosCache, navProvider.GetNavigation());
-        }, new Func<AIBehaviour.TransitionTestResult>[] {
+            behaviors.Add("path_to_last_pos", new FollowPathBehaviour(aIManager, () =>
+            {
+                return AIManager.GetNavPathGlobal(GlobalPosition, aIManager.targetPosCache, navProvider.GetNavigation());
+            }, new Func<AIBehaviour.TransitionTestResult>[] {
             // path_to_last_pos -> attack_target
             () => {
                 // If target is within range, target is visible and no tiles block path
@@ -253,9 +256,9 @@ public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
                 Physics2DDirectSpaceState spaceState = GetWorld2d().DirectSpaceState;
                 return new AIBehaviour.TransitionTestResult(AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.visibilityLayer, new Godot.Collections.Array() {this}) && AIManager.TraceToTarget(GlobalPosition, aIManager.lastTarget, spaceState, AIManager.tilesLayer, new Godot.Collections.Array() {this}), "follow_target");
             },
-        }));
+            }));
 
-        behaviors.Add("attack_target", new MeleeAttackBehaviour(aIManager, attackSpeed, attackRange, new Func<AIBehaviour.TransitionTestResult>[] {
+            behaviors.Add("attack_target", new MeleeAttackBehaviour(aIManager, attackSpeed, attackRange, new Func<AIBehaviour.TransitionTestResult>[] {
             // attack_target -> follow_target
             () => {
                 return new AIBehaviour.TransitionTestResult(GlobalPosition.DistanceTo(aIManager.lastTarget.GlobalPosition) > attackRange, "follow_target");
@@ -268,190 +271,191 @@ public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
             },
         }));
 
-        behaviors.Add("dead", new NoBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] { }));
+            behaviors.Add("dead", new NoBehaviour(aIManager, new Func<AIBehaviour.TransitionTestResult>[] { }));
 
-        aIManager.Behaviours = behaviors;
-        aIManager.SetCurrentBehaviour("idle");
+            aIManager.Behaviours = behaviors;
+            aIManager.SetCurrentBehaviour("idle");
 
-        if (initPos != Vector2.Zero)
-        {
-            GlobalPosition = initPos;
+            if (initPos != Vector2.Zero)
+            {
+                GlobalPosition = initPos;
+            }
+
+            if (hasTarget)
+                aIManager.TryTransition();
         }
 
-        if (hasTarget)
+        public override Vector2 GetInputAxis(float delta)
+        {
+            return aIManager.Steer();
+        }
+
+        public override void _Process(float delta)
+        {
+            base._Process(delta);
+
+            aIManager.Process(delta);
+
+            debugLabel.Text = aIManager.CurrentBehaviour;
+        }
+
+        public override void _ExitTree()
+        {
+            // Stop AIManager
+            aIManager.StopTryTransitionLoop();
+            aIManager.Dispose();
+            tween.StopAll();
+            base._ExitTree();
+        }
+
+        private Physics2DShapeQueryParameters GetDetectionShapeQuery()
+        {
+            shapeQuery.Transform = new Transform2D(0.0f, this.GlobalPosition);
+
+            return shapeQuery;
+        }
+
+        protected virtual void CharAnimationFinished()
+        {
+            if (spawnBloodPoolOnDeath && charSprite.Animation == _animDeath)
+            {
+                BloodPool bloodPool = bloodPoolScene.Instance<BloodPool>();
+                world.AddChild(bloodPool);
+                bloodPool.Position = GlobalPosition;
+                bloodPool.Start(world.BloodTexture);
+            }
+        }
+
+        public override void Die()
+        {
+            base.Die();
+
+            int bloodSplats = world.rng.RandiRange(Mathf.RoundToInt(minMaxBloodSplats.x), Mathf.RoundToInt(minMaxBloodSplats.y));
+            for (int i = 0; i < bloodSplats; ++i)
+            {
+                BloodSplat bloodSplat = bloodSplatScene.Instance<BloodSplat>();
+                world.AddChild(bloodSplat);
+                bloodSplat.Position = GlobalPosition;
+                bloodSplat.Init(world.BloodTexture, new Vector2(world.rng.RandfRange(-2.0f, 2.0f), world.rng.RandfRange(-1.0f, 1.0f)));
+            }
+
+            if (deathParticles.Texture != null)
+            {
+                deathParticles.Emitting = true;
+            }
+
+            if (_animDeath.Empty())
+            {
+                charSprite.Visible = false;
+                shadowSprite.Visible = false;
+            }
+
+            GetNode<CollisionShape2D>("CollisionShape2D").SetDeferred("disabled", true);
+
+            aIManager.SetCurrentBehaviour("dead");
+
+            EmitSignal(nameof(Died), this);
+        }
+
+        public void DetectionAlert()
+        {
+            tween.InterpolateProperty(detectionNotifier, "scale", new Vector2(0, 0), new Vector2(1.5f, 1.5f), 0.1f, Tween.TransitionType.Cubic);
+            tween.InterpolateProperty(detectionNotifier, "modulate", Colors.White, new Color(1.0f, 0.537255f, 0.537255f), 0.1f);
+            tween.InterpolateProperty(detectionNotifier, "scale", new Vector2(1.5f, 1.5f), new Vector2(1, 1), 0.1f, Tween.TransitionType.Cubic, delay: 0.1f);
+            tween.InterpolateProperty(detectionNotifier, "modulate", new Color(1.0f, 0.537255f, 0.537255f), Colors.White, 0.1f, delay: 0.1f);
+            tween.InterpolateProperty(detectionNotifier, "modulate", Colors.White, Colors.Transparent, 0.75f, delay: 1.35f);
+
+            tween.Start();
+
+            //play sound
+        }
+
+        public void TargetPlayer(Player player)
+        {
+            hasTarget = true;
+            aIManager.lastTarget = player;
+
             aIManager.TryTransition();
-    }
-
-    public override Vector2 GetInputAxis(float delta)
-    {
-        return aIManager.Steer();
-    }
-
-    public override void _Process(float delta)
-    {
-        base._Process(delta);
-
-        aIManager.Process(delta);
-
-        debugLabel.Text = aIManager.CurrentBehaviour;
-    }
-
-    public override void _ExitTree()
-    {
-        // Stop AIManager
-        aIManager.StopTryTransitionLoop();
-        aIManager.Dispose();
-        tween.StopAll();
-        base._ExitTree();
-    }
-
-    private Physics2DShapeQueryParameters GetDetectionShapeQuery()
-    {
-        shapeQuery.Transform = new Transform2D(0.0f, this.GlobalPosition);
-
-        return shapeQuery;
-    }
-
-    protected virtual void CharAnimationFinished()
-    {
-        if (spawnBloodPoolOnDeath && charSprite.Animation == _animDeath)
-        {
-            BloodPool bloodPool = bloodPoolScene.Instance<BloodPool>();
-            world.AddChild(bloodPool);
-            bloodPool.Position = GlobalPosition;
-            bloodPool.Start(world.BloodTexture);
-        }
-    }
-
-    public override void Die()
-    {
-        base.Die();
-
-        int bloodSplats = world.rng.RandiRange(Mathf.RoundToInt(minMaxBloodSplats.x), Mathf.RoundToInt(minMaxBloodSplats.y));
-        for (int i = 0; i < bloodSplats; ++i)
-        {
-            BloodSplat bloodSplat = bloodSplatScene.Instance<BloodSplat>();
-            world.AddChild(bloodSplat);
-            bloodSplat.Position = GlobalPosition;
-            bloodSplat.Init(world.BloodTexture, new Vector2(world.rng.RandfRange(-2.0f, 2.0f), world.rng.RandfRange(-1.0f, 1.0f)));
         }
 
-        if (deathParticles.Texture != null)
+        Vector2 ICastsSpells.GetSpellDirection()
         {
-            deathParticles.Emitting = true;
+            return GetSpellDirection();
         }
 
-        if (_animDeath.Empty())
+        protected virtual Vector2 GetSpellDirection()
         {
-            charSprite.Visible = false;
-            shadowSprite.Visible = false;
+            return dir;
         }
 
-        GetNode<CollisionShape2D>("CollisionShape2D").SetDeferred("disabled", true);
+        Vector2 ICastsSpells.GetSpellSpawnPos()
+        {
+            return GetSpellSpawnPos();
+        }
 
-        aIManager.SetCurrentBehaviour("dead");
+        public virtual Vector2 GetSpellSpawnPos()
+        {
+            return GlobalPosition;
+        }
 
-        EmitSignal(nameof(Died), this);
-    }
+        int ICastsSpells.GetSpellDamage(int baseDamge)
+        {
+            return GetSpellDamage(baseDamge);
+        }
 
-    public void DetectionAlert()
-    {
-        tween.InterpolateProperty(detectionNotifier, "scale", new Vector2(0, 0), new Vector2(1.5f, 1.5f), 0.1f, Tween.TransitionType.Cubic);
-        tween.InterpolateProperty(detectionNotifier, "modulate", Colors.White, new Color(1.0f, 0.537255f, 0.537255f), 0.1f);
-        tween.InterpolateProperty(detectionNotifier, "scale", new Vector2(1.5f, 1.5f), new Vector2(1, 1), 0.1f, Tween.TransitionType.Cubic, delay: 0.1f);
-        tween.InterpolateProperty(detectionNotifier, "modulate", new Color(1.0f, 0.537255f, 0.537255f), Colors.White, 0.1f, delay: 0.1f);
-        tween.InterpolateProperty(detectionNotifier, "modulate", Colors.White, Colors.Transparent, 0.75f, delay: 1.35f);
+        public virtual int GetSpellDamage(int baseDamge)
+        {
+            return baseDamge;
+        }
 
-        tween.Start();
+        float ICastsSpells.GetSpellRange(float baseRange)
+        {
+            return GetSpellRange(baseRange);
+        }
 
-        //play sound
-    }
+        public virtual float GetSpellRange(float baseRange)
+        {
+            return baseRange;
+        }
 
-    public void TargetPlayer(Player player)
-    {
-        hasTarget = true;
-        aIManager.lastTarget = player;
+        float ICastsSpells.GetSpellKnockback(float baseKnockback)
+        {
+            return GetSpellKnockback(baseKnockback);
+        }
 
-        aIManager.TryTransition();
-    }
+        public virtual float GetSpellKnockback(float baseKnockback)
+        {
+            return baseKnockback;
+        }
 
-    Vector2 ICastsSpells.GetSpellDirection()
-    {
-        return GetSpellDirection();
-    }
+        float ICastsSpells.GetSpellSpeed(float baseSpeed)
+        {
+            return GetSpellSpeed(baseSpeed);
+        }
 
-    protected virtual Vector2 GetSpellDirection()
-    {
-        return dir;
-    }
+        public virtual float GetSpellSpeed(float baseSpeed)
+        {
+            return baseSpeed;
+        }
 
-    Vector2 ICastsSpells.GetSpellSpawnPos()
-    {
-        return GetSpellSpawnPos();
-    }
+        Color ICastsSpells.GetSpellColour(Color baseColour)
+        {
+            return GetSpellColour(baseColour);
+        }
 
-    public virtual Vector2 GetSpellSpawnPos()
-    {
-        return GlobalPosition;
-    }
+        public virtual Color GetSpellColour(Color baseColour)
+        {
+            return baseColour;
+        }
 
-    int ICastsSpells.GetSpellDamage(int baseDamge)
-    {
-        return GetSpellDamage(baseDamge);
-    }
+        void IIntersectsPlayerHitArea.PlayerHit(Player player)
+        {
+            PlayerHit(player);
+        }
 
-    public virtual int GetSpellDamage(int baseDamge)
-    {
-        return baseDamge;
-    }
-
-    float ICastsSpells.GetSpellRange(float baseRange)
-    {
-        return GetSpellRange(baseRange);
-    }
-
-    public virtual float GetSpellRange(float baseRange)
-    {
-        return baseRange;
-    }
-
-    float ICastsSpells.GetSpellKnockback(float baseKnockback)
-    {
-        return GetSpellKnockback(baseKnockback);
-    }
-
-    public virtual float GetSpellKnockback(float baseKnockback)
-    {
-        return baseKnockback;
-    }
-
-    float ICastsSpells.GetSpellSpeed(float baseSpeed)
-    {
-        return GetSpellSpeed(baseSpeed);
-    }
-
-    public virtual float GetSpellSpeed(float baseSpeed)
-    {
-        return baseSpeed;
-    }
-
-    Color ICastsSpells.GetSpellColour(Color baseColour)
-    {
-        return GetSpellColour(baseColour);
-    }
-
-    public virtual Color GetSpellColour(Color baseColour)
-    {
-        return baseColour;
-    }
-
-    void IIntersectsPlayerHitArea.PlayerHit(Player player)
-    {
-        PlayerHit(player);
-    }
-
-    public virtual void PlayerHit(Player player)
-    {
-        EmitSignal(nameof(PlayerIntersected), player);
+        public virtual void PlayerHit(Player player)
+        {
+            EmitSignal(nameof(PlayerIntersected), player);
+        }
     }
 }

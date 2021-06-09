@@ -1,32 +1,34 @@
 using Godot;
-using Stats;
 
-public class PotionPickup : BasePickup
+namespace Oubliette
 {
-    public Potion potion;
-
-    public override void _Ready()
+    public class PotionPickup : BasePickup
     {
-        base._Ready();
+        public Potion potion;
 
-        UpdateMaterial();
-    }
+        public override void _Ready()
+        {
+            base._Ready();
 
-    public void UpdateMaterial()
-    {
-        ShaderMaterial shaderMat = (ShaderMaterial)MainSprite.Material;
+            UpdateMaterial();
+        }
 
-        shaderMat.SetShaderParam("colour_lerp_a", potion.lerpColours[0]);
-        shaderMat.SetShaderParam("colour_lerp_b", potion.lerpColours[1]);
-        shaderMat.SetShaderParam("colour_lerp_c", potion.lerpColours[2]);
-    }
+        public void UpdateMaterial()
+        {
+            ShaderMaterial shaderMat = (ShaderMaterial)MainSprite.Material;
 
-    public override void PlayerHit(Player player)
-    {
-        if(IsQueuedForDeletion())
-            return;
+            shaderMat.SetShaderParam("colour_lerp_a", potion.lerpColours[0]);
+            shaderMat.SetShaderParam("colour_lerp_b", potion.lerpColours[1]);
+            shaderMat.SetShaderParam("colour_lerp_c", potion.lerpColours[2]);
+        }
 
-        if (player.PickUpPotion(potion))
-            QueueFree();
+        public override void PlayerHit(Player player)
+        {
+            if (IsQueuedForDeletion())
+                return;
+
+            if (player.PickUpPotion(potion))
+                QueueFree();
+        }
     }
 }

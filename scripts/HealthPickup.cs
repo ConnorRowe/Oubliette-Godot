@@ -1,16 +1,17 @@
-using Godot;
-using System;
 
-public class HealthPickup : BasePickup
+namespace Oubliette
 {
-    public override void PlayerHit(Player player)
+    public class HealthPickup : BasePickup
     {
-        if (player.currentHealth < player.maxHealth && !IsQueuedForDeletion())
+        public override void PlayerHit(Player player)
         {
-            player.Heal(2);
-            player.PlayGulpSound();
+            if (player.currentHealth < player.maxHealth && !IsQueuedForDeletion())
+            {
+                player.Heal(2);
+                player.PlayGulpSound();
 
-            QueueFree();
+                QueueFree();
+            }
         }
     }
 }

@@ -1,32 +1,34 @@
 using Godot;
-using System;
 
-public class SpillageHazard : Area2D
+namespace Oubliette
 {
-    public float lifeTime = 2.0f;
-    public string DmgSourceName = "Spillage";
-
-    public override void _Process(float delta)
+    public class SpillageHazard : Area2D
     {
-        lifeTime -= delta;
+        public float lifeTime = 2.0f;
+        public string DmgSourceName = "Spillage";
 
-        if (lifeTime <= 0.0f)
+        public override void _Process(float delta)
         {
-            if (Modulate.a > 0)
-            {
-                Modulate = new Color(Modulate, Mathf.Lerp(Modulate.a, 0.0f, delta * 2.0f));
-            }
+            lifeTime -= delta;
 
-            if (Modulate.a < 0.05)
+            if (lifeTime <= 0.0f)
             {
-                QueueFree();
+                if (Modulate.a > 0)
+                {
+                    Modulate = new Color(Modulate, Mathf.Lerp(Modulate.a, 0.0f, delta * 2.0f));
+                }
+
+                if (Modulate.a < 0.05)
+                {
+                    QueueFree();
+                }
             }
         }
-    }
 
-    public void SetColours(Color spillageColour, Color bubbleColor)
-    {
-        GetNode<Sprite>("Sprite").SelfModulate = spillageColour;
-        GetNode<Particles2D>("Bubbles").SelfModulate = bubbleColor;
+        public void SetColours(Color spillageColour, Color bubbleColor)
+        {
+            GetNode<Sprite>("Sprite").SelfModulate = spillageColour;
+            GetNode<Particles2D>("Bubbles").SelfModulate = bubbleColor;
+        }
     }
 }

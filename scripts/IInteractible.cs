@@ -1,4 +1,7 @@
-interface IInteractible
+namespace Oubliette
 {
-    bool Interact();
+    interface IInteractible
+    {
+        bool Interact();
+    }
 }

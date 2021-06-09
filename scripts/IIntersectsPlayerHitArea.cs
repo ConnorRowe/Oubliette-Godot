@@ -1,4 +1,7 @@
-public interface IIntersectsPlayerHitArea
+namespace Oubliette
 {
-    void PlayerHit(Player player);
+    public interface IIntersectsPlayerHitArea
+    {
+        void PlayerHit(Player player);
+    }
 }

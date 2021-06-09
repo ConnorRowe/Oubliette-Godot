@@ -1,39 +1,41 @@
 using Godot;
-using System;
 
-public class BloodPool : AnimatedSprite
+namespace Oubliette
 {
-    private BloodTexture bloodTexture;
-
-    [Export]
-    private Texture baseTex;
-
-    public override void _Ready()
+    public class BloodPool : AnimatedSprite
     {
-        Connect("frame_changed", this, nameof(FrameChanged));
-    }
+        private BloodTexture bloodTexture;
 
-    public void Start(BloodTexture bloodTexture)
-    {
-        this.bloodTexture = bloodTexture;
-        RenderToBloodTexture();
-        Playing = true;
-    }
+        [Export]
+        private Texture baseTex;
 
-    private void FrameChanged()
-    {
-        RenderToBloodTexture();
-
-        if (Frame == Frames.GetFrameCount(Animation) - 1)
+        public override void _Ready()
         {
-            QueueFree();
+            Connect("frame_changed", this, nameof(FrameChanged));
         }
-    }
 
-    private void RenderToBloodTexture()
-    {
-        Image frameImg = new Image();
-        frameImg.CreateFromData(baseTex.GetWidth(), baseTex.GetHeight(), false, Image.Format.La8, baseTex.GetData().GetData());
-        bloodTexture.BlitImage(frameImg, (Frames.GetFrame(Animation, Frame) as AtlasTexture).Region, Position + Offset);
+        public void Start(BloodTexture bloodTexture)
+        {
+            this.bloodTexture = bloodTexture;
+            RenderToBloodTexture();
+            Playing = true;
+        }
+
+        private void FrameChanged()
+        {
+            RenderToBloodTexture();
+
+            if (Frame == Frames.GetFrameCount(Animation) - 1)
+            {
+                QueueFree();
+            }
+        }
+
+        private void RenderToBloodTexture()
+        {
+            Image frameImg = new Image();
+            frameImg.CreateFromData(baseTex.GetWidth(), baseTex.GetHeight(), false, Image.Format.La8, baseTex.GetData().GetData());
+            bloodTexture.BlitImage(frameImg, (Frames.GetFrame(Animation, Frame) as AtlasTexture).Region, Position + Offset);
+        }
     }
 }

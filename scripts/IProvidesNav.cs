@@ -1,6 +1,9 @@
 using Godot;
 
-public interface IProvidesNav
+namespace Oubliette
 {
-    Navigation2D GetNavigation();
+    public interface IProvidesNav
+    {
+        Navigation2D GetNavigation();
+    }
 }

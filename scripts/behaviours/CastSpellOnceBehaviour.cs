@@ -1,38 +1,41 @@
 using Godot;
 using System;
 
-public class CastSpellOnceBehaviour : AIBehaviour
+namespace Oubliette.AI
 {
-    private BaseSpell spell;
-
-    public CastSpellOnceBehaviour() { }
-
-    public CastSpellOnceBehaviour(AIManager manager, BaseSpell spell, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
+    public class CastSpellOnceBehaviour : AIBehaviour
     {
-        this.spell = spell;
-    }
+        private BaseSpell spell;
 
-    public override void OnBehaviourStart()
-    {
-        CastSpell();
-    }
+        public CastSpellOnceBehaviour() { }
 
-    public override void Process(float delta)
-    {
-        mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
-    }
+        public CastSpellOnceBehaviour(AIManager manager, BaseSpell spell, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
+        {
+            this.spell = spell;
+        }
 
-    public override Vector2 Steer()
-    {
-        return Vector2.Zero;
-    }
+        public override void OnBehaviourStart()
+        {
+            CastSpell();
+        }
 
-    public override void OnBehaviourEnd()
-    {
-    }
+        public override void Process(float delta)
+        {
+            mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
+        }
 
-    public virtual void CastSpell()
-    {
-        spell.Cast(mgr.owner as ICastsSpells);
+        public override Vector2 Steer()
+        {
+            return Vector2.Zero;
+        }
+
+        public override void OnBehaviourEnd()
+        {
+        }
+
+        public virtual void CastSpell()
+        {
+            spell.Cast(mgr.owner as ICastsSpells);
+        }
     }
 }

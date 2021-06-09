@@ -1,23 +1,25 @@
 using Godot;
-using System;
 
-public class TreasureRoom : Room
+namespace Oubliette.LevelGen
 {
-    private Pedestal pedestal;
-    [Export]
-    private NodePath _pedestalPath;
-
-    public override void _Ready()
+    public class TreasureRoom : Room
     {
-        base._Ready();
+        private Pedestal pedestal;
+        [Export]
+        private NodePath _pedestalPath;
 
-        pedestal = GetNode<Pedestal>(_pedestalPath);
-    }
+        public override void _Ready()
+        {
+            base._Ready();
 
-    public override void RoomEntered()
-    {
-        base.RoomEntered();
+            pedestal = GetNode<Pedestal>(_pedestalPath);
+        }
 
-        pedestal.GenerateItem();
+        public override void RoomEntered()
+        {
+            base.RoomEntered();
+
+            pedestal.GenerateItem();
+        }
     }
 }

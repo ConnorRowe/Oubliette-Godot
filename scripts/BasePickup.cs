@@ -1,31 +1,34 @@
 using Godot;
 
-public class BasePickup : RigidBody2D, IIntersectsPlayerHitArea
+namespace Oubliette
 {
-    private Sprite _mainSprite;
-
-    protected Sprite MainSprite
+    public class BasePickup : RigidBody2D, IIntersectsPlayerHitArea
     {
-        get
+        private Sprite _mainSprite;
+
+        protected Sprite MainSprite
         {
-            if (_mainSprite == null)
-                _mainSprite = GetNode<Sprite>("MainSprite");
+            get
+            {
+                if (_mainSprite == null)
+                    _mainSprite = GetNode<Sprite>("MainSprite");
 
-            return _mainSprite;
+                return _mainSprite;
+            }
         }
-    }
-    public override void _Ready()
-    {
-        base._Ready();
-    }
+        public override void _Ready()
+        {
+            base._Ready();
+        }
 
-    void IIntersectsPlayerHitArea.PlayerHit(Player player)
-    {
-        PlayerHit(player);
-    }
+        void IIntersectsPlayerHitArea.PlayerHit(Player player)
+        {
+            PlayerHit(player);
+        }
 
-    public virtual void PlayerHit(Player player)
-    {
+        public virtual void PlayerHit(Player player)
+        {
 
+        }
     }
 }

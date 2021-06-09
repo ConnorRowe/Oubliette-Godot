@@ -1,62 +1,64 @@
 using Godot;
-using System;
 
-public class Pedestal : StaticBody2D, IIntersectsPlayerHitArea
+namespace Oubliette.LevelGen
 {
-    public Sprite ItemSprite { get; set; }
-    public Artefact CurrentArtefact { get; set; }
-    public BaseSpell CurrentSpell { get; set; }
-    private bool hasGeneratedItem = false;
-    private bool itemTaken = false;
-    private bool isHoldingSpell = false;
-    private AudioStream artefactPickupSound;
-
-    public override void _Ready()
+    public class Pedestal : StaticBody2D, IIntersectsPlayerHitArea
     {
-        ItemSprite = GetNode<Sprite>("Sprite/ItemSprite");
-        artefactPickupSound = GD.Load<AudioStream>("res://sound/sfx/item_pickup_mixdown.wav");
-    }
+        public Sprite ItemSprite { get; set; }
+        public Artefact CurrentArtefact { get; set; }
+        public BaseSpell CurrentSpell { get; set; }
+        private bool hasGeneratedItem = false;
+        private bool itemTaken = false;
+        private bool isHoldingSpell = false;
+        private AudioStream artefactPickupSound;
 
-    void IIntersectsPlayerHitArea.PlayerHit(Player player)
-    {
-        if (!itemTaken)
+        public override void _Ready()
         {
-            if (isHoldingSpell)
-                player.PickUpPrimarySpell(CurrentSpell);
-            else
-            {
-                player.world.PlayGlobalSoundEffect(artefactPickupSound);
-                CurrentArtefact.PlayerPickUp(player);
-            }
-
-            ItemSprite.Visible = false;
-            itemTaken = true;
+            ItemSprite = GetNode<Sprite>("Sprite/ItemSprite");
+            artefactPickupSound = GD.Load<AudioStream>("res://sound/sfx/item_pickup_mixdown.wav");
         }
-    }
 
-    public void GenerateItem()
-    {
-        if (!hasGeneratedItem)
+        void IIntersectsPlayerHitArea.PlayerHit(Player player)
         {
-            Items items = GetNode<Items>("/root/Items");
-
-            bool tryGetSpell = items.Rng.Randf() <= 0.25f;
-
-            if (tryGetSpell)
+            if (!itemTaken)
             {
-                CurrentSpell = items.GetRandomSpell(Items.LootPool.GENERAL);
-                if (CurrentSpell != null)
+                if (isHoldingSpell)
+                    player.PickUpPrimarySpell(CurrentSpell);
+                else
                 {
-                    isHoldingSpell = true;
+                    player.world.PlayGlobalSoundEffect(artefactPickupSound);
+                    CurrentArtefact.PlayerPickUp(player);
                 }
+
+                ItemSprite.Visible = false;
+                itemTaken = true;
             }
+        }
 
-            if (!isHoldingSpell)
-                CurrentArtefact = items.GetRandomArtefact(Items.LootPool.GENERAL);
+        public void GenerateItem()
+        {
+            if (!hasGeneratedItem)
+            {
+                Items items = GetNode<Items>("/root/Items");
 
-            ItemSprite.Texture = isHoldingSpell ? CurrentSpell.Icon : CurrentArtefact.Texture;
+                bool tryGetSpell = items.Rng.Randf() <= 0.25f;
 
-            hasGeneratedItem = true;
+                if (tryGetSpell)
+                {
+                    CurrentSpell = items.GetRandomSpell(Items.LootPool.GENERAL);
+                    if (CurrentSpell != null)
+                    {
+                        isHoldingSpell = true;
+                    }
+                }
+
+                if (!isHoldingSpell)
+                    CurrentArtefact = items.GetRandomArtefact(Items.LootPool.GENERAL);
+
+                ItemSprite.Texture = isHoldingSpell ? CurrentSpell.Icon : CurrentArtefact.Texture;
+
+                hasGeneratedItem = true;
+            }
         }
     }
 }

@@ -1,44 +1,47 @@
 using Godot;
 using System.Collections.Generic;
-using Stats;
+using Oubliette.Stats;
 
-public class BuffTracker : CenterContainer
+namespace Oubliette
 {
-    private int _charges = 0;
-    public int Charges
+    public class BuffTracker : CenterContainer
     {
-        get { return _charges; }
-        set
+        private int _charges = 0;
+        public int Charges
         {
-            SetCharges(value);
-            _charges = value;
+            get { return _charges; }
+            set
+            {
+                SetCharges(value);
+                _charges = value;
+            }
         }
-    }
 
-    public string sourceName = "";
-    public HashSet<(Stat stat, float amount)> stats;
-    public TextureRect ItemIcon { get; set; }
-    private ShaderMaterial chargeGemsMat;
+        public string sourceName = "";
+        public HashSet<(Stat stat, float amount)> stats;
+        public TextureRect ItemIcon { get; set; }
+        private ShaderMaterial chargeGemsMat;
 
-    public override void _Ready()
-    {
-        ItemIcon = GetNode<TextureRect>("ItemIcon");
-        chargeGemsMat = (ShaderMaterial)(GetNode<TextureRect>("ChargeGems").Material);
-    }
+        public override void _Ready()
+        {
+            ItemIcon = GetNode<TextureRect>("ItemIcon");
+            chargeGemsMat = (ShaderMaterial)(GetNode<TextureRect>("ChargeGems").Material);
+        }
 
-    public void Init(string sourceName, HashSet<(Stat stat, float amount)> stats, int duration)
-    {
-        ItemIcon = GetNode<TextureRect>("ItemIcon");
-        chargeGemsMat = (ShaderMaterial)(GetNode<TextureRect>("ChargeGems").Material);
+        public void Init(string sourceName, HashSet<(Stat stat, float amount)> stats, int duration)
+        {
+            ItemIcon = GetNode<TextureRect>("ItemIcon");
+            chargeGemsMat = (ShaderMaterial)(GetNode<TextureRect>("ChargeGems").Material);
 
 
-        this.sourceName = sourceName;
-        this.stats = stats;
-        Charges = duration;
-    }
+            this.sourceName = sourceName;
+            this.stats = stats;
+            Charges = duration;
+        }
 
-    private void SetCharges(int charges)
-    {
-        chargeGemsMat.SetShaderParam("charges_remaining", charges);
+        private void SetCharges(int charges)
+        {
+            chargeGemsMat.SetShaderParam("charges_remaining", charges);
+        }
     }
 }

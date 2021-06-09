@@ -1,50 +1,51 @@
 using Godot;
 using System;
 
-public class FollowPathBehaviour : MovementBehaviour
+namespace Oubliette.AI
 {
-    private Func<Vector2[]> getPath;
-    private Godot.Collections.Array<Vector2> path = new Godot.Collections.Array<Vector2>() { };
-    private SceneTreeTimer timer;
-    public bool cacheTargetPos = false;
-
-    public FollowPathBehaviour(AIManager manager, Func<Vector2[]> getPath, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
+    public class FollowPathBehaviour : MovementBehaviour
     {
-        this.getPath = getPath;
-    }
+        private Func<Vector2[]> getPath;
+        private Godot.Collections.Array<Vector2> path = new Godot.Collections.Array<Vector2>() { };
+        private SceneTreeTimer timer;
+        public bool cacheTargetPos = false;
 
-    public override void OnBehaviourStart()
-    {
-        UpdatePath();
-    }
-
-    public override void Process(float delta)
-    {
-        if (cacheTargetPos)
+        public FollowPathBehaviour(AIManager manager, Func<Vector2[]> getPath, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
         {
-            mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
+            this.getPath = getPath;
+        }
+
+        public override void OnBehaviourStart()
+        {
+            UpdatePath();
+        }
+
+        public override void Process(float delta)
+        {
+            if (cacheTargetPos)
+            {
+                mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
+            }
+        }
+        public override void OnBehaviourEnd()
+        {
+            timer.Disconnect("timeout", this, nameof(UpdatePath));
+        }
+
+        public override Vector2 Steer()
+        {
+            return SteerToNextPoint(path, (mgr.owner as AICharacter).PathTolerance);
+        }
+
+        public void UpdatePath()
+        {
+            Vector2[] pathArray = getPath();
+            path = new Godot.Collections.Array<Vector2>(pathArray);
+
+            timer = mgr.owner.GetTree().CreateTimer(0.5f);
+            timer.Connect("timeout", this, nameof(UpdatePath));
+
+            // mgr.world.GetDebugOverlay().TrackLine(pathArray);
         }
     }
-    public override void OnBehaviourEnd()
-    {
-        timer.Disconnect("timeout", this, nameof(UpdatePath));
-    }
-
-    public override Vector2 Steer()
-    {
-        return SteerToNextPoint(path, (mgr.owner as AICharacter).PathTolerance);
-    }
-
-    public void UpdatePath()
-    {
-        Vector2[] pathArray = getPath();
-        path = new Godot.Collections.Array<Vector2>(pathArray);
-
-        timer = mgr.owner.GetTree().CreateTimer(0.5f);
-        timer.Connect("timeout", this, nameof(UpdatePath));
-
-        // mgr.world.GetDebugOverlay().TrackLine(pathArray);
-    }
-
-
 }

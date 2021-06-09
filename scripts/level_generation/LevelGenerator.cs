@@ -3,488 +3,491 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
 
-public class LevelGenerator : Node, IProvidesNav
+namespace Oubliette.LevelGen
 {
-    private Camera2D camera;
-    private bool canPan = false;
-    private RandomNumberGenerator rng = new RandomNumberGenerator();
-    private Player player;
-    private World world;
-    private Point currentRoomKey = Point.Empty;
-    public Point CurrentRoomKey { get { return currentRoomKey; } }
-    public Room CurrentRoom { get { return generatedRooms[currentRoomKey]; } }
-    public bool Done = false;
-
-    private List<PackedScene> possibleRooms = new List<PackedScene>();
-    private List<PackedScene> treasureRooms = new List<PackedScene>();
-    private List<PackedScene> allBosses = new List<PackedScene>();
-    private PackedScene bossRoom;
-    private PackedScene startingRoom;
-    public Dictionary<Point, Room> generatedRooms = new Dictionary<Point, Room>();
-    private int roomsToGen = 12;
-    private readonly Point[] pointDirections = new Point[4] { new Point(0, 1), new Point(1, 0), new Point(0, -1), new Point(-1, 0) };
-    private int gridWidth = 8;
-    private int gridHeight = 8;
-    private Sprite roomBorder;
-    private TileMap wallTiles;
-    private TileMap floorTiles;
-    public Navigation2D NavMesh { get; set; }
-
-    [Export]
-    private string rooms_directory = "res://scenes/level_generation/rooms/";
-    [Export]
-    private string treasure_rooms_directory = "res://scenes/level_generation/treasure_rooms/";
-    [Export]
-    private string boss_enemies_directory = "res://scenes/enemies/bosses/";
-    [Export]
-    private Godot.Collections.Array<PackedScene> possibleEnemies = new Godot.Collections.Array<PackedScene>();
-    [Export(hintString: "The tilemap to add wall tiles to.")]
-    private NodePath _wallTileMapPath;
-    [Export(hintString: "The tilemap to add floor tiles to.")]
-    private NodePath _floorTileMapPath;
-    [Export]
-    private NodePath _navigationPath;
-
-    [Signal]
-    public delegate void RoomChanged(LevelGenerator levelGen);
-    [Signal]
-    public delegate void RoomCleared(int x, int y);
-
-    public override void _Ready()
+    public class LevelGenerator : Node, IProvidesNav
     {
-        rng.Randomize();
+        private Camera2D camera;
+        private bool canPan = false;
+        private RandomNumberGenerator rng = new RandomNumberGenerator();
+        private Player player;
+        private World world;
+        private Point currentRoomKey = Point.Empty;
+        public Point CurrentRoomKey { get { return currentRoomKey; } }
+        public Room CurrentRoom { get { return generatedRooms[currentRoomKey]; } }
+        public bool Done = false;
 
-        world = GetParent<World>();
-        camera = world.GetNode<Camera2D>("Camera2D");
-        player = world.GetNode<Player>("Player");
-        roomBorder = GetNode<Sprite>("RoomBorder");
-        wallTiles = GetNode<TileMap>(_wallTileMapPath);
-        floorTiles = GetNode<TileMap>(_floorTileMapPath);
-        NavMesh = GetNode<Navigation2D>(_navigationPath);
+        private List<PackedScene> possibleRooms = new List<PackedScene>();
+        private List<PackedScene> treasureRooms = new List<PackedScene>();
+        private List<PackedScene> allBosses = new List<PackedScene>();
+        private PackedScene bossRoom;
+        private PackedScene startingRoom;
+        public Dictionary<Point, Room> generatedRooms = new Dictionary<Point, Room>();
+        private int roomsToGen = 12;
+        private readonly Point[] pointDirections = new Point[4] { new Point(0, 1), new Point(1, 0), new Point(0, -1), new Point(-1, 0) };
+        private int gridWidth = 8;
+        private int gridHeight = 8;
+        private Sprite roomBorder;
+        private TileMap wallTiles;
+        private TileMap floorTiles;
+        public Navigation2D NavMesh { get; set; }
 
-        bossRoom = GD.Load<PackedScene>("res://scenes/level_generation/BossRoom.tscn");
-        startingRoom = GD.Load<PackedScene>("res://scenes/level_generation/StartingRoom.tscn");
+        [Export]
+        private string rooms_directory = "res://scenes/level_generation/rooms/";
+        [Export]
+        private string treasure_rooms_directory = "res://scenes/level_generation/treasure_rooms/";
+        [Export]
+        private string boss_enemies_directory = "res://scenes/enemies/bosses/";
+        [Export]
+        private Godot.Collections.Array<PackedScene> possibleEnemies = new Godot.Collections.Array<PackedScene>();
+        [Export(hintString: "The tilemap to add wall tiles to.")]
+        private NodePath _wallTileMapPath;
+        [Export(hintString: "The tilemap to add floor tiles to.")]
+        private NodePath _floorTileMapPath;
+        [Export]
+        private NodePath _navigationPath;
 
-        LoadFromDirectory<PackedScene>(rooms_directory, possibleRooms);
-        LoadFromDirectory<PackedScene>(treasure_rooms_directory, treasureRooms);
-        LoadFromDirectory<PackedScene>(boss_enemies_directory, allBosses);
+        [Signal]
+        public delegate void RoomChanged(LevelGenerator levelGen);
+        [Signal]
+        public delegate void RoomCleared(int x, int y);
 
-        // Generate level
-        CallDeferred(nameof(GenerateLevel));
-    }
-
-    public override void _Input(InputEvent evt)
-    {
-        base._Input(evt);
-
-        if (evt is InputEventMouseMotion emm)
+        public override void _Ready()
         {
-            if (canPan)
-                camera.Position -= emm.Relative * 2.0f * camera.Zoom;
+            rng.Randomize();
+
+            world = GetParent<World>();
+            camera = world.GetNode<Camera2D>("Camera2D");
+            player = world.GetNode<Player>("Player");
+            roomBorder = GetNode<Sprite>("RoomBorder");
+            wallTiles = GetNode<TileMap>(_wallTileMapPath);
+            floorTiles = GetNode<TileMap>(_floorTileMapPath);
+            NavMesh = GetNode<Navigation2D>(_navigationPath);
+
+            bossRoom = GD.Load<PackedScene>("res://scenes/level_generation/BossRoom.tscn");
+            startingRoom = GD.Load<PackedScene>("res://scenes/level_generation/StartingRoom.tscn");
+
+            LoadFromDirectory<PackedScene>(rooms_directory, possibleRooms);
+            LoadFromDirectory<PackedScene>(treasure_rooms_directory, treasureRooms);
+            LoadFromDirectory<PackedScene>(boss_enemies_directory, allBosses);
+
+            // Generate level
+            CallDeferred(nameof(GenerateLevel));
         }
-        if (evt is InputEventMouseButton emb)
+
+        public override void _Input(InputEvent evt)
         {
-            if (emb.ButtonIndex == (uint)ButtonList.Middle)
+            base._Input(evt);
+
+            if (evt is InputEventMouseMotion emm)
             {
-                canPan = emb.Pressed;
+                if (canPan)
+                    camera.Position -= emm.Relative * 2.0f * camera.Zoom;
             }
-            if (emb.ButtonIndex == (uint)ButtonList.WheelUp)
+            if (evt is InputEventMouseButton emb)
             {
-                camera.Zoom /= 2.0f;
-            }
-            if (emb.ButtonIndex == (uint)ButtonList.WheelDown)
-            {
-                camera.Zoom *= 2.0f;
-            }
-        }
-        if (evt is InputEventKey ek)
-        {
-            if (ek.Pressed)
-            {
-                if (ek.Scancode == (uint)KeyList.Space)
+                if (emb.ButtonIndex == (uint)ButtonList.Middle)
                 {
-                    // GenerateLevel();
+                    canPan = emb.Pressed;
                 }
-
-                if (ek.Scancode == (uint)KeyList.Enter)
+                if (emb.ButtonIndex == (uint)ButtonList.WheelUp)
                 {
-                    if (player.camera.Current)
-                    {
-                        this.camera.Current = true;
-                    }
-                    else
-                    {
-                        player.camera.Current = true;
-                    }
+                    camera.Zoom /= 2.0f;
+                }
+                if (emb.ButtonIndex == (uint)ButtonList.WheelDown)
+                {
+                    camera.Zoom *= 2.0f;
                 }
             }
-        }
-    }
-
-    public static void LoadFromDirectory<T>(string fileDirectory, List<T> objectList) where T : Godot.Object
-    {
-        HashSet<T> objects = new HashSet<T>();
-        LoadFromDirectory<T>(fileDirectory, objects);
-        foreach (T o in objects)
-        {
-            objectList.Add(o);
-        }
-    }
-
-    public static void LoadFromDirectory<T>(string fileDirectory, HashSet<T> objectSet) where T : Godot.Object
-    {
-        Directory directory = new Directory();
-        directory.Open(fileDirectory);
-        directory.ListDirBegin(skipNavigational: true);
-
-        string file = directory.GetNext();
-        do
-        {
-            // remove .import extension
-            if (file.Substring(file.Length - 7) == ".import")
-                file = file.Substring(0, file.Length - 7);
-
-            objectSet.Add(GD.Load<T>(fileDirectory + file));
-
-            file = directory.GetNext();
-        } while (!file.Empty());
-
-    }
-
-    private int[,] GenerateLevelGrid()
-    {
-        int[,] grid = new int[gridWidth, gridHeight];
-        for (int x = 0; x < gridWidth; ++x)
-        {
-            for (int y = 0; y < gridHeight; ++y)
+            if (evt is InputEventKey ek)
             {
-                grid[x, y] = -1;
-            }
-        }
-        List<Point> rooms = new List<Point>();
-
-        // Treasure room    = 1
-        // Boss room        = 2
-        // Starting room    = 3
-        // at least one treasure room and one boss room must be generated
-        List<int> requiredSpecialRooms = new List<int>() { 1, 2, 3 };
-
-        for (int i = 0; i < roomsToGen; ++i)
-        {
-            if (rooms.Count == 0) // First room
-            {
-                rooms.Add(new Point(rng.RandiRange(0, gridWidth - 1), rng.RandiRange(0, gridHeight - 1)));
-                grid[rooms[0].X, rooms[0].Y] = 0;
-            }
-            else // Rest of the rooms
-            {
-                Point next = Point.Empty;
-                bool success = false;
-                while (!success)
+                if (ek.Pressed)
                 {
-                    Point start = rooms[rng.RandiRange(0, rooms.Count - 1)];
-                    foreach (Point dir in ShuffledPointDirections())
+                    if (ek.Scancode == (uint)KeyList.Space)
                     {
-                        if (start.X + dir.X >= 0 && start.X + dir.X < gridWidth
-                        && start.Y + dir.Y >= 0 && start.Y + dir.Y < gridHeight)
+                        // GenerateLevel();
+                    }
+
+                    if (ek.Scancode == (uint)KeyList.Enter)
+                    {
+                        if (player.camera.Current)
                         {
-                            if (grid[start.X + dir.X, start.Y + dir.Y] < 0)
-                            {
-                                next = new Point(start.X + dir.X, start.Y + dir.Y);
-                                success = true;
-                                break;
-                            }
+                            this.camera.Current = true;
+                        }
+                        else
+                        {
+                            player.camera.Current = true;
                         }
                     }
                 }
+            }
+        }
 
-                rooms.Add(next);
+        public static void LoadFromDirectory<T>(string fileDirectory, List<T> objectList) where T : Godot.Object
+        {
+            HashSet<T> objects = new HashSet<T>();
+            LoadFromDirectory<T>(fileDirectory, objects);
+            foreach (T o in objects)
+            {
+                objectList.Add(o);
+            }
+        }
 
-                int nextRoomID = 0;
+        public static void LoadFromDirectory<T>(string fileDirectory, HashSet<T> objectSet) where T : Godot.Object
+        {
+            Directory directory = new Directory();
+            directory.Open(fileDirectory);
+            directory.ListDirBegin(skipNavigational: true);
 
-                // Generate special room if needed or at random
-                if (requiredSpecialRooms.Count > 0)
+            string file = directory.GetNext();
+            do
+            {
+                // remove .import extension
+                if (file.Substring(file.Length - 7) == ".import")
+                    file = file.Substring(0, file.Length - 7);
+
+                objectSet.Add(GD.Load<T>(fileDirectory + file));
+
+                file = directory.GetNext();
+            } while (!file.Empty());
+
+        }
+
+        private int[,] GenerateLevelGrid()
+        {
+            int[,] grid = new int[gridWidth, gridHeight];
+            for (int x = 0; x < gridWidth; ++x)
+            {
+                for (int y = 0; y < gridHeight; ++y)
                 {
-                    if (roomsToGen - i <= requiredSpecialRooms.Count)
+                    grid[x, y] = -1;
+                }
+            }
+            List<Point> rooms = new List<Point>();
+
+            // Treasure room    = 1
+            // Boss room        = 2
+            // Starting room    = 3
+            // at least one treasure room and one boss room must be generated
+            List<int> requiredSpecialRooms = new List<int>() { 1, 2, 3 };
+
+            for (int i = 0; i < roomsToGen; ++i)
+            {
+                if (rooms.Count == 0) // First room
+                {
+                    rooms.Add(new Point(rng.RandiRange(0, gridWidth - 1), rng.RandiRange(0, gridHeight - 1)));
+                    grid[rooms[0].X, rooms[0].Y] = 0;
+                }
+                else // Rest of the rooms
+                {
+                    Point next = Point.Empty;
+                    bool success = false;
+                    while (!success)
                     {
-                        int specialRoomIndex = rng.RandiRange(0, requiredSpecialRooms.Count - 1);
-                        nextRoomID = requiredSpecialRooms[specialRoomIndex];
-                        requiredSpecialRooms.RemoveAt(specialRoomIndex);
+                        Point start = rooms[rng.RandiRange(0, rooms.Count - 1)];
+                        foreach (Point dir in ShuffledPointDirections())
+                        {
+                            if (start.X + dir.X >= 0 && start.X + dir.X < gridWidth
+                            && start.Y + dir.Y >= 0 && start.Y + dir.Y < gridHeight)
+                            {
+                                if (grid[start.X + dir.X, start.Y + dir.Y] < 0)
+                                {
+                                    next = new Point(start.X + dir.X, start.Y + dir.Y);
+                                    success = true;
+                                    break;
+                                }
+                            }
+                        }
                     }
-                    else
+
+                    rooms.Add(next);
+
+                    int nextRoomID = 0;
+
+                    // Generate special room if needed or at random
+                    if (requiredSpecialRooms.Count > 0)
                     {
-                        if (rng.Randf() < 0.25f)
+                        if (roomsToGen - i <= requiredSpecialRooms.Count)
                         {
                             int specialRoomIndex = rng.RandiRange(0, requiredSpecialRooms.Count - 1);
                             nextRoomID = requiredSpecialRooms[specialRoomIndex];
                             requiredSpecialRooms.RemoveAt(specialRoomIndex);
                         }
+                        else
+                        {
+                            if (rng.Randf() < 0.25f)
+                            {
+                                int specialRoomIndex = rng.RandiRange(0, requiredSpecialRooms.Count - 1);
+                                nextRoomID = requiredSpecialRooms[specialRoomIndex];
+                                requiredSpecialRooms.RemoveAt(specialRoomIndex);
+                            }
+                        }
+                    }
+
+                    grid[next.X, next.Y] = nextRoomID;
+                }
+            }
+
+            int roomCount = 0;
+
+            for (int y = 0; y < gridHeight; ++y)
+            {
+                string row = "";
+                for (int x = 0; x < gridWidth; ++x)
+                {
+                    row += " " + grid[x, y];
+
+                    if (grid[x, y] >= 0)
+                    {
+                        ++roomCount;
                     }
                 }
 
-                grid[next.X, next.Y] = nextRoomID;
+                GD.Print(row);
             }
+
+            GD.Print("Generated " + roomCount + " rooms");
+
+            return grid;
         }
 
-        int roomCount = 0;
-
-        for (int y = 0; y < gridHeight; ++y)
+        private Point[] ShuffledPointDirections()
         {
-            string row = "";
-            for (int x = 0; x < gridWidth; ++x)
-            {
-                row += " " + grid[x, y];
+            return pointDirections.OrderBy(x => rng.Randi()).ToArray<Point>();
+        }
 
-                if (grid[x, y] >= 0)
+        private void GenerateLevel()
+        {
+            foreach (KeyValuePair<Point, Room> room in generatedRooms)
+            {
+                room.Value.QueueFree();
+            }
+            generatedRooms.Clear();
+
+            int[,] grid = GenerateLevelGrid();
+
+            for (int y = 0; y < gridHeight; ++y)
+            {
+                for (int x = 0; x < gridWidth; ++x)
                 {
-                    ++roomCount;
+                    if (grid[x, y] >= 0)
+                    {
+                        Room nextRoom = RandomRoomFromIndex(grid[x, y]);
+                        nextRoom.Position = new Vector2(x, y) * nextRoom.Width * 16.0f;
+                        nextRoom.Name = "Room_" + generatedRooms.Count;
+                        nextRoom.roomType = grid[x, y];
+                        nextRoom.Visible = false;
+
+                        generatedRooms.Add(new Point(x, y), nextRoom);
+                        GetParent().CallDeferred("add_child", nextRoom);
+                    }
                 }
             }
 
-            GD.Print(row);
-        }
-
-        GD.Print("Generated " + roomCount + " rooms");
-
-        return grid;
-    }
-
-    private Point[] ShuffledPointDirections()
-    {
-        return pointDirections.OrderBy(x => rng.Randi()).ToArray<Point>();
-    }
-
-    private void GenerateLevel()
-    {
-        foreach (KeyValuePair<Point, Room> room in generatedRooms)
-        {
-            room.Value.QueueFree();
-        }
-        generatedRooms.Clear();
-
-        int[,] grid = GenerateLevelGrid();
-
-        for (int y = 0; y < gridHeight; ++y)
-        {
-            for (int x = 0; x < gridWidth; ++x)
+            foreach (KeyValuePair<Point, Room> room in generatedRooms)
             {
-                if (grid[x, y] >= 0)
+                // Figure out connections
+                foreach (Direction d in DirectionExt.Directions())
                 {
-                    Room nextRoom = RandomRoomFromIndex(grid[x, y]);
-                    nextRoom.Position = new Vector2(x, y) * nextRoom.Width * 16.0f;
-                    nextRoom.Name = "Room_" + generatedRooms.Count;
-                    nextRoom.roomType = grid[x, y];
-                    nextRoom.Visible = false;
-
-                    generatedRooms.Add(new Point(x, y), nextRoom);
-                    GetParent().CallDeferred("add_child", nextRoom);
-                }
-            }
-        }
-
-        foreach (KeyValuePair<Point, Room> room in generatedRooms)
-        {
-            // Figure out connections
-            foreach (Direction d in DirectionExt.Directions())
-            {
-                Point pos = room.Key;
-                pos.Offset(d.AsPoint());
-                if (generatedRooms.ContainsKey(pos))
-                {
-                    room.Value.connections[d] = generatedRooms[pos].roomType;
-                }
-            }
-
-            // Connect door collision
-            room.Value.Connect(nameof(Room.DoorHit), this, nameof(DoorHit));
-
-            // Spawn enemies
-            foreach (Node2D point in room.Value.GetNode("EnemySpawnPoints").GetChildren())
-            {
-                AICharacter newEnemy = RandomEnemyInstance();
-                room.Value.AddChild(newEnemy);
-                newEnemy.navProvider = this;
-                newEnemy.initPos = room.Value.Position + point.Position;
-
-                room.Value.enemies.Add(newEnemy);
-                room.Value.enemyCounter++;
-
-                // Connect enemy die signal to room function
-                newEnemy.Connect(nameof(AICharacter.Died), room.Value, nameof(Room.EnemyDied));
-                // Also connect to function here to remove their overlay
-                newEnemy.Connect(nameof(AICharacter.Died), this, nameof(EnemyDied));
-            }
-
-            // If boss room spawn a random boss
-            if (room.Value.roomType == 2)
-            {
-                AICharacter boss = allBosses[rng.RandiRange(0, allBosses.Count - 1)].Instance<AICharacter>();
-                room.Value.AddChild(boss);
-                boss.navProvider = this;
-                boss.initPos = room.Value.Position + new Vector2(177, 143);
-
-                room.Value.enemies.Add(boss);
-                room.Value.enemyCounter++;
-
-                boss.Connect(nameof(AICharacter.Died), room.Value, nameof(Room.EnemyDied));
-                boss.Connect(nameof(AICharacter.Died), this, nameof(EnemyDied));
-            }
-
-            // Manage ChanceSpawnChild nodes
-            Node2D objectSpawnPoints = room.Value.GetNode<Node2D>("ObjectSpawnPoints");
-            List<ChanceSpawnChild> chanceSpawns = objectSpawnPoints.GetChildren().OfType<ChanceSpawnChild>().ToList<ChanceSpawnChild>();
-
-            for (int i = 0; i < chanceSpawns.Count; ++i)
-            {
-                if (rng.Randf() <= chanceSpawns[i].SpawnChance)
-                {
-                    Node2D child = (Node2D)chanceSpawns[i].GetChild(0);
-                    child.Position = chanceSpawns[i].Position;
-                    chanceSpawns[i].RemoveChild(child);
-                    objectSpawnPoints.AddChild(child);
+                    Point pos = room.Key;
+                    pos.Offset(d.AsPoint());
+                    if (generatedRooms.ContainsKey(pos))
+                    {
+                        room.Value.connections[d] = generatedRooms[pos].roomType;
+                    }
                 }
 
-                chanceSpawns[i].QueueFree();
+                // Connect door collision
+                room.Value.Connect(nameof(Room.DoorHit), this, nameof(DoorHit));
+
+                // Spawn enemies
+                foreach (Node2D point in room.Value.GetNode("EnemySpawnPoints").GetChildren())
+                {
+                    AICharacter newEnemy = RandomEnemyInstance();
+                    room.Value.AddChild(newEnemy);
+                    newEnemy.navProvider = this;
+                    newEnemy.initPos = room.Value.Position + point.Position;
+
+                    room.Value.enemies.Add(newEnemy);
+                    room.Value.enemyCounter++;
+
+                    // Connect enemy die signal to room function
+                    newEnemy.Connect(nameof(AICharacter.Died), room.Value, nameof(Room.EnemyDied));
+                    // Also connect to function here to remove their overlay
+                    newEnemy.Connect(nameof(AICharacter.Died), this, nameof(EnemyDied));
+                }
+
+                // If boss room spawn a random boss
+                if (room.Value.roomType == 2)
+                {
+                    AICharacter boss = allBosses[rng.RandiRange(0, allBosses.Count - 1)].Instance<AICharacter>();
+                    room.Value.AddChild(boss);
+                    boss.navProvider = this;
+                    boss.initPos = room.Value.Position + new Vector2(177, 143);
+
+                    room.Value.enemies.Add(boss);
+                    room.Value.enemyCounter++;
+
+                    boss.Connect(nameof(AICharacter.Died), room.Value, nameof(Room.EnemyDied));
+                    boss.Connect(nameof(AICharacter.Died), this, nameof(EnemyDied));
+                }
+
+                // Manage ChanceSpawnChild nodes
+                Node2D objectSpawnPoints = room.Value.GetNode<Node2D>("ObjectSpawnPoints");
+                List<ChanceSpawnChild> chanceSpawns = objectSpawnPoints.GetChildren().OfType<ChanceSpawnChild>().ToList<ChanceSpawnChild>();
+
+                for (int i = 0; i < chanceSpawns.Count; ++i)
+                {
+                    if (rng.Randf() <= chanceSpawns[i].SpawnChance)
+                    {
+                        Node2D child = (Node2D)chanceSpawns[i].GetChild(0);
+                        child.Position = chanceSpawns[i].Position;
+                        chanceSpawns[i].RemoveChild(child);
+                        objectSpawnPoints.AddChild(child);
+                    }
+
+                    chanceSpawns[i].QueueFree();
+                }
+
+                // Connect cleared signal
+                room.Value.Connect(nameof(Room.Cleared), this, nameof(RoomWasCleared));
+
+                // Unify TileMaps by copying each tile from each room into the level generator's tilemaps
+                foreach (Vector2 tile in room.Value.WallTiles.GetUsedCells())
+                {
+                    wallTiles.SetCellv((room.Value.Position / 16) + tile, room.Value.WallTiles.GetCell(Mathf.FloorToInt(tile.x), Mathf.FloorToInt(tile.y)));
+                }
+                foreach (Vector2 tile in room.Value.FloorTiles.GetUsedCells())
+                {
+                    floorTiles.SetCellv((room.Value.Position / 16) + tile, room.Value.FloorTiles.GetCell(Mathf.FloorToInt(tile.x), Mathf.FloorToInt(tile.y)));
+                }
+
+                room.Value.WallTiles.CallDeferred("queue_free");
+                room.Value.FloorTiles.CallDeferred("queue_free");
+
+                if (room.Value.roomType == 3)
+                {
+                    // Put player in starting room
+                    currentRoomKey = room.Key;
+                    player.Position = generatedRooms[currentRoomKey].Position + new Vector2(177, 143);
+                    generatedRooms[currentRoomKey].Visible = true;
+                    generatedRooms[currentRoomKey].firstRoom = true;
+                    roomBorder.Position = generatedRooms[currentRoomKey].Position + new Vector2(176, 144);
+                }
             }
 
-            // Connect cleared signal
-            room.Value.Connect(nameof(Room.Cleared), this, nameof(RoomWasCleared));
+            wallTiles.UpdateBitmaskRegion();
+            wallTiles.UpdateDirtyQuadrants();
+            floorTiles.UpdateBitmaskRegion();
+            floorTiles.UpdateDirtyQuadrants();
 
-            // Unify TileMaps by copying each tile from each room into the level generator's tilemaps
-            foreach (Vector2 tile in room.Value.WallTiles.GetUsedCells())
-            {
-                wallTiles.SetCellv((room.Value.Position / 16) + tile, room.Value.WallTiles.GetCell(Mathf.FloorToInt(tile.x), Mathf.FloorToInt(tile.y)));
-            }
-            foreach (Vector2 tile in room.Value.FloorTiles.GetUsedCells())
-            {
-                floorTiles.SetCellv((room.Value.Position / 16) + tile, room.Value.FloorTiles.GetCell(Mathf.FloorToInt(tile.x), Mathf.FloorToInt(tile.y)));
-            }
+            // Update minimap
+            EmitSignal(nameof(RoomChanged), this);
+            EmitSignal(nameof(RoomCleared), currentRoomKey.X, currentRoomKey.Y);
 
-            room.Value.WallTiles.CallDeferred("queue_free");
-            room.Value.FloorTiles.CallDeferred("queue_free");
-
-            if (room.Value.roomType == 3)
-            {
-                // Put player in starting room
-                currentRoomKey = room.Key;
-                player.Position = generatedRooms[currentRoomKey].Position + new Vector2(177, 143);
-                generatedRooms[currentRoomKey].Visible = true;
-                generatedRooms[currentRoomKey].firstRoom = true;
-                roomBorder.Position = generatedRooms[currentRoomKey].Position + new Vector2(176, 144);
-            }
+            Done = true;
         }
 
-        wallTiles.UpdateBitmaskRegion();
-        wallTiles.UpdateDirtyQuadrants();
-        floorTiles.UpdateBitmaskRegion();
-        floorTiles.UpdateDirtyQuadrants();
-
-        // Update minimap
-        EmitSignal(nameof(RoomChanged), this);
-        EmitSignal(nameof(RoomCleared), currentRoomKey.X, currentRoomKey.Y);
-
-        Done = true;
-    }
-
-    public void RegenerateLevel()
-    {
-        foreach (Node node in GetParent().GetChildren())
+        public void RegenerateLevel()
         {
-            if (node is Room || node is AICharacter || node is BasePickup)
+            foreach (Node node in GetParent().GetChildren())
             {
-                node.QueueFree();
+                if (node is Room || node is AICharacter || node is BasePickup)
+                {
+                    node.QueueFree();
+                }
+            }
+
+            wallTiles.Clear();
+            floorTiles.Clear();
+
+            world.BloodTexture.ResetImage();
+
+            world.OverlayRender.ClearCharacters();
+            world.OverlayRender.AddCharacter(player);
+
+            GetParent().GetNode<Minimap>("CanvasLayer/Minimap").ClearMinimap();
+
+            CallDeferred(nameof(GenerateLevel));
+        }
+
+        private Room RandomRoomFromIndex(int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return RandomRoomInstance(possibleRooms);
+                case 1:
+                    return RandomRoomInstance(treasureRooms);
+                case 2:
+                    return bossRoom.Instance<BossRoom>();
+                case 3:
+                    return startingRoom.Instance<Room>();
+            }
+
+            return null;
+        }
+
+        private Room RandomRoomInstance(List<PackedScene> roomScenesList)
+        {
+            return roomScenesList[rng.RandiRange(0, roomScenesList.Count - 1)].Instance<Room>();
+        }
+
+        private AICharacter RandomEnemyInstance()
+        {
+            return possibleEnemies[rng.RandiRange(0, possibleEnemies.Count - 1)].Instance<AICharacter>();
+        }
+
+        private void MoveRoom(Direction dir)
+        {
+            generatedRooms[currentRoomKey].Visible = false;
+
+            Point nextRoom = currentRoomKey;
+            nextRoom.Offset(dir.AsPoint());
+
+            player.GlobalPosition = generatedRooms[nextRoom].doors[dir.Opposite()].GlobalPosition + (dir.AsVector() * 20.0f);
+
+            generatedRooms[nextRoom].Visible = true;
+            currentRoomKey = nextRoom;
+
+            foreach (AICharacter enemy in generatedRooms[currentRoomKey].enemies)
+            {
+                enemy.TargetPlayer(player);
+            }
+
+            world.OverlayRender.AddCharacters(generatedRooms[currentRoomKey].enemies.Cast<Character>().ToHashSet());
+
+            roomBorder.Position = generatedRooms[currentRoomKey].Position + new Vector2(176, 144);
+
+            EmitSignal(nameof(RoomChanged), this);
+
+            generatedRooms[currentRoomKey].RoomEntered();
+        }
+
+        private void DoorHit(Direction dir)
+        {
+            MoveRoom(dir);
+        }
+
+        public Navigation2D GetNavigation()
+        {
+            return NavMesh;
+        }
+
+        private void RoomWasCleared(Room room)
+        {
+            Point roomKey = generatedRooms.First(x => x.Value.Position == room.Position).Key;
+            EmitSignal(nameof(RoomCleared), roomKey.X, roomKey.Y);
+
+            if (!room.ClearedByDefault)
+            {
+                player.ClearedRoom();
             }
         }
 
-        wallTiles.Clear();
-        floorTiles.Clear();
-
-        world.BloodTexture.ResetImage();
-
-        world.OverlayRender.ClearCharacters();
-        world.OverlayRender.AddCharacter(player);
-
-        GetParent().GetNode<Minimap>("CanvasLayer/Minimap").ClearMinimap();
-
-        CallDeferred(nameof(GenerateLevel));
-    }
-
-    private Room RandomRoomFromIndex(int index)
-    {
-        switch (index)
+        public void EnemyDied(AICharacter aICharacter)
         {
-            case 0:
-                return RandomRoomInstance(possibleRooms);
-            case 1:
-                return RandomRoomInstance(treasureRooms);
-            case 2:
-                return bossRoom.Instance<BossRoom>();
-            case 3:
-                return startingRoom.Instance<Room>();
+            world.OverlayRender.RemoveCharacter(aICharacter);
         }
-
-        return null;
-    }
-
-    private Room RandomRoomInstance(List<PackedScene> roomScenesList)
-    {
-        return roomScenesList[rng.RandiRange(0, roomScenesList.Count - 1)].Instance<Room>();
-    }
-
-    private AICharacter RandomEnemyInstance()
-    {
-        return possibleEnemies[rng.RandiRange(0, possibleEnemies.Count - 1)].Instance<AICharacter>();
-    }
-
-    private void MoveRoom(Direction dir)
-    {
-        generatedRooms[currentRoomKey].Visible = false;
-
-        Point nextRoom = currentRoomKey;
-        nextRoom.Offset(dir.AsPoint());
-
-        player.GlobalPosition = generatedRooms[nextRoom].doors[dir.Opposite()].GlobalPosition + (dir.AsVector() * 20.0f);
-
-        generatedRooms[nextRoom].Visible = true;
-        currentRoomKey = nextRoom;
-
-        foreach (AICharacter enemy in generatedRooms[currentRoomKey].enemies)
-        {
-            enemy.TargetPlayer(player);
-        }
-
-        world.OverlayRender.AddCharacters(generatedRooms[currentRoomKey].enemies.Cast<Character>().ToHashSet());
-
-        roomBorder.Position = generatedRooms[currentRoomKey].Position + new Vector2(176, 144);
-
-        EmitSignal(nameof(RoomChanged), this);
-
-        generatedRooms[currentRoomKey].RoomEntered();
-    }
-
-    private void DoorHit(Direction dir)
-    {
-        MoveRoom(dir);
-    }
-
-    public Navigation2D GetNavigation()
-    {
-        return NavMesh;
-    }
-
-    private void RoomWasCleared(Room room)
-    {
-        Point roomKey = generatedRooms.First(x => x.Value.Position == room.Position).Key;
-        EmitSignal(nameof(RoomCleared), roomKey.X, roomKey.Y);
-
-        if (!room.ClearedByDefault)
-        {
-            player.ClearedRoom();
-        }
-    }
-
-    public void EnemyDied(AICharacter aICharacter)
-    {
-        world.OverlayRender.RemoveCharacter(aICharacter);
     }
 }

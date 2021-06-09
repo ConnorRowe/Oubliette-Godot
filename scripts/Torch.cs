@@ -1,28 +1,30 @@
 using Godot;
-using System;
 
-public class Torch : Node2D
+namespace Oubliette.LevelGen
 {
-    [Export]
-    private Curve flickerCurve;
-
-    private Light2D light;
-
-    private float count = 0.0f;
-
-    public override void _Ready()
+    public class Torch : Node2D
     {
-        light = GetNode<Light2D>("Sprite/Light2D");
-        GD.Randomize();
-        count = GD.Randf();
-    }
+        [Export]
+        private Curve flickerCurve;
 
-    public override void _Process(float delta)
-    {
-        count += delta / 2.0f;
-        if (count > 1.0f)
-            count -= 1.0f;
+        private Light2D light;
 
-        light.Energy = flickerCurve.InterpolateBaked(count) * 0.75f;
+        private float count = 0.0f;
+
+        public override void _Ready()
+        {
+            light = GetNode<Light2D>("Sprite/Light2D");
+            GD.Randomize();
+            count = GD.Randf();
+        }
+
+        public override void _Process(float delta)
+        {
+            count += delta / 2.0f;
+            if (count > 1.0f)
+                count -= 1.0f;
+
+            light.Energy = flickerCurve.InterpolateBaked(count) * 0.75f;
+        }
     }
 }

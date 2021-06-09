@@ -1,43 +1,46 @@
 using Godot;
 using System;
 
-public class WanderStraightBehaviour : MovementBehaviour
+namespace Oubliette.AI
 {
-    Direction currentDirection = Direction.Left;
-
-    public WanderStraightBehaviour(AIManager manager, Func<TransitionTestResult>[] transitions) : base(manager, transitions) {}
-
-    public override void OnBehaviourStart() 
+    public class WanderStraightBehaviour : MovementBehaviour
     {
-        currentDirection = DirectionExt.FromInt(mgr.rng.RandiRange(0, 3));
+        Direction currentDirection = Direction.Left;
 
-        if(!mgr.owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
+        public WanderStraightBehaviour(AIManager manager, Func<TransitionTestResult>[] transitions) : base(manager, transitions) { }
+
+        public override void OnBehaviourStart()
         {
-            mgr.owner.Connect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
+            currentDirection = DirectionExt.FromInt(mgr.rng.RandiRange(0, 3));
+
+            if (!mgr.owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
+            {
+                mgr.owner.Connect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
+            }
         }
-    }
 
-    public override void Process(float delta)
-    {
-        // mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
-    }
-
-    public override void OnBehaviourEnd() 
-    {
-        if(mgr.owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
+        public override void Process(float delta)
         {
-            mgr.owner.Disconnect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
+            // mgr.targetPosCache = mgr.lastTarget.GlobalPosition;
         }
-    }
 
-    public override Vector2 Steer()
-    {
-        return currentDirection.AsVector();
-    }
+        public override void OnBehaviourEnd()
+        {
+            if (mgr.owner.IsConnected(nameof(Character.SlideCollision), this, nameof(SlideCollision)))
+            {
+                mgr.owner.Disconnect(nameof(Character.SlideCollision), this, nameof(SlideCollision));
+            }
+        }
 
-    private void SlideCollision(KinematicCollision2D collision)
-    {
-        // cycle direction on collision
-        currentDirection = DirectionExt.Directions()[Mathf.PosMod((int)currentDirection + 1, 4)];
+        public override Vector2 Steer()
+        {
+            return currentDirection.AsVector();
+        }
+
+        private void SlideCollision(KinematicCollision2D collision)
+        {
+            // cycle direction on collision
+            currentDirection = DirectionExt.Directions()[Mathf.PosMod((int)currentDirection + 1, 4)];
+        }
     }
 }
