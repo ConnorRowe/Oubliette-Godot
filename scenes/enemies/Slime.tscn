@@ -2,7 +2,7 @@
 
 [ext_resource path="res://scenes/AICharacter.tscn" type="PackedScene" id=1]
 [ext_resource path="res://textures/slime_death.png" type="Texture" id=2]
-[ext_resource path="res://scripts/Slime.cs" type="Script" id=3]
+[ext_resource path="res://scripts/enemies/Slime.cs" type="Script" id=3]
 [ext_resource path="res://textures/slime.png" type="Texture" id=4]
 
 [sub_resource type="Shader" id=1]

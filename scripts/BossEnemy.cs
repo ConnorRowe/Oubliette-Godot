@@ -1,12 +1,15 @@
 using Godot;
 using Oubliette.AI;
 
-public class BossEnemy : AICharacter
+namespace Oubliette.AI
 {
-    public override void ApplyKnockBack(Vector2 vel)
+    public class BossEnemy : AICharacter
     {
-        Vector2 kb = vel.Normalized();
+        public override void ApplyKnockBack(Vector2 vel)
+        {
+            Vector2 kb = vel.Normalized();
 
-        base.ApplyKnockBack(kb * (vel.Length() * 0.25f));
+            base.ApplyKnockBack(kb * (vel.Length() * 0.25f));
+        }
     }
 }

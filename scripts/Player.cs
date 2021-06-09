@@ -173,28 +173,6 @@ namespace Oubliette
             if (IsDead)
                 return;
 
-            if (Input.IsActionPressed("g_cast_primary_spell"))
-            {
-                if (currentMajyka >= GetSpellCost(primarySpell.majykaCost) && primarySpellCooldown == 0.0f)
-                {
-                    // Cast primary spell
-                    primarySpell.Cast(this);
-
-                    spellSoundPlayer.Stream = spellCastSound;
-                    spellSoundPlayer.Play(0);
-
-                    currentMajyka -= GetSpellCost(primarySpell.majykaCost);
-                    UpdateMajykaBar();
-
-                    primarySpellCooldown = GetMaxPrimarySpellCooldown();
-
-                }
-            }
-            if (evt.IsActionPressed("g_cast_secondary_spell"))
-            {
-                CastSecondarySpell();
-            }
-
             if (evt is InputEventKey keyEvt)
             {
                 if (keyEvt.Pressed)
@@ -309,6 +287,28 @@ namespace Oubliette
         public override void _Process(float delta)
         {
             base._Process(delta);
+
+            if (Input.IsActionPressed("g_cast_primary_spell"))
+            {
+                if (currentMajyka >= GetSpellCost(primarySpell.majykaCost) && primarySpellCooldown == 0.0f)
+                {
+                    // Cast primary spell
+                    primarySpell.Cast(this);
+
+                    spellSoundPlayer.Stream = spellCastSound;
+                    spellSoundPlayer.Play(0);
+
+                    currentMajyka -= GetSpellCost(primarySpell.majykaCost);
+                    UpdateMajykaBar();
+
+                    primarySpellCooldown = GetMaxPrimarySpellCooldown();
+
+                }
+            }
+            if (Input.IsActionPressed("g_cast_secondary_spell"))
+            {
+                CastSecondarySpell();
+            }
 
             // Follow head gib
             if (IsDead && headGib != null)

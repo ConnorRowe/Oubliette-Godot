@@ -1,6 +1,6 @@
 [gd_scene load_steps=30 format=2]
 
-[ext_resource path="res://scripts/AICharacterWithWeapon.cs" type="Script" id=1]
+[ext_resource path="res://scripts/enemies/AICharacterWithWeapon.cs" type="Script" id=1]
 [ext_resource path="res://scenes/AICharacter.tscn" type="PackedScene" id=2]
 [ext_resource path="res://textures/Skel_noarm_walk_right.png" type="Texture" id=3]
 [ext_resource path="res://textures/thin_sword.png" type="Texture" id=4]

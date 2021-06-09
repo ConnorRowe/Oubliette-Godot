@@ -97,7 +97,7 @@ namespace Oubliette.AI
 
             Vector2 playerPos = AIManager.LastTarget.Position;
 
-            if(GlobalPosition.DistanceTo(playerPos) <= 256.0f)
+            if(GlobalPosition.DistanceTo(playerPos) <= 80.0f)
                 return Vector2.Zero;
 
             return GlobalPosition.DirectionTo(playerPos);
