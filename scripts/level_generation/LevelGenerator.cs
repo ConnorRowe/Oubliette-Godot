@@ -14,7 +14,7 @@ namespace Oubliette.LevelGen
         private World world;
         private Point currentRoomKey = Point.Empty;
         public Point CurrentRoomKey { get { return currentRoomKey; } }
-        public Room CurrentRoom { get { return generatedRooms[currentRoomKey]; } }
+        public Room CurrentRoom { get { return GeneratedRooms[currentRoomKey]; } }
         public bool Done = false;
 
         private List<PackedScene> possibleRooms = new List<PackedScene>();
@@ -22,7 +22,7 @@ namespace Oubliette.LevelGen
         private List<PackedScene> allBosses = new List<PackedScene>();
         private PackedScene bossRoom;
         private PackedScene startingRoom;
-        public Dictionary<Point, Room> generatedRooms = new Dictionary<Point, Room>();
+        public Dictionary<Point, Room> GeneratedRooms { get; set; } = new Dictionary<Point, Room>();
         private int roomsToGen = 12;
         private readonly Point[] pointDirections = new Point[4] { new Point(0, 1), new Point(1, 0), new Point(0, -1), new Point(-1, 0) };
         private int gridWidth = 8;
@@ -110,13 +110,13 @@ namespace Oubliette.LevelGen
 
                     if (ek.Scancode == (uint)KeyList.Enter)
                     {
-                        if (player.camera.Current)
+                        if (player.Camera.Current)
                         {
                             this.camera.Current = true;
                         }
                         else
                         {
-                            player.camera.Current = true;
+                            player.Camera.Current = true;
                         }
                     }
                 }
@@ -258,11 +258,11 @@ namespace Oubliette.LevelGen
 
         private void GenerateLevel()
         {
-            foreach (KeyValuePair<Point, Room> room in generatedRooms)
+            foreach (KeyValuePair<Point, Room> room in GeneratedRooms)
             {
                 room.Value.QueueFree();
             }
-            generatedRooms.Clear();
+            GeneratedRooms.Clear();
 
             int[,] grid = GenerateLevelGrid();
 
@@ -274,26 +274,27 @@ namespace Oubliette.LevelGen
                     {
                         Room nextRoom = RandomRoomFromIndex(grid[x, y]);
                         nextRoom.Position = new Vector2(x, y) * nextRoom.Width * 16.0f;
-                        nextRoom.Name = "Room_" + generatedRooms.Count;
-                        nextRoom.roomType = grid[x, y];
+                        nextRoom.Name = "Room_" + GeneratedRooms.Count;
+                        nextRoom.RoomType = grid[x, y];
                         nextRoom.Visible = false;
+                        nextRoom.BloodTexture.ResetImage();
 
-                        generatedRooms.Add(new Point(x, y), nextRoom);
+                        GeneratedRooms.Add(new Point(x, y), nextRoom);
                         GetParent().CallDeferred("add_child", nextRoom);
                     }
                 }
             }
 
-            foreach (KeyValuePair<Point, Room> room in generatedRooms)
+            foreach (KeyValuePair<Point, Room> room in GeneratedRooms)
             {
                 // Figure out connections
                 foreach (Direction d in DirectionExt.Directions())
                 {
                     Point pos = room.Key;
                     pos.Offset(d.AsPoint());
-                    if (generatedRooms.ContainsKey(pos))
+                    if (GeneratedRooms.ContainsKey(pos))
                     {
-                        room.Value.connections[d] = generatedRooms[pos].roomType;
+                        room.Value.Connections[d] = GeneratedRooms[pos].RoomType;
                     }
                 }
 
@@ -308,8 +309,8 @@ namespace Oubliette.LevelGen
                     newEnemy.NavProvider = this;
                     newEnemy.InitPos = room.Value.Position + point.Position;
 
-                    room.Value.enemies.Add(newEnemy);
-                    room.Value.enemyCounter++;
+                    room.Value.Enemies.Add(newEnemy);
+                    room.Value.EnemyCounter++;
 
                     // Connect enemy die signal to room function
                     newEnemy.Connect(nameof(AI.AICharacter.Died), room.Value, nameof(Room.EnemyDied));
@@ -318,15 +319,15 @@ namespace Oubliette.LevelGen
                 }
 
                 // If boss room spawn a random boss
-                if (room.Value.roomType == 2)
+                if (room.Value.RoomType == 2)
                 {
                     AI.AICharacter boss = allBosses[rng.RandiRange(0, allBosses.Count - 1)].Instance<AI.AICharacter>();
                     room.Value.AddChild(boss);
                     boss.NavProvider = this;
                     boss.InitPos = room.Value.Position + new Vector2(177, 143);
 
-                    room.Value.enemies.Add(boss);
-                    room.Value.enemyCounter++;
+                    room.Value.Enemies.Add(boss);
+                    room.Value.EnemyCounter++;
 
                     boss.Connect(nameof(AI.AICharacter.Died), room.Value, nameof(Room.EnemyDied));
                     boss.Connect(nameof(AI.AICharacter.Died), this, nameof(EnemyDied));
@@ -365,14 +366,14 @@ namespace Oubliette.LevelGen
                 room.Value.WallTiles.CallDeferred("queue_free");
                 room.Value.FloorTiles.CallDeferred("queue_free");
 
-                if (room.Value.roomType == 3)
+                if (room.Value.RoomType == 3)
                 {
                     // Put player in starting room
                     currentRoomKey = room.Key;
-                    player.Position = generatedRooms[currentRoomKey].Position + new Vector2(177, 143);
-                    generatedRooms[currentRoomKey].Visible = true;
-                    generatedRooms[currentRoomKey].firstRoom = true;
-                    roomBorder.Position = generatedRooms[currentRoomKey].Position + new Vector2(176, 144);
+                    player.Position = GeneratedRooms[currentRoomKey].Position + new Vector2(177, 143);
+                    GeneratedRooms[currentRoomKey].Visible = true;
+                    GeneratedRooms[currentRoomKey].FirstRoom = true;
+                    roomBorder.Position = GeneratedRooms[currentRoomKey].Position + new Vector2(176, 144);
                 }
             }
 
@@ -400,8 +401,6 @@ namespace Oubliette.LevelGen
 
             wallTiles.Clear();
             floorTiles.Clear();
-
-            world.BloodTexture.ResetImage();
 
             world.OverlayRender.ClearCharacters();
             world.OverlayRender.AddCharacter(player);
@@ -440,28 +439,29 @@ namespace Oubliette.LevelGen
 
         private void MoveRoom(Direction dir)
         {
-            generatedRooms[currentRoomKey].Visible = false;
+            GeneratedRooms[currentRoomKey].Visible = false;
+            GeneratedRooms[currentRoomKey].BloodTexture.IsActive = false;
 
             Point nextRoom = currentRoomKey;
             nextRoom.Offset(dir.AsPoint());
 
-            player.GlobalPosition = generatedRooms[nextRoom].doors[dir.Opposite()].GlobalPosition + (dir.AsVector() * 20.0f);
+            player.GlobalPosition = GeneratedRooms[nextRoom].Doors[dir.Opposite()].GlobalPosition + (dir.AsVector() * 20.0f);
 
-            generatedRooms[nextRoom].Visible = true;
+            GeneratedRooms[nextRoom].Visible = true;
             currentRoomKey = nextRoom;
 
-            foreach (AI.AICharacter enemy in generatedRooms[currentRoomKey].enemies)
+            foreach (AI.AICharacter enemy in GeneratedRooms[currentRoomKey].Enemies)
             {
                 enemy.TargetPlayer(player);
             }
 
-            world.OverlayRender.AddCharacters(generatedRooms[currentRoomKey].enemies.Cast<Character>().ToHashSet());
+            world.OverlayRender.AddCharacters(GeneratedRooms[currentRoomKey].Enemies.Cast<Character>().ToHashSet());
 
-            roomBorder.Position = generatedRooms[currentRoomKey].Position + new Vector2(176, 144);
+            roomBorder.Position = GeneratedRooms[currentRoomKey].Position + new Vector2(176, 144);
 
             EmitSignal(nameof(RoomChanged), this);
 
-            generatedRooms[currentRoomKey].RoomEntered();
+            GeneratedRooms[currentRoomKey].RoomEntered();
         }
 
         private void DoorHit(Direction dir)
@@ -476,7 +476,7 @@ namespace Oubliette.LevelGen
 
         private void RoomWasCleared(Room room)
         {
-            Point roomKey = generatedRooms.First(x => x.Value.Position == room.Position).Key;
+            Point roomKey = GeneratedRooms.First(x => x.Value.Position == room.Position).Key;
             EmitSignal(nameof(RoomCleared), roomKey.X, roomKey.Y);
 
             if (!room.ClearedByDefault)

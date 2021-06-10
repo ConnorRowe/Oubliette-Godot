@@ -26,7 +26,7 @@ namespace Oubliette.LevelGen
                     player.PickUpPrimarySpell(CurrentSpell);
                 else
                 {
-                    player.world.PlayGlobalSoundEffect(artefactPickupSound);
+                    player.World.PlayGlobalSoundEffect(artefactPickupSound);
                     CurrentArtefact.PlayerPickUp(player);
                 }
 

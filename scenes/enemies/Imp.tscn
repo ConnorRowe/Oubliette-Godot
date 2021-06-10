@@ -172,6 +172,7 @@ _animUp = "walk_up"
 _animDeath = "die"
 attackSpeed = 0.75
 attackRange = 20.0
+bloodColour = Color( 0.760784, 0, 0.658824, 1 )
 minMaxBloodSplats = Vector2( 1, 3 )
 spawnBloodPoolOnDeath = true
 

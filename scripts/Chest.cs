@@ -71,6 +71,7 @@ namespace Oubliette.LevelGen
                 GetParent().AddChild(pickup);
                 pickup.Position = Position + (new Vector2(rng.Randi(), rng.Randi()).Normalized() * 3.0f);
                 pickup.Visible = true;
+                pickup.IsActive = true;
             }
 
             pickups.Clear();

@@ -40,6 +40,8 @@ namespace Oubliette.AI
         [Export(hintString: "How close the character must be to a path point for it to count as reached.")]
         public float PathTolerance = 7.5f;
         [Export]
+        private Color bloodColour = new Color(0.760784f, 0, 0.101961f);
+        [Export]
         private Vector2 minMaxBloodSplats = Vector2.Zero;
         [Export]
         private bool spawnBloodPoolOnDeath = false;
@@ -321,6 +323,7 @@ namespace Oubliette.AI
                 BloodPool bloodPool = bloodPoolScene.Instance<BloodPool>();
                 World.AddChild(bloodPool);
                 bloodPool.Position = GlobalPosition;
+                bloodPool.BloodColour = bloodColour;
                 bloodPool.Start(World.BloodTexture);
             }
         }
@@ -335,7 +338,7 @@ namespace Oubliette.AI
                 BloodSplat bloodSplat = bloodSplatScene.Instance<BloodSplat>();
                 World.AddChild(bloodSplat);
                 bloodSplat.Position = GlobalPosition;
-                bloodSplat.Init(World.BloodTexture, new Vector2(World.rng.RandfRange(-2.0f, 2.0f), World.rng.RandfRange(-1.0f, 1.0f)));
+                bloodSplat.Init(World.BloodTexture, new Vector2(World.rng.RandfRange(-2.0f, 2.0f), World.rng.RandfRange(-1.0f, 1.0f)), bloodColour);
             }
 
             if (deathParticles.Texture != null)

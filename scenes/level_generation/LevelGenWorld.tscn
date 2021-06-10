@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=2]
+[gd_scene load_steps=43 format=2]
 
 [ext_resource path="res://font/small_font.tres" type="DynamicFont" id=1]
 [ext_resource path="res://scripts/World.cs" type="Script" id=2]
@@ -32,7 +32,6 @@
 [ext_resource path="res://textures/respawn_btn_metalborder.png" type="Texture" id=30]
 [ext_resource path="res://textures/respawn_btn_release_txt.png" type="Texture" id=31]
 [ext_resource path="res://textures/respawn_btn_letgo_txt.png" type="Texture" id=32]
-[ext_resource path="res://scenes/BloodTexture.tscn" type="PackedScene" id=33]
 [ext_resource path="res://textures/1x1_white.png" type="Texture" id=34]
 [ext_resource path="res://particle/BloodDrip.shader" type="Shader" id=35]
 [ext_resource path="res://scenes/OverlayRender.tscn" type="PackedScene" id=36]
@@ -99,7 +98,6 @@ render_target_update_mode = 3
 
 [node name="Player" parent="." instance=ExtResource( 8 )]
 position = Vector2( 114, 197 )
-maxHealth = 8
 
 [node name="OverlayLight" type="Light2D" parent="Player"]
 show_behind_parent = true
@@ -294,9 +292,6 @@ visible = false
 scale = Vector2( 2816, 2816 )
 texture = ExtResource( 34 )
 centered = false
-
-[node name="BloodTexture" parent="." instance=ExtResource( 33 )]
-z_index = -1
 
 [node name="Navigation2D" type="Navigation2D" parent="."]
 

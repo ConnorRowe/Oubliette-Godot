@@ -1,4 +1,5 @@
 using Godot;
+using Oubliette.LevelGen;
 
 namespace Oubliette
 {
@@ -18,6 +19,7 @@ namespace Oubliette
         private bool canSpawnPool = true;
         private Particles2D bloodSpray;
         private bool fakeRotPositive = false;
+        public Color BloodColour = new Color(0.760784f, 0, 0.101961f, 0.25f);
 
         [Export]
         public bool isHead = false;
@@ -56,15 +58,15 @@ namespace Oubliette
                     Vector2 randOffset = new Vector2(rng.RandfRange(-2, 2), rng.RandfRange(-2, 2));
                     if (dist > 1.0f)
                         if (bloodAmount > 0.5f)
-                            bloodTexture.AddSweepedPlus(lastPosition + randOffset, newPosition, Mathf.Max(Mathf.RoundToInt(dist), 8), bloodSpray.GlobalPosition, 0.25f);
+                            bloodTexture.AddSweepedPlus(lastPosition + randOffset, newPosition, Mathf.Max(Mathf.RoundToInt(dist), 8), bloodSpray.GlobalPosition, BloodColour);
                         else
-                            bloodTexture.AddSweepedPoints(lastPosition + randOffset, newPosition, Mathf.Max(Mathf.RoundToInt(dist), 8), bloodSpray.GlobalPosition, 0.25f);
+                            bloodTexture.AddSweepedPixels(lastPosition + randOffset, newPosition, Mathf.Max(Mathf.RoundToInt(dist), 8), bloodSpray.GlobalPosition, BloodColour);
                     else
                     {
                         if (bloodAmount > 0.5f)
-                            bloodTexture.AddPlus(newPosition + randOffset, bloodSpray.GlobalPosition, 0.25f);
+                            bloodTexture.AddPlus(newPosition + randOffset, bloodSpray.GlobalPosition, BloodColour);
                         else
-                            bloodTexture.AddPoint(newPosition + randOffset, 0.25f);
+                            bloodTexture.AddPixel(newPosition + randOffset, BloodColour);
                     }
 
                     bloodAmount -= delta * 2.0f;

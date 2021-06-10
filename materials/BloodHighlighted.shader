@@ -1,25 +1,20 @@
 shader_type canvas_item;
 
-uniform vec4 blood_colour: hint_color = vec4(1.0, 0.0, 0.0, 1.0);
-uniform vec4 highlight_colour: hint_color = vec4(2.0, 2.0, 2.0, 2.0);
-
 void fragment()
 {
-	vec4 sample = texture(TEXTURE, UV);
-	COLOR = sample;
-	COLOR.rgb *= blood_colour.rgb;
-	COLOR.a *= sample.r;
+	COLOR = texture(TEXTURE, UV);
 	
+	float brightness = (COLOR.r + COLOR.g + COLOR.b) / 3.0f;
+	brightness = clamp(brightness, 1.1f, 5.0f);
+	vec4 highlight_colour = mix(COLOR, vec4(1.0f), 0.2f) * brightness;
 	
-	// Highlight 
-	float highlight_width = 1.0;
-	float w = highlight_width * 1.0 / float(textureSize(TEXTURE, 0).x);
-	float h = highlight_width * 1.0 / float(textureSize(TEXTURE, 0).y);
+	vec2 uv_adjust = 1.0f / vec2(textureSize(TEXTURE, 0));
+
+	bool left_empty = texture(TEXTURE, UV + vec2(-uv_adjust.x, 0.0f)).a == 0.0f;
+	bool up_empty = texture(TEXTURE, UV + vec2(0, -uv_adjust.y)).a == 0.0f;
 	
-	float alpha = -2.0 * COLOR.a;
-	alpha += texture(TEXTURE, UV + vec2(w, 0.0)).a;
-	alpha += texture(TEXTURE, UV + vec2(0.0, h)).a;
-	
-	
-	COLOR = mix(COLOR, highlight_colour, clamp(alpha, 0.0, 1.0));
+	if(COLOR.a > 0.1f && (left_empty || up_empty))
+	{
+		COLOR = highlight_colour;
+	}
 }

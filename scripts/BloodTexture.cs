@@ -2,23 +2,40 @@ using Godot;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Oubliette
+namespace Oubliette.LevelGen
 {
     public class BloodTexture : Sprite
     {
+        private static readonly HashSet<Vector2> plusPixels = new HashSet<Vector2>() { Vector2.Zero, Vector2.Left, Vector2.Up, Vector2.Right, Vector2.Down };
+
         private ImageTexture drawImageTexture;
         private Image image;
-        private HashSet<(Vector2 dst, float alpha)> pixelsToDraw = new HashSet<(Vector2 dst, float alpha)>();
+        private HashSet<(Vector2 dst, Color colour)> pixelsToDraw = new HashSet<(Vector2 dst, Color colour)>();
         private HashSet<(Image img, Rect2 srcRect, Vector2 dst)> imagesToDraw = new HashSet<(Image img, Rect2 srcRect, Vector2 dst)>();
-        private readonly HashSet<Vector2> plusPoints = new HashSet<Vector2>() { Vector2.Zero, Vector2.Left, Vector2.Up, Vector2.Right, Vector2.Down };
+        private bool isActive = false;
+    
+        public Image.Format ImageFormat { get; set; } = Image.Format.Rgbah;
+        public Vector2 BloodCheckPos { get; set; } = Vector2.Zero;
+        public Color BloodCheckColour { get; set; } = Colors.Transparent;
+        public float CheckAlpha { get { return BloodCheckColour.a; } }
+        public bool IsActive
+        {
+            get { return isActive; }
+            set
+            {
+                isActive = value;
+                SetProcess(isActive);
+            }
+        }
 
-        public Vector2 BloodCheckPos = Vector2.Zero;
-        private float checkAlpha = 0.0f;
-        public float CheckAlpha { get { return checkAlpha; } }
+        [Export]
+        public Vector2 ImageSize { get; set; } = new Vector2(288, 224);
 
         public override void _Ready()
         {
             ResetImage();
+
+            IsActive = false;
         }
 
         public override void _Process(float delta)
@@ -27,22 +44,33 @@ namespace Oubliette
 
             image.Lock();
 
-            Parallel.ForEach<(Vector2 dst, float alpha)>(pixelsToDraw, point =>
+            // Draw all pixels
+            Parallel.ForEach<(Vector2 dst, Color colour)>(pixelsToDraw, point =>
             {
-                if (point.dst.x <= 2816 - 1 && point.dst.y <= 2816 - 1 && point.dst.x >= 0 && point.dst.y >= 0)
+                if (point.dst.x < ImageSize.x && point.dst.y < ImageSize.y && point.dst.x >= 0 && point.dst.y >= 0)
                 {
-                    float alphaBlend = Mathf.Min(image.GetPixelv(point.dst.Round()).a + point.alpha, 1.0f);
+                    Color baseColour = image.GetPixelv(point.dst.Round());
+                    Color blend = point.colour.LinearInterpolate(baseColour, 0.5f * baseColour.a);
 
-                    image.SetPixelv(point.dst.Round(), new Color(1.0f, 1.0f, 1.0f, alphaBlend));
+                    blend.a = System.Math.Max(baseColour.a, point.colour.a);
+
+                    image.SetPixelv(point.dst.Round(), blend);
                 }
             });
 
+            // Process all texture blits
             Parallel.ForEach<(Image img, Rect2 srcRect, Vector2 dst)>(imagesToDraw, img =>
             {
                 image.BlitRectMask(img.img, img.img, img.srcRect, img.dst);
+                img.img.Dispose();
             });
 
-            checkAlpha = image.GetPixelv(BloodCheckPos.Round()).a;
+            // Check player position for drawing their blood trail (can only read pixel when data is locked)
+            Vector2 checkPos = (BloodCheckPos - GlobalPosition).Round();
+            if (checkPos.x < ImageSize.x && checkPos.y < ImageSize.y && checkPos.x > 0 && checkPos.y > 0)
+            {
+                BloodCheckColour = image.GetPixelv(checkPos);
+            }
 
             image.Unlock();
             pixelsToDraw.Clear();
@@ -50,35 +78,40 @@ namespace Oubliette
             drawImageTexture.CreateFromImage(image, 1);
         }
 
-        public void AddPoint(Vector2 point, float alpha = 1.0f)
+        // Queue a single pixel to draw
+        public void AddPixel(Vector2 point, Color colour)
         {
-            pixelsToDraw.Add((point, alpha));
+            pixelsToDraw.Add((point, colour));
         }
 
-        public void AddPoints(HashSet<(Vector2 dst, float alpha)> points)
+        // Queue a set of pixels to draw
+        private void AddPixels(HashSet<(Vector2 dst, Color colour)> points)
         {
             pixelsToDraw.UnionWith(points);
         }
 
-        public void AddPlus(Vector2 origin, Vector2 removePixel, float alpha = 1.0f)
+        // Queue a plus (+) shape of pixels to draw - removePixel arg is used to keep the pixel under the player empty if needed
+        public void AddPlus(Vector2 origin, Vector2 removePixel, Color colour)
         {
-            AddPoints((MakePlus(origin, removePixel, alpha)));
+            AddPixels((MakePlus(origin, removePixel, colour)));
         }
 
-        private HashSet<(Vector2 dst, float alpha)> MakePlus(Vector2 origin, Vector2 removePixel, float alpha = 1.0f)
+        // Make a set of pixels in the shape of a plus
+        private HashSet<(Vector2 dst, Color colour)> MakePlus(Vector2 origin, Vector2 removePixel, Color colour)
         {
-            HashSet<(Vector2 dst, float alpha)> newPlus = new HashSet<(Vector2 dst, float alpha)>();
-            foreach (Vector2 point in plusPoints)
+            HashSet<(Vector2 dst, Color colour)> newPlus = new HashSet<(Vector2 dst, Color colour)>();
+            foreach (Vector2 pixel in plusPixels)
             {
-                newPlus.Add((point + origin, alpha));
+                newPlus.Add((pixel + origin, colour));
             }
 
-            newPlus.Remove((removePixel, alpha));
+            newPlus.Remove((removePixel - GlobalPosition, colour));
 
             return newPlus;
         }
 
-        private HashSet<(Vector2 dst, float alpha)> SweepPoints(Vector2 start, Vector2 end, int maxPoints, float alpha = 1.0f)
+        // Sweep a defined number of pixels between two points
+        private HashSet<(Vector2 dst, Color colour)> SweepPixels(Vector2 start, Vector2 end, int maxPoints, Color colour)
         {
             var diff_X = end.x - start.x;
             var diff_Y = end.y - start.y;
@@ -86,50 +119,64 @@ namespace Oubliette
             var interval_X = diff_X / (maxPoints + 1);
             var interval_Y = diff_Y / (maxPoints + 1);
 
-            HashSet<(Vector2 dst, float alpha)> pointSet = new HashSet<(Vector2 dst, float alpha)>();
+            HashSet<(Vector2 dst, Color colour)> pixels = new HashSet<(Vector2 dst, Color colour)>();
             for (int i = 1; i <= maxPoints; i++)
             {
-                pointSet.Add((new Vector2(start.x + interval_X * i, end.y + interval_Y * i).Round(), alpha));
+                pixels.Add((new Vector2(start.x + interval_X * i, end.y + interval_Y * i).Round(), colour));
             }
 
-            return pointSet;
+            return pixels;
         }
 
-        public void AddSweepedPoints(Vector2 start, Vector2 end, int maxPoints, Vector2 removePixel, float alpha = 1.0f)
+        // Queue a set of sweeped pixels between two points to draw
+        public void AddSweepedPixels(Vector2 start, Vector2 end, int maxPoints, Vector2 removePixel, Color colour)
         {
-            HashSet<(Vector2 dst, float alpha)> pointSet = SweepPoints(start, end, maxPoints, alpha);
-            pointSet.Remove((removePixel.Round(), alpha));
+            HashSet<(Vector2 dst, Color colour)> pointSet = SweepPixels(start - GlobalPosition, end - GlobalPosition, maxPoints, colour);
+            pointSet.Remove((removePixel.Round(), colour));
 
-            AddPoints(pointSet);
+            AddPixels(pointSet);
         }
 
-        public void AddSweepedPlus(Vector2 start, Vector2 end, int maxPoints, Vector2 removePixel, float alpha = 1.0f)
+        // Queue a set of sweeped plus shapes between two points to draw
+        public void AddSweepedPlus(Vector2 start, Vector2 end, int maxPoints, Vector2 removePixel, Color colour)
         {
 
-            HashSet<(Vector2 dst, float alpha)> pointSet = SweepPoints(start, end, maxPoints, alpha);
-            pointSet.Remove((removePixel.Round(), alpha));
+            HashSet<(Vector2 dst, Color colour)> pointSet = SweepPixels(start - GlobalPosition, end - GlobalPosition, maxPoints, colour);
+            pointSet.Remove((removePixel.Round(), colour));
 
-            HashSet<(Vector2 dst, float alpha)> plusSet = new HashSet<(Vector2 dst, float alpha)>();
+            HashSet<(Vector2 dst, Color colour)> plusSet = new HashSet<(Vector2 dst, Color colour)>();
 
-            foreach ((Vector2 dst, float alpha) p in pointSet)
+            foreach ((Vector2 dst, Color colour) p in pointSet)
             {
-                plusSet.UnionWith(MakePlus(p.dst, removePixel, p.alpha));
+                plusSet.UnionWith(MakePlus(p.dst, removePixel, p.colour));
             }
 
-            AddPoints(plusSet);
+            AddPixels(plusSet);
         }
 
-        public void BlitImage(Image img, Rect2 srcRect, Vector2 dst, float alpha = 1.0f)
+        // Queue an image to blit
+        public void BlitImage(Image img, Rect2 srcRect, Vector2 dst)
         {
-            imagesToDraw.Add((img, srcRect, dst));
+            imagesToDraw.Add((img, srcRect, dst - GlobalPosition));
         }
 
+        // Generate base image data
         public void ResetImage()
         {
             image = new Image();
-            image.Create(2816, 2816, false, Image.Format.La8);
-            drawImageTexture = (ImageTexture)Texture;
+            image.Create(Mathf.RoundToInt(ImageSize.x), Mathf.RoundToInt(ImageSize.y), false, ImageFormat);
+            drawImageTexture = new ImageTexture();
             drawImageTexture.CreateFromImage(image, 1);
+            Texture = drawImageTexture;
+        }
+
+        // Dispose image / texture when freed
+        public override void _ExitTree()
+        {
+            base._ExitTree();
+
+            drawImageTexture.Dispose();
+            image.Dispose();
         }
     }
 }

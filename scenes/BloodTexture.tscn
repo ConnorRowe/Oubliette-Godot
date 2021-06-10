@@ -3,19 +3,16 @@
 [ext_resource path="res://scripts/BloodTexture.cs" type="Script" id=1]
 [ext_resource path="res://materials/BloodHighlighted.shader" type="Shader" id=2]
 
-[sub_resource type="ShaderMaterial" id=1]
+[sub_resource type="ShaderMaterial" id=2]
 shader = ExtResource( 2 )
-shader_param/blood_colour = Color( 1, 0, 0, 1 )
-shader_param/highlight_colour = Color( 1, 0.24, 0.24, 1 )
 
-[sub_resource type="ImageTexture" id=2]
+[sub_resource type="ImageTexture" id=1]
 flags = 3
 flags = 3
-size = Vector2( 2816, 2816 )
+size = Vector2( 288, 224 )
 
 [node name="BloodTexture" type="Sprite"]
-modulate = Color( 1, 1, 1, 0.796078 )
-material = SubResource( 1 )
-texture = SubResource( 2 )
+material = SubResource( 2 )
+texture = SubResource( 1 )
 centered = false
 script = ExtResource( 1 )

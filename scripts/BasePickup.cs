@@ -16,6 +16,9 @@ namespace Oubliette
                 return _mainSprite;
             }
         }
+
+        public bool IsActive { get; set; } = false;
+
         public override void _Ready()
         {
             base._Ready();
@@ -23,7 +26,8 @@ namespace Oubliette
 
         void IIntersectsPlayerHitArea.PlayerHit(Player player)
         {
-            PlayerHit(player);
+            if (IsActive)
+                PlayerHit(player);
         }
 
         public virtual void PlayerHit(Player player)

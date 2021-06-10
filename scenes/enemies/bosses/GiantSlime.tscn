@@ -101,9 +101,13 @@ script = ExtResource( 4 )
 DamageSourceName = "the Giant Slime"
 MaxHealth = 20
 _animDeath = ""
+bloodColour = Color( 0.286275, 0.74902, 0, 1 )
+minMaxBloodSplats = Vector2( 2, 4 )
 
 [node name="DeathParticles" parent="." index="0"]
 modulate = Color( 0.523507, 0.79, 0.0632, 1 )
+process_material = null
+texture = null
 
 [node name="shadow" parent="." index="1"]
 modulate = Color( 0.0823529, 1, 0, 0.607843 )

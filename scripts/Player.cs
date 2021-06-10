@@ -31,17 +31,19 @@ namespace Oubliette
         private HashSet<Node> intersectedAreas = new HashSet<Node>();
         private Potion currentPotion;
         private float pickupCooldown = 0.0f;
-        public HashSet<(Color colour, float weight)> SpellColourMods = new HashSet<(Color colour, float weight)>();
+        public HashSet<(Color colour, float weight)> SpellColourMods { get; set; } = new HashSet<(Color colour, float weight)>();
         private Color primarySpellColourCache;
-        public float BloodTrailAmount = 0.0f;
-        public HashSet<BuffTracker> PerRoomBuffs = new HashSet<BuffTracker>();
+        public float BloodTrailAmount { get; set; } = 0.0f;
+        public Color BloodTrailColour { get; set; } = Colors.Transparent;
+        public HashSet<BuffTracker> PerRoomBuffs { get; set; } = new HashSet<BuffTracker>();
+        private Color PlayerBloodColour = new Color(0.760784f, 0, 0.101961f);
 
         // Nodes
-        public Camera2D camera;
+        public Camera2D Camera { get; set; }
         private Particles2D spellParticle;
         private MajykaContainer majykaBar;
         private Sprite staff;
-        public World world;
+        public World @World { get; set; }
         private Line2D arm;
         private Line2D armOutline;
         private Light2D staffLight;
@@ -126,18 +128,18 @@ namespace Oubliette
             spellParticle = GetNode<Particles2D>("CharSprite/SpellParticle");
             spellParticle.Material = new ShaderMaterial();
             staff = GetNode<Sprite>("CharSprite/staff");
-            camera = GetNode<Camera2D>(_cameraPath);
-            world = GetParent<World>();
+            Camera = GetNode<Camera2D>(_cameraPath);
+            World = GetParent<World>();
             arm = GetNode<Line2D>("CharSprite/Arm");
             armOutline = GetNode<Line2D>("CharSprite/ArmOutline");
             staffLight = GetNode<Light2D>("CharSprite/staff/StaffLight");
             spellSpawnPoint = GetNode<Node2D>("CharSprite/staff/SpellSpawnPoint");
-            potionSlot = world.GetNode<ItemDisplaySlot>("CanvasLayer/PotionSlot");
-            primarySpellSlot = world.GetNode<ItemDisplaySlot>("CanvasLayer/PrimarySpellSlot");
+            potionSlot = World.GetNode<ItemDisplaySlot>("CanvasLayer/PotionSlot");
+            primarySpellSlot = World.GetNode<ItemDisplaySlot>("CanvasLayer/PrimarySpellSlot");
             hitSoundPlayer = GetNode<AudioStreamPlayer>("HitSoundPlayer");
             spellSoundPlayer = GetNode<AudioStreamPlayer>("SpellSoundPlayer");
             potionSoundPlayer = GetNode<AudioStreamPlayer>("PotionSoundPlayer");
-            buffTrackerContainer = world.GetNode<GridContainer>("CanvasLayer/BuffTrackerContainer");
+            buffTrackerContainer = World.GetNode<GridContainer>("CanvasLayer/BuffTrackerContainer");
 
             Items items = GetNode<Items>("/root/Items");
             var magicMissile = items.FindSpellPoolEntry(Spells.MagicMissile, Items.LootPool.GENERAL);
@@ -147,7 +149,7 @@ namespace Oubliette
 
             CachePrimarySpellColour();
 
-            DebugOverlay debug = world.GetDebugOverlay();
+            DebugOverlay debug = World.GetDebugOverlay();
             debug.TrackFunc(nameof(GetSpellDamage), this, "DMG", 1);
             debug.TrackFunc(nameof(GetSpellRange), this, "RNG", 1);
             debug.TrackFunc(nameof(GetSpellKnockback), this, "KBK", 1);
@@ -254,7 +256,7 @@ namespace Oubliette
 
             if (evt is InputEventMouseMotion emm)
             {
-                Vector2 gMPos = camera.GetGlobalMousePosition();
+                Vector2 gMPos = Camera.GetGlobalMousePosition();
                 facingDir = new Vector2(gMPos.x - GlobalPosition.x, gMPos.y - GlobalPosition.y).Normalized();
                 staffRot = Mathf.Atan2(facingDir.y, facingDir.x);
             }
@@ -313,7 +315,7 @@ namespace Oubliette
             // Follow head gib
             if (IsDead && headGib != null)
             {
-                camera.Offset = (headGib.GlobalPosition - Position) + new Vector2(0, -16);
+                Camera.Offset = (headGib.GlobalPosition - Position) + new Vector2(0, -16);
             }
 
             if (IsDead)
@@ -386,9 +388,9 @@ namespace Oubliette
             staffLight.Color = Colors.White;
             staffLight.Energy = 1.0f;
 
-            var rng = world.rng;
+            var rng = World.rng;
 
-            BloodTexture bloodTexture = world.BloodTexture;
+            LevelGen.BloodTexture bloodTexture = World.BloodTexture;
             foreach (PackedScene gibScene in deathGibs)
             {
                 PlayerGib gib = gibScene.Instance<PlayerGib>();
@@ -396,7 +398,7 @@ namespace Oubliette
                 {
                     headGib = gib;
                 }
-                world.AddChild(gib);
+                World.AddChild(gib);
                 Vector2 gibOffset = new Vector2(rng.Randf(), rng.Randf()).Normalized() * 2.0f;
                 gib.Position = Position + gibOffset;
                 float gibDir = rng.Randf() > 0.5f ? -1.0f : 1.0f;
@@ -612,8 +614,9 @@ namespace Oubliette
             if (canTakeDamage)
             {
                 BloodTrailAmount += damage;
+                BloodTrailColour = PlayerBloodColour;
 
-                hitSoundPlayer.Stream = hitSounds[world.rng.RandiRange(0, hitSounds.Count - 1)];
+                hitSoundPlayer.Stream = hitSounds[World.rng.RandiRange(0, hitSounds.Count - 1)];
                 hitSoundPlayer.Play(0);
 
                 base.TakeDamage(damage, source, sourceName);
@@ -747,14 +750,14 @@ namespace Oubliette
 
                 PotionPickup droppedPotion = potionScene.Instance<PotionPickup>();
                 droppedPotion.potion = currentPotion;
-                world.AddChild(droppedPotion);
+                World.AddChild(droppedPotion);
                 droppedPotion.Position = Position;
                 droppedPotion.ApplyCentralImpulse(Dir * 60f);
             }
 
             currentPotion = newPotion;
 
-            world.artefactNamePopup?.DisplayPopup(newPotion.name, newPotion.desc);
+            World.artefactNamePopup?.DisplayPopup(newPotion.name, newPotion.desc);
 
             UpdatePotionSlot();
 
@@ -772,7 +775,7 @@ namespace Oubliette
 
             GetTree().CreateTimer(0.25f).Connect("timeout", this, nameof(ThrowEmptyPotion));
 
-            if (world.rng.Randf() <= 0.2f)
+            if (World.rng.Randf() <= 0.2f)
             {
                 GetTree().CreateTimer(1.0f).Connect("timeout", this, nameof(PlayBurpSound));
             }
@@ -795,9 +798,9 @@ namespace Oubliette
         private void ThrowEmptyPotion()
         {
             BottleSmashEffect emptyPotion = bottleSmashEffectScene.Instance<BottleSmashEffect>();
-            world.AddChild(emptyPotion);
+            World.AddChild(emptyPotion);
             emptyPotion.Position = Position + new Vector2(0, -11);
-            emptyPotion.Start(new Vector2(world.rng.RandfRange(2.0f, 3.5f) * (world.rng.Randf() <= 0.5f ? -1.0f : 1.0f), world.rng.RandfRange(-1.0f, 1.0f)), world.rng.RandfRange(350.0f, 500.0f));
+            emptyPotion.Start(new Vector2(World.rng.RandfRange(2.0f, 3.5f) * (World.rng.Randf() <= 0.5f ? -1.0f : 1.0f), World.rng.RandfRange(-1.0f, 1.0f)), World.rng.RandfRange(350.0f, 500.0f));
         }
 
         public void PlayGulpSound()
@@ -808,7 +811,7 @@ namespace Oubliette
 
         private void PlayBurpSound()
         {
-            potionSoundPlayer.Stream = burpSounds[world.rng.RandiRange(0, burpSounds.Count - 1)];
+            potionSoundPlayer.Stream = burpSounds[World.rng.RandiRange(0, burpSounds.Count - 1)];
             potionSoundPlayer.Play(0);
         }
 
@@ -834,7 +837,7 @@ namespace Oubliette
 
         public void PickedUpArtefact(Artefact artefact)
         {
-            world.artefactNamePopup.DisplayPopup(artefact.Name, artefact.Description);
+            World.artefactNamePopup.DisplayPopup(artefact.Name, artefact.Description);
         }
 
         public void MixInSpellColour(Color newColour, float weight)
@@ -877,7 +880,7 @@ namespace Oubliette
             if (primarySpell != null)
                 DropSpellPickup(primarySpell);
 
-            world.artefactNamePopup?.DisplayPopup("Tome of " + spell.Name, "");
+            World.artefactNamePopup?.DisplayPopup("Tome of " + spell.Name, "");
 
             primarySpell = spell;
 
@@ -891,7 +894,7 @@ namespace Oubliette
         {
             SpellPickup droppedSpell = spellPickupScene.Instance<SpellPickup>();
             droppedSpell.SetSpell(spell);
-            world.AddChild(droppedSpell);
+            World.AddChild(droppedSpell);
             droppedSpell.Position = Position + new Vector2(Dir * -8.0f);
             droppedSpell.ApplyCentralImpulse(Dir * -80.0f);
         }

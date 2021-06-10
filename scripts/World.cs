@@ -20,13 +20,12 @@ namespace Oubliette
         public ArtefactNamePopup artefactNamePopup { get; set; }
         private RichTextLabel killedByLabel;
         private MainMenuButton respawnBtn;
-        private BloodTexture bloodTexture;
         private Vector2 lastPlayerPos;
         private OverlayRender charOverlayRender;
         private Light2D overlayLight;
         private AudioStreamPlayer sfxPlayer;
 
-        public BloodTexture @BloodTexture { get { return bloodTexture; } }
+        public BloodTexture @BloodTexture { get { return levelGenerator.CurrentRoom.BloodTexture; } }
         public OverlayRender @OverlayRender { get { return charOverlayRender; } }
         public Player @Player { get { return player; } }
 
@@ -73,7 +72,6 @@ namespace Oubliette
             artefactNamePopup = GetNode<ArtefactNamePopup>(_artefactNamePopupPath);
             killedByLabel = GetNode<RichTextLabel>("CanvasLayer/KilledBy");
             respawnBtn = GetNode<MainMenuButton>("CanvasLayer/RespawnButton");
-            bloodTexture = GetNode<BloodTexture>("BloodTexture");
             charOverlayRender = GetNode<OverlayRender>("CharOverlayViewport/OverlayRender");
             overlayLight = GetNode<Light2D>("Player/OverlayLight");
             sfxPlayer = GetNode<AudioStreamPlayer>("SFXPlayer");
@@ -117,16 +115,15 @@ namespace Oubliette
         {
             base._Process(delta);
 
-            if (!levelGenerator.Done || player.IsDead)
+            if (!levelGenerator.Done || player.IsDead || BloodTexture == null)
                 return;
 
-            // overlayLight.RangeLayerMin = Mathf.RoundToInt(player.GlobalPosition.y);
-
             // Check if player stood in strong blood
-            bloodTexture.BloodCheckPos = player.Position;
-            if (bloodTexture.CheckAlpha - 0.5f > player.BloodTrailAmount)
+            BloodTexture.BloodCheckPos = player.Position;
+            if (BloodTexture.CheckAlpha - 0.5f > player.BloodTrailAmount)
             {
-                player.BloodTrailAmount = bloodTexture.CheckAlpha - 0.2f;
+                player.BloodTrailAmount = BloodTexture.CheckAlpha - 0.2f;
+                player.BloodTrailColour = BloodTexture.BloodCheckColour;
             }
 
             Vector2 newPlayerPos = player.Position + -(player.Dir * 2.0f);
@@ -134,19 +131,24 @@ namespace Oubliette
             // Trail blood
             if (player.BloodTrailAmount > 0.0f && DrawPlayerBloodTrail)
             {
-                float dist = lastPlayerPos.DistanceTo(newPlayerPos);
+                // Lower blood opacity when amount is low
+                Color weakBlood = player.BloodTrailColour;
+                weakBlood.a = Math.Min(1.0f, player.BloodTrailAmount);
+                
+                float posDelta = lastPlayerPos.DistanceTo(newPlayerPos);
                 Vector2 randOffset = new Vector2(rng.RandfRange(-2, 2), rng.RandfRange(-2, 2));
-                if (dist > 1.0f)
+                
+                if (posDelta > 1.0f)
                     if (player.BloodTrailAmount >= 0.5f)
-                        bloodTexture.AddSweepedPlus(lastPlayerPos + randOffset, newPlayerPos, Mathf.Max(Mathf.RoundToInt(dist), 8), player.Position, 0.25f);
+                        BloodTexture.AddSweepedPlus(lastPlayerPos + randOffset, newPlayerPos, Math.Max(Mathf.RoundToInt(posDelta), 8), player.Position, weakBlood);
                     else
-                        bloodTexture.AddSweepedPoints(lastPlayerPos + randOffset, newPlayerPos, Mathf.Max(Mathf.RoundToInt(dist), 8), player.Position, 0.25f);
+                        BloodTexture.AddSweepedPixels(lastPlayerPos + randOffset, newPlayerPos, Math.Max(Mathf.RoundToInt(posDelta), 8), player.Position, weakBlood);
                 else
                 {
                     if (player.BloodTrailAmount >= 0.5f)
-                        bloodTexture.AddPlus(newPlayerPos + randOffset, player.Position, 0.25f);
+                        BloodTexture.AddPlus(newPlayerPos + randOffset, player.Position, weakBlood);
                     else
-                        bloodTexture.AddPoint(newPlayerPos + randOffset);
+                        BloodTexture.AddPixel(newPlayerPos + randOffset, weakBlood);
                 }
             }
 
@@ -243,7 +245,7 @@ namespace Oubliette
             displayedDeathGUI = true;
 
             // Stop enemy AI
-            foreach (AI.AICharacter enemy in levelGenerator.CurrentRoom.enemies)
+            foreach (AI.AICharacter enemy in levelGenerator.CurrentRoom.Enemies)
             {
                 enemy.hasTarget = false;
                 enemy.AIManager.SetCurrentBehaviour("idle");
@@ -251,8 +253,8 @@ namespace Oubliette
             }
 
             // Zoom in on player
-            tween.InterpolateProperty(player.camera, "zoom", new Vector2(0.333f, 0.333f), new Vector2(0.1f, 0.1f), 0.25f, Tween.TransitionType.Cubic, Tween.EaseType.InOut);
-            tween.InterpolateProperty(player.camera, "offset", Vector2.Zero, new Vector2(0, -16), 0.25f);
+            tween.InterpolateProperty(player.Camera, "zoom", new Vector2(0.333f, 0.333f), new Vector2(0.1f, 0.1f), 0.25f, Tween.TransitionType.Cubic, Tween.EaseType.InOut);
+            tween.InterpolateProperty(player.Camera, "offset", Vector2.Zero, new Vector2(0, -16), 0.25f);
 
             // Hide GUI
             foreach (Node node in GetNode<CanvasLayer>("CanvasLayer").GetChildren())
@@ -300,7 +302,7 @@ namespace Oubliette
             BloodPool newPool = bloodPoolScene.Instance<BloodPool>();
             newPool.Position = position;
             AddChild(newPool);
-            newPool.Start(bloodTexture);
+            newPool.Start(BloodTexture);
         }
 
         // For testing purposes only. vvv

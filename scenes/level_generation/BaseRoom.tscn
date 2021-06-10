@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://scripts/level_generation/Room.cs" type="Script" id=1]
 [ext_resource path="res://textures/other_tiles/dungeon_wall/tileset_dungeon_wall.tres" type="TileSet" id=2]
@@ -6,6 +6,7 @@
 [ext_resource path="res://textures/other_tiles/dungeon_floor/tileset_dungeon_floor.tres" type="TileSet" id=4]
 [ext_resource path="res://textures/wood_door.png" type="Texture" id=5]
 [ext_resource path="res://textures/wood_door_side.png" type="Texture" id=6]
+[ext_resource path="res://scenes/BloodTexture.tscn" type="PackedScene" id=7]
 
 [sub_resource type="AtlasTexture" id=1]
 flags = 2
@@ -62,10 +63,10 @@ extents = Vector2( 8, 4 )
 
 [node name="Room" type="YSort"]
 script = ExtResource( 1 )
-_wallTileMapPath = NodePath("Walls")
-_floorTileMapPath = NodePath("Floor")
 Width = 22
 Height = 18
+_wallTileMapPath = NodePath("Walls")
+_floorTileMapPath = NodePath("Floor")
 
 [node name="Doors" type="YSort" parent="."]
 z_index = 1
@@ -158,3 +159,6 @@ polygon = PoolVector2Array( 320, 20, 320, 270, 32, 270, 32, 20, 21, 17, 21, 272,
 
 [node name="Node2D" type="Node2D" parent="."]
 position = Vector2( 176, 0 )
+
+[node name="BloodTexture" parent="." instance=ExtResource( 7 )]
+position = Vector2( 32, 32 )

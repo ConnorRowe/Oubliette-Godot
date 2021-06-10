@@ -35,8 +35,6 @@ namespace Oubliette.AI
         private void Timeout()
         {
             mgr.CanTryTransition = true;
-
-            GD.Print("giant slime timeout");
         }
     }
 }

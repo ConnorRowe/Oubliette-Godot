@@ -103,7 +103,7 @@ namespace Oubliette
 
             if (!discoveredRooms.ContainsKey(currentRoom))
             {
-                discoveredRooms.Add(currentRoom, new RoomMapData(false, levelGen.generatedRooms[currentRoom].roomType));
+                discoveredRooms.Add(currentRoom, new RoomMapData(false, levelGen.GeneratedRooms[currentRoom].RoomType));
             }
 
             foreach (Direction dir in DirectionExt.Directions())
@@ -111,9 +111,9 @@ namespace Oubliette
                 Point newRoom = currentRoom;
                 newRoom.Offset(dir.AsPoint());
 
-                if (levelGen.generatedRooms.ContainsKey(newRoom) && !discoveredRooms.ContainsKey(newRoom))
+                if (levelGen.GeneratedRooms.ContainsKey(newRoom) && !discoveredRooms.ContainsKey(newRoom))
                 {
-                    discoveredRooms.Add(newRoom, new RoomMapData(false, levelGen.generatedRooms[newRoom].roomType));
+                    discoveredRooms.Add(newRoom, new RoomMapData(false, levelGen.GeneratedRooms[newRoom].RoomType));
                 }
             }
 

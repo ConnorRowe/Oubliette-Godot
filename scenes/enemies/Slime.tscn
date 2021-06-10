@@ -134,9 +134,13 @@ DamageSourceName = "a Slime"
 MaxHealth = 1
 _animDeath = "die"
 maxMovementSpeed = 12.0
+bloodColour = Color( 0.286275, 0.74902, 0, 1 )
+minMaxBloodSplats = Vector2( 0, 2 )
+spawnBloodPoolOnDeath = true
 
 [node name="DeathParticles" parent="." index="0"]
 modulate = Color( 0.286275, 0.74902, 0, 0.623529 )
+process_material = null
 
 [node name="CharSprite" parent="." index="2"]
 material = SubResource( 2 )

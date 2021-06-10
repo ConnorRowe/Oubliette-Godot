@@ -1,4 +1,5 @@
 using Godot;
+using Oubliette.LevelGen;
 
 namespace Oubliette
 {
@@ -26,10 +27,11 @@ namespace Oubliette
             this.Position += velocity;
         }
 
-        public void Init(BloodTexture bloodTexture, Vector2 velocity)
+        public void Init(BloodTexture bloodTexture, Vector2 velocity, Color bloodColour)
         {
             this.bloodTexture = bloodTexture;
             this.velocity = velocity;
+            Modulate = bloodColour;
 
             GetNode<AnimationPlayer>("AnimationPlayer").Play("Splat");
         }
@@ -39,6 +41,7 @@ namespace Oubliette
             BloodPool bloodPool = bloodPoolScene.Instance<BloodPool>();
             GetParent().AddChild(bloodPool);
             bloodPool.Position = droplet.GlobalPosition;
+            bloodPool.BloodColour = Modulate;
             bloodPool.Start(bloodTexture);
 
             QueueFree();
