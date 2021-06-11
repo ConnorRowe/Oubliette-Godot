@@ -370,10 +370,12 @@ namespace Oubliette.LevelGen
                 {
                     // Put player in starting room
                     currentRoomKey = room.Key;
-                    player.Position = GeneratedRooms[currentRoomKey].Position + new Vector2(177, 143);
-                    GeneratedRooms[currentRoomKey].Visible = true;
-                    GeneratedRooms[currentRoomKey].FirstRoom = true;
-                    roomBorder.Position = GeneratedRooms[currentRoomKey].Position + new Vector2(176, 144);
+                    player.Position = CurrentRoom.Position + new Vector2(177, 143);
+                    CurrentRoom.Visible = true;
+                    CurrentRoom.FirstRoom = true;
+                    roomBorder.Position = CurrentRoom.Position + new Vector2(176, 144);
+                    CurrentRoom.RoomEntered();
+                    CurrentRoom.BloodTexture.IsActive = true;
                 }
             }
 

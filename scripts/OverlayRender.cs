@@ -34,7 +34,7 @@ namespace Oubliette
                 AtlasTexture tex = (AtlasTexture)spriteFrames.GetFrame(c.CharSprite.Animation, c.CharSprite.Frame);
 
                 // Position is centre of texture + the difference between the char's global pos and the player's pos, offset by the half texture size to centre it
-                Vector2 pos = new Vector2(512, 300 + c.Elevation) + (c.GlobalPosition - world.Player.Position) - (tex.Region.Size * 0.5f) + c.CharSprite.Offset + c.CharSprite.Position;
+                Vector2 pos = new Vector2(512, 288 + c.Elevation) + (c.GlobalPosition - world.Player.Position) - (tex.Region.Size * 0.5f) + c.CharSprite.Offset + c.CharSprite.Position;
                 float flipH = c.CharSprite.FlipH ? -1.0f : 1.0f;
 
                 DrawTextureRect(tex, new Rect2(pos, tex.Region.Size * new Vector2(flipH, 1.0f)), false);

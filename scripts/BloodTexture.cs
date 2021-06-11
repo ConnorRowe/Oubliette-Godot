@@ -35,7 +35,7 @@ namespace Oubliette.LevelGen
         {
             ResetImage();
 
-            IsActive = false;
+            SetProcess(isActive);
         }
 
         public override void _Process(float delta)

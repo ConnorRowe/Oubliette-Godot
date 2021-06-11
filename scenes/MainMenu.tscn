@@ -20,16 +20,23 @@ glow_bloom = 0.24
 glow_blend_mode = 1
 glow_bicubic_upscale = true
 
-[node name="MainMenu" type="Node2D"]
+[node name="MainMenu" type="Control"]
 script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 nextScene = ExtResource( 4 )
 
 [node name="Background" type="TextureRect" parent="."]
 modulate = Color( 0.28192, 0.2752, 0.32, 1 )
-margin_right = 344.0
-margin_bottom = 200.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = 341.0
+margin_bottom = 192.0
 mouse_filter = 2
 input_pass_on_modal_close_click = false
+size_flags_horizontal = 3
+size_flags_vertical = 3
 texture = ExtResource( 2 )
 stretch_mode = 2
 __meta__ = {
@@ -37,12 +44,12 @@ __meta__ = {
 }
 
 [node name="PlayButton" parent="." instance=ExtResource( 1 )]
-position = Vector2( 176, 104 )
+position = Vector2( 170.667, 104 )
 _cameraPath = NodePath("../Camera2D")
 
 [node name="QuitButton" parent="." instance=ExtResource( 1 )]
 modulate = Color( 0.61, 0.61, 0.61, 1 )
-position = Vector2( 176, 168 )
+position = Vector2( 170.667, 164 )
 mouseOverText = ExtResource( 5 )
 normalText = ExtResource( 6 )
 _cameraPath = NodePath("../Camera2D")

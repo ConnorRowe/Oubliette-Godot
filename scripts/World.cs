@@ -137,7 +137,7 @@ namespace Oubliette
                 
                 float posDelta = lastPlayerPos.DistanceTo(newPlayerPos);
                 Vector2 randOffset = new Vector2(rng.RandfRange(-2, 2), rng.RandfRange(-2, 2));
-                
+
                 if (posDelta > 1.0f)
                     if (player.BloodTrailAmount >= 0.5f)
                         BloodTexture.AddSweepedPlus(lastPlayerPos + randOffset, newPlayerPos, Math.Max(Mathf.RoundToInt(posDelta), 8), player.Position, weakBlood);
@@ -185,7 +185,10 @@ namespace Oubliette
                         // BottleSmashEffect bottleTest = TestSpawnNodeAtMouse<BottleSmashEffect>("res://scenes/BottleSmashEffect.tscn");
                         // bottleTest.Start(new Vector2(rng.RandfRange(2.0f, 3.5f) * (rng.Randf() <= 0.5f ? -1.0f : 1.0f), rng.RandfRange(-1.0f, 1.0f)), rng.RandfRange(350.0f, 500.0f));
 
-                        TestSpawnNodeAtMouse<Chest>("res://scenes/Chest.tscn");
+                        TestSpawnEnemyAtMouse<AI.AICharacter>("res://scenes/enemies/Imp.tscn").Position += (Vector2.Up * 32.0f);
+                        TestSpawnEnemyAtMouse<AI.AICharacter>("res://scenes/enemies/FireFly.tscn").Position += (Vector2.Left * 32.0f);
+                        TestSpawnEnemyAtMouse<AI.AICharacter>("res://scenes/enemies/Slime.tscn").Position += (Vector2.Right * 32.0f);
+                        TestSpawnEnemyAtMouse<AI.AICharacter>("res://scenes/enemies/Snail.tscn").Position += (Vector2.Down * 32.0f);
                     }
                 }
             }

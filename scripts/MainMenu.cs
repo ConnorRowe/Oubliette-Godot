@@ -2,7 +2,7 @@ using Godot;
 
 namespace Oubliette
 {
-    public class MainMenu : Node2D
+    public class MainMenu : Control
     {
         private MainMenuButton playButton;
         private MainMenuButton quitButton;

@@ -85,7 +85,7 @@ defaultGlobalLighting = Color( 0.15, 0.1425, 0.1425, 1 )
 _artefactNamePopupPath = NodePath("CanvasLayer/ArtefactNamePopup")
 
 [node name="CharOverlayViewport" type="Viewport" parent="."]
-size = Vector2( 1024, 600 )
+size = Vector2( 1024, 576 )
 transparent_bg = true
 hdr = false
 usage = 0
@@ -138,7 +138,7 @@ material = SubResource( 2 )
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_right = -512.0
-margin_bottom = -300.0
+margin_bottom = -288.0
 mouse_filter = 2
 texture = ExtResource( 25 )
 expand = true
@@ -221,11 +221,10 @@ position = Vector2( 4, 12 )
 position = Vector2( 4, 4 )
 
 [node name="DialogueBox" parent="CanvasLayer" instance=ExtResource( 7 )]
-visible = false
 margin_left = 14.0
 margin_top = 217.0
 margin_right = -525.0
-margin_bottom = -304.0
+margin_bottom = -292.0
 
 [node name="Minimap" parent="CanvasLayer" instance=ExtResource( 9 )]
 position = Vector2( 218, 0 )
