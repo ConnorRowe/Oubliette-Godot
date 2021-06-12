@@ -3,7 +3,7 @@ using System;
 
 namespace Oubliette.AI
 {
-    public class AICharacter : Character, ICastsSpells, IIntersectsPlayerHitArea
+    public class AICharacter : Character, Spells.ICastsSpells, IIntersectsPlayerHitArea
     {
         public AIManager AIManager { get; set; }
         protected Particles2D deathParticles;
@@ -380,7 +380,7 @@ namespace Oubliette.AI
             AIManager.TryTransition();
         }
 
-        Vector2 ICastsSpells.GetSpellDirection()
+        Vector2 Spells.ICastsSpells.GetSpellDirection()
         {
             return GetSpellDirection();
         }
@@ -390,7 +390,7 @@ namespace Oubliette.AI
             return Dir;
         }
 
-        Vector2 ICastsSpells.GetSpellSpawnPos()
+        Vector2 Spells.ICastsSpells.GetSpellSpawnPos()
         {
             return GetSpellSpawnPos();
         }
@@ -400,7 +400,7 @@ namespace Oubliette.AI
             return GlobalPosition;
         }
 
-        int ICastsSpells.GetSpellDamage(int baseDamge)
+        int Spells.ICastsSpells.GetSpellDamage(int baseDamge)
         {
             return GetSpellDamage(baseDamge);
         }
@@ -410,7 +410,7 @@ namespace Oubliette.AI
             return baseDamge;
         }
 
-        float ICastsSpells.GetSpellRange(float baseRange)
+        float Spells.ICastsSpells.GetSpellRange(float baseRange)
         {
             return GetSpellRange(baseRange);
         }
@@ -420,7 +420,7 @@ namespace Oubliette.AI
             return baseRange;
         }
 
-        float ICastsSpells.GetSpellKnockback(float baseKnockback)
+        float Spells.ICastsSpells.GetSpellKnockback(float baseKnockback)
         {
             return GetSpellKnockback(baseKnockback);
         }
@@ -430,7 +430,7 @@ namespace Oubliette.AI
             return baseKnockback;
         }
 
-        float ICastsSpells.GetSpellSpeed(float baseSpeed)
+        float Spells.ICastsSpells.GetSpellSpeed(float baseSpeed)
         {
             return GetSpellSpeed(baseSpeed);
         }
@@ -440,7 +440,7 @@ namespace Oubliette.AI
             return baseSpeed;
         }
 
-        Color ICastsSpells.GetSpellColour(Color baseColour)
+        Color Spells.ICastsSpells.GetSpellColour(Color baseColour)
         {
             return GetSpellColour(baseColour);
         }

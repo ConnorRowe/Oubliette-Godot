@@ -10,7 +10,10 @@ namespace Oubliette.AI
         private Curve flicker;
         private ShaderMaterial spriteMat;
         private ShaderMaterial deathBubblesMat;
-        private MultiSpreadProjectileSpell deathRattleSpell = new MultiSpreadProjectileSpell(3, Mathf.Tau / 3.0f, "Firebolt", 1, 40.0f, 20.0f, 50.0f, 0.0f, new Color(0.921569f, 0.427451f, 0.098039f), null, null, "res://scenes/ProjectileSmall.tscn");
+        private static Spells.MultiSpreadProjectileSpell deathRattleSpell = new Spells.MultiSpreadProjectileSpell(3, Mathf.Tau / 3.0f, "Firebolt",
+            new Spells.ProjectileSpellBuilder().SetDamage(1).SetRange(80f).SetSpeed(20f).SetKnockback(50f).SetBaseColour(new Color(0.921569f, 0.427451f, 0.098039f))
+            .SetProjectileScene(GD.Load<PackedScene>("res://scenes/ProjectileSmall.tscn"))
+            .SetCurves(GD.Load<Curve>("res://curve/ProjSpiral_x.tres"), GD.Load<Curve>("res://curve/ProjSpiral_y.tres"), 4f, 50f).Build());
 
         public override void _Ready()
         {

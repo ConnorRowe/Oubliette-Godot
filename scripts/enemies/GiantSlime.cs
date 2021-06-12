@@ -3,11 +3,11 @@ using System;
 
 namespace Oubliette.AI
 {
-    public class GiantSlime : BossEnemy, ICastsSpells
+    public class GiantSlime : BossEnemy
     {
         private bool attackSwitch = false;
-        private ProjectileSpell slimeBallSpell = new ProjectileSpell("Slime Ball", 1, 400.0f, 100.0f, 140.0f, 0.0f, new Color(0.682353f, 0.917647f, 0.301961f), null, null, "res://scenes/SlimeBallProjectile.tscn");
-        private ProjectileSpell tripleSlimeBallSpell = new MultiSpreadProjectileSpell(3, Mathf.Pi / 5f, "Triple Slime Ball", 1, 400.0f, 100.0f, 140.0f, 0.0f, new Color(0.682353f, 0.917647f, 0.301961f), null, null, "res://scenes/SlimeBallProjectile.tscn");
+        private static Spells.ProjectileSpell slimeBallSpell = new Spells.ProjectileSpell("Slime Ball", 1, 400.0f, 100.0f, 140.0f, 0.0f, new Color(0.682353f, 0.917647f, 0.301961f), null, null, GD.Load<PackedScene>("res://scenes/SlimeBallProjectile.tscn"));
+        private static Spells.MultiSpreadProjectileSpell tripleSlimeBallSpell = new Spells.MultiSpreadProjectileSpell(3, Mathf.Pi / 5f, "Triple Slime Ball", slimeBallSpell);
 
         public override void _Ready()
         {
@@ -92,12 +92,12 @@ namespace Oubliette.AI
 
         private Vector2 StayInRangeOfPlayer()
         {
-            if(AIManager.LastTarget == null)
+            if (AIManager.LastTarget == null)
                 return Vector2.Zero;
 
             Vector2 playerPos = AIManager.LastTarget.Position;
 
-            if(GlobalPosition.DistanceTo(playerPos) <= 80.0f)
+            if (GlobalPosition.DistanceTo(playerPos) <= 80.0f)
                 return Vector2.Zero;
 
             return GlobalPosition.DirectionTo(playerPos);

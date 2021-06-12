@@ -1,7 +1,6 @@
 using Godot;
-using System;
 
-namespace Oubliette
+namespace Oubliette.Spells
 {
     public class MultiSpreadProjectileSpell : ProjectileSpell
     {
@@ -10,10 +9,14 @@ namespace Oubliette
 
         public MultiSpreadProjectileSpell() : base() { }
 
-        public MultiSpreadProjectileSpell(int projectileCount, float spread, string name, int damage, float range, float knockback, float speed, float majykaCost, Color baseColour, Texture icon, Action<Character> hitCharEvt, NodePath projectilePath) : base(name, damage, range, knockback, speed, majykaCost, baseColour, icon, hitCharEvt, projectilePath)
+        public MultiSpreadProjectileSpell(int projectileCount, float spread, string name, ProjectileSpell baseProjectileSpell) : base(name, baseProjectileSpell.Damage, baseProjectileSpell.Range, baseProjectileSpell.Knockback, baseProjectileSpell.Speed, baseProjectileSpell.MajykaCost, baseProjectileSpell.BaseColour, baseProjectileSpell.Icon, baseProjectileSpell.HitCharEvent, baseProjectileSpell.ProjectileScene)
         {
             this.projectileCount = projectileCount;
             this.spread = spread;
+            this.CurveX = baseProjectileSpell.CurveX;
+            this.CurveY = baseProjectileSpell.CurveY;
+            this.CurveInterpSpeed = baseProjectileSpell.CurveInterpSpeed;
+            this.CurveMoveSpeed = baseProjectileSpell.CurveMoveSpeed;
         }
 
         public override void Cast(ICastsSpells source)
@@ -27,7 +30,7 @@ namespace Oubliette
                 Vector2 adjustDir = baseDir.Rotated(angleFactor);
 
                 Projectile proj = CastAndReturn(source);
-                proj.direction = adjustDir;
+                proj.SetDirection(adjustDir);
             }
         }
     }

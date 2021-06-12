@@ -1,6 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 using Oubliette.Stats;
+using Oubliette.Spells;
 
 namespace Oubliette
 {
@@ -217,9 +218,9 @@ namespace Oubliette
 
         private void RegisterSpells()
         {
-            RegisterSpell(Spells.MagicMissile, 1.0f, new LootPool[] { LootPool.GENERAL });
-            RegisterSpell(Spells.Shadowbolt, 0.5f, new LootPool[] { LootPool.GENERAL });
-            RegisterSpell(Spells.IceSpike, 1.0f, new LootPool[] { LootPool.GENERAL });
+            RegisterSpell(Spells.Spells.MagicMissile, 1.0f, new LootPool[] { LootPool.GENERAL });
+            RegisterSpell(Spells.Spells.Shadowbolt, 0.5f, new LootPool[] { LootPool.GENERAL });
+            RegisterSpell(Spells.Spells.IceSpike, 1.0f, new LootPool[] { LootPool.GENERAL });
         }
 
         public void ResetItemPools()

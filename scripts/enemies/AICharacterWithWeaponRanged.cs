@@ -7,7 +7,7 @@ namespace Oubliette.AI
     {
         private bool isCharging = false;
         private Particles2D weaponParticles;
-        private BaseSpell currentSpell;
+        private Spells.BaseSpell currentSpell;
 
         [Export]
         private NodePath _weaponParticlesPath;
@@ -18,11 +18,11 @@ namespace Oubliette.AI
         {
             base._Ready();
 
-            currentSpell = Spells.Shadowbolt;
+            currentSpell = Spells.Spells.Shadowbolt;
 
             weaponParticles = GetNode<Particles2D>(_weaponParticlesPath);
 
-            ProjectileBehaviour projBehaviour = new ProjectileBehaviour(AIManager, currentSpell as ProjectileSpell, new Func<AIBehaviour.TransitionTestResult>[] {
+            ProjectileBehaviour projBehaviour = new ProjectileBehaviour(AIManager, currentSpell as Spells.ProjectileSpell, new Func<AIBehaviour.TransitionTestResult>[] {
             
             // attack_target -> follow_target
             () => {

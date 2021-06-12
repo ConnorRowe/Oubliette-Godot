@@ -6,7 +6,7 @@ namespace Oubliette.LevelGen
     {
         public Sprite ItemSprite { get; set; }
         public Artefact CurrentArtefact { get; set; }
-        public BaseSpell CurrentSpell { get; set; }
+        public Spells.BaseSpell CurrentSpell { get; set; }
         private bool hasGeneratedItem = false;
         private bool itemTaken = false;
         private bool isHoldingSpell = false;

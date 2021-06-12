@@ -5,9 +5,9 @@ namespace Oubliette.AI
 {
     public class ProjectileBehaviour : AIBehaviour
     {
-        ProjectileSpell projectileSpell;
+        Spells.ProjectileSpell projectileSpell;
 
-        public ProjectileBehaviour(AIManager manager, ProjectileSpell projectileSpell, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
+        public ProjectileBehaviour(AIManager manager, Spells.ProjectileSpell projectileSpell, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
         {
             this.projectileSpell = projectileSpell;
 
@@ -34,7 +34,7 @@ namespace Oubliette.AI
 
         private void FireProjectile()
         {
-            projectileSpell.Cast(mgr.Owner as ICastsSpells);
+            projectileSpell.Cast(mgr.Owner as Spells.ICastsSpells);
         }
     }
 }

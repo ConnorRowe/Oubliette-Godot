@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Oubliette.Stats;
 
-namespace Oubliette
+namespace Oubliette.Spells
 {
     public class BuffSpell : BaseSpell
     {

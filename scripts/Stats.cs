@@ -27,7 +27,7 @@ namespace Oubliette.Stats
         public uint startTime;
         // Set duration 0 to be permanent
         public uint duration;
-        public BuffSpell notifyExpired;
+        public Spells.BuffSpell notifyExpired;
     }
 
     public static class Buffs
@@ -50,7 +50,7 @@ namespace Oubliette.Stats
         };
 
         // Duration is in seconds for ease of use
-        public static Buff CreateBuff(string name, List<(Stat stat, float amount)> stats, float duration, BuffSpell notifyExpired = null)
+        public static Buff CreateBuff(string name, List<(Stat stat, float amount)> stats, float duration, Spells.BuffSpell notifyExpired = null)
         {
             return new Buff()
             {

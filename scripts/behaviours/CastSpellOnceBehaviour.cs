@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Oubliette.Spells;
 
 namespace Oubliette.AI
 {

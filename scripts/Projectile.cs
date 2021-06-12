@@ -10,14 +10,22 @@ namespace Oubliette
         private float knockback = 0;
         private float speed = 0;
         private Color spellColour = Colors.Transparent;
-
         private float rangeCounter = 0;
         private bool deactivated = false;
-        public Vector2 direction = new Vector2(0, 0);
-        public Character source = null;
+        private float projCurveCount = 0.0f;
 
-        public Light2D light;
-        public Particles2D particles;
+        private Vector2 direction = new Vector2(0, 0);
+        private float directionRadians = 0.0f;
+
+        public Character Source { get; set; } = null;
+        public Light2D Light { get; set; }
+        public Particles2D Particles { get; set; }
+        public Curve CurveX { get; set; }
+        public Curve CurveY { get; set; }
+        public float CurveInterpSpeed { get; set; }
+        public float CurveMoveSpeed { get; set; }
+
+
         private Tween tween;
         private AudioStreamPlayer2D explodePlayer;
         private AudioStreamRandomPitch explodeSound = new AudioStreamRandomPitch();
@@ -30,12 +38,13 @@ namespace Oubliette
         [Export]
         private AudioStreamSample baseExplodeSound;
 
+
         public override void _Ready()
         {
             base._Ready();
 
-            light = GetNode<Light2D>("Light2D");
-            particles = GetNodeOrNull<Particles2D>("Particles2D");
+            Light = GetNode<Light2D>("Light2D");
+            Particles = GetNodeOrNull<Particles2D>("Particles2D");
             tween = GetNode<Tween>("Tween");
             explodePlayer = GetNode<AudioStreamPlayer2D>("ExplodePlayer");
 
@@ -51,7 +60,25 @@ namespace Oubliette
         {
             base._PhysicsProcess(delta);
 
-            Vector2 move = direction * speed * delta;
+            Vector2 curveAdjust = Vector2.Zero;
+
+            if (CurveInterpSpeed > 0.0f)
+            {
+                if (CurveX != null)
+                    curveAdjust.x = CurveX.InterpolateBaked(projCurveCount);
+                if (CurveY != null)
+                    curveAdjust.y = CurveY.InterpolateBaked(projCurveCount);
+
+                curveAdjust = curveAdjust.Rotated(directionRadians);
+                curveAdjust *= CurveMoveSpeed;
+
+                projCurveCount += (delta * CurveInterpSpeed);
+
+                if (projCurveCount >= 1.0f)
+                    projCurveCount -= 1.0f;
+            }
+
+            Vector2 move = ((direction * speed) + curveAdjust) * delta;
 
             KinematicCollision2D collide = MoveAndCollide(move);
 
@@ -69,12 +96,12 @@ namespace Oubliette
 
         private void Hit(Node node)
         {
-            if (deactivated || node.Owner == source || node is Projectile)
+            if (deactivated || node.Owner == Source || node is Projectile)
                 return;
 
             if (node.Owner is Character character)
             {
-                character.TakeDamage(damage, source, dmgSourceName);
+                character.TakeDamage(damage, Source, dmgSourceName);
                 character.ApplyKnockBack(direction * knockback);
                 hitCharEvent?.Invoke(character);
             }
@@ -93,17 +120,17 @@ namespace Oubliette
             SetPhysicsProcess(false);
 
             float hueCache = 0.0f;
-            if (particles.ProcessMaterial != null && particles.ProcessMaterial is ParticlesMaterial pMat)
+            if (Particles.ProcessMaterial != null && Particles.ProcessMaterial is ParticlesMaterial pMat)
                 hueCache = pMat.HueVariation;
 
             direction = Vector2.Zero;
-            particles.OneShot = true;
-            particles.Explosiveness = 1.0f;
-            particles.ProcessMaterial = explodeParticleMaterial;
-            ((ParticlesMaterial)particles.ProcessMaterial).HueVariation = hueCache;
-            particles.Restart();
+            Particles.OneShot = true;
+            Particles.Explosiveness = 1.0f;
+            Particles.ProcessMaterial = explodeParticleMaterial;
+            ((ParticlesMaterial)Particles.ProcessMaterial).HueVariation = hueCache;
+            Particles.Restart();
 
-            tween.InterpolateProperty(light, "energy", light.Energy, 0.0f, 0.5f, Tween.TransitionType.Quad);
+            tween.InterpolateProperty(Light, "energy", Light.Energy, 0.0f, 0.5f, Tween.TransitionType.Quad);
             tween.InterpolateCallback(this, 0.5f, nameof(Die));
             tween.Start();
 
@@ -133,12 +160,18 @@ namespace Oubliette
         {
             spellColour = newColour;
 
-            if (particles.ProcessMaterial != null)
+            if (Particles.ProcessMaterial != null)
             {
-                GradientTexture particleColourRamp = (GradientTexture)((ParticlesMaterial)particles.ProcessMaterial).ColorRamp;
+                GradientTexture particleColourRamp = (GradientTexture)((ParticlesMaterial)Particles.ProcessMaterial).ColorRamp;
                 particleColourRamp.Gradient.SetColor(0, spellColour);
                 explodeParticleMaterial.ColorRamp = particleColourRamp;
             }
+        }
+
+        public void SetDirection(Vector2 direction)
+        {
+            this.direction = direction;
+            directionRadians = Mathf.Atan2(direction.x, direction.y);
         }
     }
 }

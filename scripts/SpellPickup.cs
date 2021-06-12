@@ -1,3 +1,4 @@
+using Oubliette.Spells;
 
 namespace Oubliette
 {

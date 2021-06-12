@@ -81,7 +81,7 @@ _levelPath = NodePath("LevelGenerator")
 _debugOverlayPath = NodePath("CanvasLayer/DebugOverlay")
 _globalLightingPath = NodePath("CanvasModulate")
 _tweenPath = NodePath("Tween")
-defaultGlobalLighting = Color( 0.15, 0.1425, 0.1425, 1 )
+defaultGlobalLighting = Color( 0.14902, 0.141176, 0.141176, 1 )
 _artefactNamePopupPath = NodePath("CanvasLayer/ArtefactNamePopup")
 
 [node name="CharOverlayViewport" type="Viewport" parent="."]

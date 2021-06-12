@@ -1,6 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 using Oubliette.Stats;
+using Oubliette.Spells;
 
 namespace Oubliette
 {
@@ -142,10 +143,10 @@ namespace Oubliette
             buffTrackerContainer = World.GetNode<GridContainer>("CanvasLayer/BuffTrackerContainer");
 
             Items items = GetNode<Items>("/root/Items");
-            var magicMissile = items.FindSpellPoolEntry(Spells.MagicMissile, Items.LootPool.GENERAL);
+            var magicMissile = items.FindSpellPoolEntry(Spells.Spells.MagicMissile, Items.LootPool.GENERAL);
             PickUpPrimarySpell(magicMissile.spell);
             items.RemoveSpellFromPools(magicMissile);
-            secondarySpell = Spells.IceSkin;
+            secondarySpell = Spells.Spells.IceSkin;
 
             CachePrimarySpellColour();
 
@@ -292,7 +293,7 @@ namespace Oubliette
 
             if (Input.IsActionPressed("g_cast_primary_spell"))
             {
-                if (currentMajyka >= GetSpellCost(primarySpell.majykaCost) && primarySpellCooldown == 0.0f)
+                if (currentMajyka >= GetSpellCost(primarySpell.MajykaCost) && primarySpellCooldown == 0.0f)
                 {
                     // Cast primary spell
                     primarySpell.Cast(this);
@@ -300,7 +301,7 @@ namespace Oubliette
                     spellSoundPlayer.Stream = spellCastSound;
                     spellSoundPlayer.Play(0);
 
-                    currentMajyka -= GetSpellCost(primarySpell.majykaCost);
+                    currentMajyka -= GetSpellCost(primarySpell.MajykaCost);
                     UpdateMajykaBar();
 
                     primarySpellCooldown = GetMaxPrimarySpellCooldown();
@@ -577,14 +578,14 @@ namespace Oubliette
 
         public void CastSecondarySpell()
         {
-            if (currentMajyka >= GetSpellCost(secondarySpell.majykaCost))
+            if (currentMajyka >= GetSpellCost(secondarySpell.MajykaCost))
             {
                 secondarySpell.Cast(this);
 
                 spellSoundPlayer.Stream = spellCastSound;
                 spellSoundPlayer.Play(0);
 
-                currentMajyka -= GetSpellCost(secondarySpell.majykaCost);
+                currentMajyka -= GetSpellCost(secondarySpell.MajykaCost);
                 UpdateMajykaBar();
             }
         }
@@ -859,7 +860,7 @@ namespace Oubliette
 
         private void CachePrimarySpellColour()
         {
-            Color baseColour = primarySpell.baseColour;
+            Color baseColour = primarySpell.BaseColour;
 
             foreach (var modifier in SpellColourMods)
             {

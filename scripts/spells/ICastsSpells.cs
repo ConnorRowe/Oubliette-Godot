@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Oubliette
+namespace Oubliette.Spells
 {
     public interface ICastsSpells
     {

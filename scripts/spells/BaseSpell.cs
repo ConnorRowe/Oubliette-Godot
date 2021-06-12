@@ -1,31 +1,36 @@
 using Godot;
 using System;
 
-namespace Oubliette
+namespace Oubliette.Spells
 {
     public abstract class BaseSpell : Reference
     {
-        public readonly string Name;
-        protected readonly int damage;
-        protected readonly float range;
-        protected readonly float knockback;
-        protected readonly float speed;
-        public readonly float majykaCost;
-        public readonly Color baseColour;
-        public readonly Texture Icon;
-        public readonly Action<Character> HitCharEvent;
+        public string Name { get; set; }
+        public int Damage { get; set; }
+        public float Range { get; set; }
+        public float Knockback { get; set; }
+        public float Speed { get; set; }
+        public float MajykaCost { get; set; }
+        public Color BaseColour { get; set; }
+        public Texture Icon { get; set; }
+        public Action<Character> HitCharEvent { get; set; }
 
         public BaseSpell() { }
 
         public BaseSpell(string name, int damage, float range, float knockback, float speed, float majykaCost, Color baseColour, Texture icon, Action<Character> hitCharEvt)
         {
+            SetBasicStats(name, damage, range, knockback, speed, majykaCost, baseColour, icon, hitCharEvt);
+        }
+
+        public void SetBasicStats(string name, int damage, float range, float knockback, float speed, float majykaCost, Color baseColour, Texture icon, Action<Character> hitCharEvt)
+        {
             Name = name;
-            this.damage = damage;
-            this.range = range;
-            this.knockback = knockback;
-            this.speed = speed;
-            this.majykaCost = majykaCost;
-            this.baseColour = baseColour;
+            this.Damage = damage;
+            this.Range = range;
+            this.Knockback = knockback;
+            this.Speed = speed;
+            this.MajykaCost = majykaCost;
+            this.BaseColour = baseColour;
             Icon = icon;
             HitCharEvent = hitCharEvt;
         }
