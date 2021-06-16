@@ -121,11 +121,14 @@ namespace Oubliette.AI
 
         public override void Die()
         {
-            // stop spell from charging and firing
-            tween.StopAll();
-            weaponParticles.QueueFree();
+            if (!IsDead)
+            {
+                // stop spell from charging and firing
+                tween.StopAll();
+                weaponParticles.Emitting = false;
 
-            tween.InterpolateMethod(this, nameof(SetWeaponGlow), 20.0f, 1.0f, 4.0f, Tween.TransitionType.Cubic, Tween.EaseType.In);
+                tween.InterpolateMethod(this, nameof(SetWeaponGlow), 20.0f, 1.0f, 4.0f, Tween.TransitionType.Cubic, Tween.EaseType.In);
+            }
 
             base.Die();
         }

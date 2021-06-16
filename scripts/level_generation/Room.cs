@@ -153,8 +153,8 @@ namespace Oubliette.LevelGen
             foreach (var door in Doors)
             {
                 door.Value.Frame = unlock ? 1 : 0;
-                door.Value.GetChild<Area2D>(0).Monitorable = unlock;
-                door.Value.GetChild<Area2D>(0).Monitoring = unlock;
+                door.Value.GetChild<Area2D>(0).SetDeferred("monitorable", unlock);
+                door.Value.GetChild<Area2D>(0).SetDeferred("monitoring", unlock);
             }
         }
 

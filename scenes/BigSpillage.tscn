@@ -1,0 +1,79 @@
+[gd_scene load_steps=17 format=2]
+
+[ext_resource path="res://scenes/SpillageHazard.tscn" type="PackedScene" id=1]
+[ext_resource path="res://textures/screen_shine.png" type="Texture" id=2]
+[ext_resource path="res://materials/ScreenShine.shader" type="Shader" id=3]
+[ext_resource path="res://textures/big_spillage_anim.png" type="Texture" id=4]
+[ext_resource path="res://scripts/BigSpillage.cs" type="Script" id=5]
+
+[sub_resource type="ShaderMaterial" id=1]
+shader = ExtResource( 3 )
+shader_param/shineTex = ExtResource( 2 )
+
+[sub_resource type="AtlasTexture" id=2]
+atlas = ExtResource( 4 )
+region = Rect2( 0, 0, 64, 32 )
+
+[sub_resource type="AtlasTexture" id=3]
+atlas = ExtResource( 4 )
+region = Rect2( 64, 0, 64, 32 )
+
+[sub_resource type="AtlasTexture" id=4]
+atlas = ExtResource( 4 )
+region = Rect2( 128, 0, 64, 32 )
+
+[sub_resource type="AtlasTexture" id=5]
+atlas = ExtResource( 4 )
+region = Rect2( 192, 0, 64, 32 )
+
+[sub_resource type="SpriteFrames" id=6]
+animations = [ {
+"frames": [ SubResource( 2 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ) ],
+"loop": false,
+"name": "default",
+"speed": 10.0
+} ]
+
+[sub_resource type="Curve" id=7]
+_data = [ Vector2( 0, 0 ), 0.0, 1.5608, 0, 1, Vector2( 0.097561, 0.152273 ), 0.0, 0.0, 0, 0, Vector2( 0.487805, 0.155682 ), 0.0, 0.0, 0, 0, Vector2( 0.675958, 0.473864 ), 0.0, 0.0, 0, 0, Vector2( 1, 1 ), 1.62367, 0.0, 1, 0 ]
+
+[sub_resource type="CurveTexture" id=8]
+curve = SubResource( 7 )
+
+[sub_resource type="Curve" id=9]
+max_value = 20.0
+_data = [ Vector2( 0, 0 ), 0.0, 0.0, 0, 0, Vector2( 0.689895, 0 ), 0.0, 0.0, 0, 0, Vector2( 0.749129, 20 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=10]
+curve = SubResource( 9 )
+
+[sub_resource type="ParticlesMaterial" id=11]
+resource_local_to_scene = true
+emission_shape = 2
+emission_box_extents = Vector3( 20.669, 9.442, 1 )
+flag_disable_z = true
+gravity = Vector3( 0, 0, 0 )
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+linear_accel_curve = SubResource( 10 )
+anim_offset_curve = SubResource( 8 )
+
+[node name="BigSpillage" instance=ExtResource( 1 )]
+script = ExtResource( 5 )
+
+[node name="Sprite" parent="." index="0"]
+visible = false
+texture = null
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="." index="1"]
+material = SubResource( 1 )
+frames = SubResource( 6 )
+frame = 3
+playing = true
+
+[node name="CollisionPolygon2D" parent="." index="2"]
+polygon = PoolVector2Array( -17, -18, -26, -19, -27, -21, -15, -24, -3, -26, 18, -21, 27, -15, 28, -11, 22, -10, 31, 2, 5, 3, -18, 3, -29, -4, -31, -12 )
+
+[node name="Bubbles" parent="." index="3"]
+position = Vector2( -1, 0 )
+process_material = SubResource( 11 )

@@ -41,33 +41,45 @@ namespace Oubliette
             }
         }
 
-        public static ArtefactTextureSet emptyTexSet = new ArtefactTextureSet(Vector2.Zero, null, null, null);
+        public static ArtefactTextureSet EmptyTexSet { get; } = new ArtefactTextureSet(Vector2.Zero, null, null, null);
 
         public string Name { get; set; }
         public string Description { get; set; }
-        public Texture Texture { get; set; }
-        private Action<Player> playerPickUpAction { get; set; }
-        public ArtefactTextureSet TextureSet;
-        public float RarityWeight;
+        public Texture Icon { get; set; }
+        public Action<Player> PlayerPickUpAction { get; set; }
+        public Action<Player> OnPlayerDamaged { get; set; }
+        public ArtefactTextureSet TextureSet { get; set; } = EmptyTexSet;
+        public float RarityWeight { get; set; }
+
+        private Player player;
 
         public Artefact(string name, string desc, float rarityWeight, Texture texture, Action<Player> playerPickUpAction, ArtefactTextureSet textureSet)
         {
             Name = name;
             Description = desc;
-            Texture = texture;
-            this.playerPickUpAction = playerPickUpAction;
+            Icon = texture;
+            this.PlayerPickUpAction = playerPickUpAction;
             TextureSet = textureSet;
             RarityWeight = rarityWeight;
         }
 
         public void PlayerPickUp(Player player)
         {
-            playerPickUpAction(player);
+            this.player = player;
+
+            PlayerPickUpAction?.Invoke(player);
 
             if (TextureSet.IsValid())
                 player.artefactTextureSets.Add(TextureSet);
 
             player.PickedUpArtefact(this);
+
+            player.Connect(nameof(Player.PlayerDamaged), this, nameof(PlayerDamaged));
+        }
+
+        private void PlayerDamaged(int damage)
+        {
+            OnPlayerDamaged?.Invoke(player);
         }
     }
 }

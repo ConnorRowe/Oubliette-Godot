@@ -6,6 +6,13 @@ namespace Oubliette
     {
         private BaseSpell spell;
 
+        public override void _Ready()
+        {
+            base._Ready();
+
+            IsActive = true;
+        }
+
         public void SetSpell(BaseSpell spell)
         {
             this.spell = spell;

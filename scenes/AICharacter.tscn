@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://scripts/AICharacter.cs" type="Script" id=1]
 [ext_resource path="res://textures/shadow.png" type="Texture" id=2]
@@ -59,6 +59,9 @@ tracks/1/keys = {
 "values": [ 0.0, 1.0, 0.0 ]
 }
 
+[sub_resource type="RectangleShape2D" id=6]
+extents = Vector2( 2.5, 1 )
+
 [node name="AICharacter" type="KinematicBody2D"]
 z_index = 1
 script = ExtResource( 1 )
@@ -68,7 +71,7 @@ _rightLeftColliderPath = NodePath("Hitbox/LeftRight")
 _charSpritePath = NodePath("CharSprite")
 _shadowSpritePath = NodePath("shadow")
 _animationPlayerPath = NodePath("AnimationPlayer")
-maxHealth = 1
+_feetAreaPath = NodePath("FeetArea")
 _animDown = "default"
 _animLeftRight = "default"
 _animUp = "default"
@@ -140,3 +143,13 @@ scale = Vector2( 1e-05, 1 )
 texture = ExtResource( 8 )
 
 [node name="Tween" type="Tween" parent="."]
+
+[node name="FeetArea" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 16
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FeetArea"]
+shape = SubResource( 6 )

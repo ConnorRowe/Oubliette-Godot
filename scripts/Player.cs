@@ -13,8 +13,6 @@ namespace Oubliette
         private BaseSpell secondarySpell;
         private SceneTreeTimer spellEffectTimer;
         private SceneTreeTimer takeDmgTimer;
-        private SceneTreeTimer spillageDmgTimer;
-        private int spillageCount = 0;
         private bool canTakeDamage = true;
         private float primarySpellCooldown = 0.0f;
         public float maxPrimarySpellCooldown = 0.5f;
@@ -51,7 +49,6 @@ namespace Oubliette
         private Node2D spellSpawnPoint;
         private ItemDisplaySlot potionSlot;
         private ItemDisplaySlot primarySpellSlot;
-        private SpillageHazard lastSpillage;
         private PlayerGib headGib;
         private AudioStreamPlayer hitSoundPlayer;
         private AudioStreamPlayer spellSoundPlayer;
@@ -86,15 +83,13 @@ namespace Oubliette
         // Signals
         [Signal]
         public delegate void PlayerDied(Player player);
+        [Signal]
+        public delegate void PlayerDamaged(int damage);
 
         // Called when the node enters the scene tree for the first time.
         public override void _Ready()
         {
             base._Ready();
-
-            Area2D feetArea = GetNode<Area2D>("FeetArea");
-            feetArea.Connect("area_entered", this, nameof(OnAreaEntered));
-            feetArea.Connect("area_exited", this, nameof(OnAreaExited));
 
             debugPoint = GD.Load<Texture>("res://textures/2x2_white.png");
             projectileScene = GD.Load<PackedScene>("res://scenes/Projectile.tscn");
@@ -379,7 +374,8 @@ namespace Oubliette
 
         public override void Die()
         {
-            base.Die();
+            if (IsDead)
+                return;
 
             KilledBy = lastDamagedBy;
 
@@ -415,6 +411,8 @@ namespace Oubliette
 
             charSprite.Visible = false;
             shadowSprite.Visible = false;
+
+            base.Die();
 
             EmitSignal(nameof(PlayerDied), this);
         }
@@ -624,6 +622,8 @@ namespace Oubliette
                 canTakeDamage = false;
                 takeDmgTimer = GetTree().CreateTimer(0.25f, false);
                 takeDmgTimer.Connect("timeout", this, nameof(ResetCanTakeDamage));
+
+                EmitSignal(nameof(PlayerDamaged), damage);
             }
         }
 
@@ -700,42 +700,6 @@ namespace Oubliette
         private float GetMaxPrimarySpellCooldown()
         {
             return (maxPrimarySpellCooldown + currentStats[Stat.CooldownFlat]) * currentStats[Stat.CooldownMultplier];
-        }
-
-        public void OnAreaEntered(Area2D area)
-        {
-            if (area is SpillageHazard spillage)
-            {
-                spillageCount++;
-
-                if (spillageCount == 1)
-                {
-                    if (spillageDmgTimer != null && spillageDmgTimer.TimeLeft > 0.0f)
-                        return;
-
-                    lastSpillage = spillage;
-                    SpillageDamage();
-                }
-            }
-        }
-
-        public void OnAreaExited(Area2D area)
-        {
-            if (area is SpillageHazard)
-            {
-                spillageCount--;
-            }
-        }
-
-        private void SpillageDamage()
-        {
-            if (spillageCount > 0)
-            {
-                TakeDamage(sourceName: lastSpillage.DmgSourceName);
-
-                spillageDmgTimer = GetTree().CreateTimer(1.0f, false);
-                spillageDmgTimer.Connect("timeout", this, nameof(SpillageDamage));
-            }
         }
 
         public bool PickUpPotion(Potion newPotion)

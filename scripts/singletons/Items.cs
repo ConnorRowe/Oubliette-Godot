@@ -23,13 +23,23 @@ namespace Oubliette
         private Dictionary<LootPool, float> artefactPoolWeightSum = new Dictionary<LootPool, float>() { { LootPool.GENERAL, 0.0f }, { LootPool.ENEMY, 0.0f }, { LootPool.WOOD_CHEST, 0.0f } };
         private Dictionary<LootPool, float> spellPoolWeightSum = new Dictionary<LootPool, float>() { { LootPool.GENERAL, 0.0f }, { LootPool.ENEMY, 0.0f }, { LootPool.WOOD_CHEST, 0.0f } };
 
-        private PackedScene potionScene;
         private Artefact defaultArtefact = new Artefact("Vital Elixir", "you feel more vital!", 1.0f, GD.Load<Texture>("res://textures/health_potion.png"),
         (Player p) =>
         {
             p.AdjustMaxHealth(4, true);
-        }, Artefact.emptyTexSet);
-        private PackedScene spellPickupScene;
+        }, Artefact.EmptyTexSet);
+
+        private static PackedScene potionScene;
+        private static PackedScene spellPickupScene;
+        private static PackedScene bigSpillageScene;
+
+        static Items()
+        {
+            potionScene = GD.Load<PackedScene>("res://scenes/Potion.tscn");
+            spellPickupScene = GD.Load<PackedScene>("res://scenes/SpellPickup.tscn");
+            bigSpillageScene = GD.Load<PackedScene>("res://scenes/BigSpillage.tscn");
+        }
+
 
         public void RegisterArtefact(Artefact artifact, LootPool[] lootPools)
         {
@@ -166,8 +176,6 @@ namespace Oubliette
         public Items()
         {
             Rng.Randomize();
-            potionScene = GD.Load<PackedScene>("res://scenes/Potion.tscn");
-            spellPickupScene = GD.Load<PackedScene>("res://scenes/SpellPickup.tscn");
 
             RegisterArtefacts();
             RegisterPickups();
@@ -192,7 +200,7 @@ namespace Oubliette
             {
                 p.ApplyTimedBuff(Buffs.CreateBuff("Amanita Muscaria",
             new List<(Stat stat, float amount)>() { (Stat.DamageFlat, 1.0f), (Stat.RangeMultiplier, 1.25f), (Stat.MagykaCostMultiplier, 0.75f) }, 0));
-            }, Artefact.emptyTexSet), new LootPool[] { LootPool.GENERAL });
+            }, Artefact.EmptyTexSet), new LootPool[] { LootPool.GENERAL });
 
             RegisterArtefact(new Artefact("Grunty's Hat", "although she's dim, she attended Fat Hag High!", rarityWeight: 0.7f, GD.Load<Texture>("res://textures/witch_hat.png"),
             (Player p) =>
@@ -202,6 +210,24 @@ namespace Oubliette
             new List<(Stat stat, float amount)>() { (Stat.SpellSpeedMultiplier, 1.5f), (Stat.RangeMultiplier, 2.0f), (Stat.MagykaCostMultiplier, -0.5f), (Stat.CooldownMultplier, -0.5f) }, 0));
             }, new Artefact.ArtefactTextureSet(new Vector2(-3, -22), GD.Load<Texture>("res://textures/witch_hat_equip_updown.png"), GD.Load<Texture>("res://textures/witch_hat_equip_updown.png"), GD.Load<Texture>("res://textures/witch_hat_equip_leftright.png"))
             ), new LootPool[] { LootPool.GENERAL });
+
+            RegisterArtefact(new ArtefactBuilder().SetName("Bucket o' Blood").SetDescription("watch your iron levels").SetRarityWeight(0.4f).SetIcon(GD.Load<Texture>("res://textures/bucket_o_blood.png"))
+                .SetOnPlayerDamaged(p =>
+                {
+                    p.BloodTrailAmount += 1f;
+
+                    // Spawn big blood spillage
+                    if (Rng.Randf() <= 0.2f)
+                    {
+                        BigSpillage spillage = bigSpillageScene.Instance<BigSpillage>();
+                        p.World.CallDeferred("add_child", spillage);
+                        spillage.SetColours(new Color(0.760784f, 0, 0.101961f), new Color(1, 0.501961f, 0.501961f));
+                        spillage.EnemyOwned = false;
+                        spillage.LifeTime = 5.0f;
+                        spillage.SetDeferred("position", p.Position);
+                    }
+
+                }).Build(), new LootPool[] { LootPool.GENERAL });
         }
 
         private void RegisterPickups()

@@ -169,6 +169,8 @@ namespace Oubliette
         public bool CheckSlideCollisions { get; set; } = false;
         private float CheckSlideMaxCD = 0.15f;
         private float checkSlideCD = 0.0f;
+        private SceneTreeTimer spillageDmgTimer;
+        private int spillageCount = 0;
 
         public float Elevation { get { return elevation; } }
 
@@ -198,6 +200,8 @@ namespace Oubliette
         protected KinematicBody2D hitbox;
         private CollisionPolygon2D upDownCollider;
         private CollisionPolygon2D rightLeftCollider;
+        protected Area2D feetArea;
+        private SpillageHazard lastSpillage;
 
         // Export
         [Export]
@@ -215,9 +219,15 @@ namespace Oubliette
         [Export]
         private NodePath _animationPlayerPath;
         [Export]
+        private NodePath _feetAreaPath;
+        [Export]
         public int MaxHealth { get; set; } = 12;
         [Export]
         private bool renderElevation = false;
+        [Export]
+        private bool tracksSpillages = true;
+        [Export]
+        public bool IsOnEnemyTeam { get; set; } = true;
 
         // Sprite animations
         [Export]
@@ -247,6 +257,10 @@ namespace Oubliette
             hitbox = GetNode<KinematicBody2D>(_hitboxPath);
             upDownCollider = GetNode<CollisionPolygon2D>(_upDownColliderPath);
             rightLeftCollider = GetNode<CollisionPolygon2D>(_rightLeftColliderPath);
+            feetArea = GetNode<Area2D>(_feetAreaPath);
+            feetArea.Connect("area_entered", this, nameof(OnFeetAreaEntered));
+            feetArea.Connect("area_exited", this, nameof(OnFeetAreaExited));
+
 
             CurrentHealth = MaxHealth;
 
@@ -423,6 +437,51 @@ namespace Oubliette
             EmitSignal(nameof(SlideCollision), kinematicCollision);
         }
 
+        public virtual void OnFeetAreaEntered(Area2D area)
+        {
+            if (tracksSpillages && area is SpillageHazard spillage && spillage.EnemyOwned != IsOnEnemyTeam && spillage.Active)
+            {
+                spillageCount++;
+
+                if (spillageCount == 1)
+                {
+                    if (spillageDmgTimer != null && spillageDmgTimer.TimeLeft > 0.0f)
+                        return;
+
+                    lastSpillage = spillage;
+                    SpillageDamage();
+                }
+
+            }
+        }
+
+        public virtual void OnFeetAreaExited(Area2D area)
+        {
+            if (tracksSpillages && area is SpillageHazard spillage && spillage.EnemyOwned != IsOnEnemyTeam && spillage.Active)
+            {
+                spillageCount--;
+            }
+        }
+
+        private void SpillageDamage()
+        {
+            if (spillageCount > 0)
+            {
+                if (!lastSpillage.Active)
+                {
+                    spillageCount--;
+
+                    if (spillageCount <= 0)
+                        return;
+                }
+
+                TakeDamage(sourceName: lastSpillage.DmgSourceName);
+
+                spillageDmgTimer = GetTree().CreateTimer(1.0f, false);
+                spillageDmgTimer.Connect("timeout", this, nameof(SpillageDamage));
+            }
+        }
+
         public bool IsAirborne()
         {
             return this.elevation > 0;
@@ -530,6 +589,9 @@ namespace Oubliette
 
         public virtual void TakeDamage(int damage = 1, Character source = null, string sourceName = "")
         {
+            if (IsDead)
+                return;
+
             lastDamagedBy = sourceName;
 
             // Resist damage

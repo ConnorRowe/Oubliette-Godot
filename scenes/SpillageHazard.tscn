@@ -32,7 +32,7 @@ curve = SubResource( 5 )
 [sub_resource type="ParticlesMaterial" id=7]
 resource_local_to_scene = true
 emission_shape = 1
-emission_sphere_radius = 2.67
+emission_sphere_radius = 2.5
 flag_disable_z = true
 gravity = Vector3( 0, 0, 0 )
 orbit_velocity = 0.0
@@ -41,9 +41,9 @@ linear_accel_curve = SubResource( 6 )
 anim_offset_curve = SubResource( 4 )
 
 [node name="SpillageHazard" type="Area2D"]
-monitoring = false
-collision_layer = 16
-collision_mask = 0
+z_index = -1
+collision_layer = 18
+collision_mask = 18
 script = ExtResource( 2 )
 
 [node name="Sprite" type="Sprite" parent="."]

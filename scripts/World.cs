@@ -134,7 +134,7 @@ namespace Oubliette
                 // Lower blood opacity when amount is low
                 Color weakBlood = player.BloodTrailColour;
                 weakBlood.a = Math.Min(1.0f, player.BloodTrailAmount);
-                
+
                 float posDelta = lastPlayerPos.DistanceTo(newPlayerPos);
                 Vector2 randOffset = new Vector2(rng.RandfRange(-2, 2), rng.RandfRange(-2, 2));
 
@@ -185,10 +185,20 @@ namespace Oubliette
                         // BottleSmashEffect bottleTest = TestSpawnNodeAtMouse<BottleSmashEffect>("res://scenes/BottleSmashEffect.tscn");
                         // bottleTest.Start(new Vector2(rng.RandfRange(2.0f, 3.5f) * (rng.Randf() <= 0.5f ? -1.0f : 1.0f), rng.RandfRange(-1.0f, 1.0f)), rng.RandfRange(350.0f, 500.0f));
 
-                        TestSpawnEnemyAtMouse<AI.AICharacter>("res://scenes/enemies/Imp.tscn").Position += (Vector2.Up * 32.0f);
-                        TestSpawnEnemyAtMouse<AI.AICharacter>("res://scenes/enemies/FireFly.tscn").Position += (Vector2.Left * 32.0f);
-                        TestSpawnEnemyAtMouse<AI.AICharacter>("res://scenes/enemies/Slime.tscn").Position += (Vector2.Right * 32.0f);
-                        TestSpawnEnemyAtMouse<AI.AICharacter>("res://scenes/enemies/Snail.tscn").Position += (Vector2.Down * 32.0f);
+                        // TestSpawnEnemyAtMouse<AI.AICharacter>("res://scenes/enemies/Imp.tscn").Position += (Vector2.Up * 32.0f);
+                        // TestSpawnEnemyAtMouse<AI.AICharacter>("res://scenes/enemies/FireFly.tscn").Position += (Vector2.Left * 32.0f);
+                        // TestSpawnEnemyAtMouse<AI.AICharacter>("res://scenes/enemies/Slime.tscn").Position += (Vector2.Right * 32.0f);
+                        // TestSpawnEnemyAtMouse<AI.AICharacter>("res://scenes/enemies/Snail.tscn").Position += (Vector2.Down * 32.0f);
+
+
+                        if (emb.Shift)
+                        {
+                            TestSpawnNodeAtMouse<Pedestal>("res://scenes/Pedestal.tscn").GenerateItem();
+                        }
+                        else
+                        {
+                            TestSpawnEnemyAtMouse<AI.AICharacterWithWeaponRanged>("res://scenes/enemies/SkeletonMage.tscn");
+                        }
                     }
                 }
             }

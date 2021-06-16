@@ -199,3 +199,6 @@ polygon = PoolVector2Array( -2, 0, -2, -19, 3, -19, 4, -10, 3, 0 )
 
 [node name="LeftRight" parent="Hitbox" index="1"]
 polygon = PoolVector2Array( 0, 0, -2, -19, 2, -19, 2, 0 )
+
+[node name="CollisionShape2D" parent="FeetArea" index="0"]
+position = Vector2( 0.5, -1 )

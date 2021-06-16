@@ -322,6 +322,7 @@ shader_param/color_ramp = SubResource( 11 )
 script = ExtResource( 5 )
 DamageSourceName = "a Firefly"
 MaxHealth = 2
+tracksSpillages = false
 _animDeath = ""
 maxMovementSpeed = 28.0
 PathTolerance = 4.0

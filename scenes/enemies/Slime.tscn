@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=2]
+[gd_scene load_steps=28 format=2]
 
 [ext_resource path="res://scenes/AICharacter.tscn" type="PackedScene" id=1]
 [ext_resource path="res://textures/slime_death.png" type="Texture" id=2]
@@ -128,6 +128,9 @@ animations = [ {
 "speed": 7.5
 } ]
 
+[sub_resource type="RectangleShape2D" id=23]
+extents = Vector2( 5, 1 )
+
 [node name="Slime" instance=ExtResource( 1 )]
 script = ExtResource( 3 )
 DamageSourceName = "a Slime"
@@ -155,3 +158,7 @@ polygon = PoolVector2Array( -6, 0, -6, -3, -3, -7, 0, -8, 3, -7, 6, -3, 6, 0 )
 
 [node name="LeftRight" parent="Hitbox" index="1"]
 polygon = PoolVector2Array( -6, 0, -6, -3, -3, -7, 0, -8, 3, -7, 6, -3, 6, 0 )
+
+[node name="CollisionShape2D" parent="FeetArea" index="0"]
+position = Vector2( 0, -1 )
+shape = SubResource( 23 )

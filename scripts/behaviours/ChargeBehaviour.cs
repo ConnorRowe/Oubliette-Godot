@@ -74,7 +74,7 @@ namespace Oubliette.AI
             {
                 if (node is Player player)
                 {
-                    player.TakeDamage(1, mgr.Owner);
+                    player.TakeDamage(1, mgr.Owner, mgr.Owner.DamageSourceName);
                 }
 
                 if (node is Character character)

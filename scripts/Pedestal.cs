@@ -55,7 +55,7 @@ namespace Oubliette.LevelGen
                 if (!isHoldingSpell)
                     CurrentArtefact = items.GetRandomArtefact(Items.LootPool.GENERAL);
 
-                ItemSprite.Texture = isHoldingSpell ? CurrentSpell.Icon : CurrentArtefact.Texture;
+                ItemSprite.Texture = isHoldingSpell ? CurrentSpell.Icon : CurrentArtefact.Icon;
 
                 hasGeneratedItem = true;
             }
