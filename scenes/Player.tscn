@@ -137,8 +137,8 @@ collision_layer = 512
 script = ExtResource( 1 )
 IsOnEnemyTeam = false
 _hitboxPath = NodePath("Hitbox")
-_upDownColliderPath = NodePath("Hitbox/CollisionPolygon2D")
-_rightLeftColliderPath = NodePath("Hitbox/CollisionPolygon2D")
+_upDownColliderPath = NodePath("Hitbox/UpDown")
+_rightLeftColliderPath = NodePath("Hitbox/LeftRight")
 _charSpritePath = NodePath("CharSprite")
 _shadowSpritePath = NodePath("ShadowSprite")
 _animationPlayerPath = NodePath("AnimationPlayer")
@@ -224,7 +224,10 @@ visible = false
 collision_layer = 8
 collision_mask = 8
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Hitbox"]
+[node name="UpDown" type="CollisionPolygon2D" parent="Hitbox"]
+polygon = PoolVector2Array( -2, 1, -2, -17, -1, -18, 1, -18, 2, -17, 2, 1 )
+
+[node name="LeftRight" type="CollisionPolygon2D" parent="Hitbox"]
 polygon = PoolVector2Array( -2, 1, -2, -17, -1, -18, 1, -18, 2, -17, 2, 1 )
 
 [node name="FeetArea" type="Area2D" parent="."]
