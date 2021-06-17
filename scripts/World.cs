@@ -15,7 +15,6 @@ namespace Oubliette
         private HealthContainer healthContainer;
         private CanvasModulate globalLighting;
         private Tween tween;
-        private AudioStreamPlayer musicPlayer;
         private Items items;
         public ArtefactNamePopup artefactNamePopup { get; set; }
         private RichTextLabel killedByLabel;
@@ -67,7 +66,6 @@ namespace Oubliette
             healthContainer = GetNode<HealthContainer>("CanvasLayer/HealthContainer");
             globalLighting = GetNode<CanvasModulate>(_globalLightingPath);
             tween = GetNode<Tween>(_tweenPath);
-            musicPlayer = GetNode<AudioStreamPlayer>("MusicPlayer");
             items = GetNode<Items>("/root/Items");
             artefactNamePopup = GetNode<ArtefactNamePopup>(_artefactNamePopupPath);
             killedByLabel = GetNode<RichTextLabel>("CanvasLayer/KilledBy");
@@ -89,7 +87,6 @@ namespace Oubliette
             defaultKilledByText = killedByLabel.BbcodeText;
 
             globalLighting.Color = defaultGlobalLighting;
-            musicPlayer.Play();
         }
 
         public void PlayGlobalSoundEffect(AudioStream audioStream)

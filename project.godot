@@ -24,6 +24,7 @@ default_bus_layout="res://sound/default_bus_layout.tres"
 
 Spells="*res://scripts/singletons/Spells.cs"
 Items="*res://scripts/singletons/Items.cs"
+GlobalMusicPlayer="*res://scenes/GlobalMusicPlayer.tscn"
 
 [display]
 

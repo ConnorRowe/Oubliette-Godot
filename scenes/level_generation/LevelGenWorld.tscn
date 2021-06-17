@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=2]
+[gd_scene load_steps=42 format=2]
 
 [ext_resource path="res://font/small_font.tres" type="DynamicFont" id=1]
 [ext_resource path="res://scripts/World.cs" type="Script" id=2]
@@ -16,7 +16,6 @@
 [ext_resource path="res://scenes/enemies/Imp.tscn" type="PackedScene" id=14]
 [ext_resource path="res://textures/other_tiles/dungeon_wall/tileset_dungeon_wall.tres" type="TileSet" id=15]
 [ext_resource path="res://textures/other_tiles/dungeon_floor/tileset_dungeon_floor.tres" type="TileSet" id=16]
-[ext_resource path="res://sound/music/theme_mix_6.ogg" type="AudioStream" id=17]
 [ext_resource path="res://scenes/ItemDisplaySlot.tscn" type="PackedScene" id=18]
 [ext_resource path="res://textures/rgb_potion_fill.png" type="Texture" id=19]
 [ext_resource path="res://materials/PotionFill.shader" type="Shader" id=20]
@@ -304,11 +303,6 @@ format = 1
 __meta__ = {
 "_editor_description_": ""
 }
-
-[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource( 17 )
-autoplay = true
-bus = "Music"
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource( 22 )
