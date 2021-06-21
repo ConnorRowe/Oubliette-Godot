@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=2]
+[gd_scene load_steps=43 format=2]
 
 [ext_resource path="res://font/small_font.tres" type="DynamicFont" id=1]
 [ext_resource path="res://scripts/World.cs" type="Script" id=2]
@@ -16,6 +16,7 @@
 [ext_resource path="res://scenes/enemies/Imp.tscn" type="PackedScene" id=14]
 [ext_resource path="res://textures/other_tiles/dungeon_wall/tileset_dungeon_wall.tres" type="TileSet" id=15]
 [ext_resource path="res://textures/other_tiles/dungeon_floor/tileset_dungeon_floor.tres" type="TileSet" id=16]
+[ext_resource path="res://scenes/enemies/GoblinWBearTrap.tscn" type="PackedScene" id=17]
 [ext_resource path="res://scenes/ItemDisplaySlot.tscn" type="PackedScene" id=18]
 [ext_resource path="res://textures/rgb_potion_fill.png" type="Texture" id=19]
 [ext_resource path="res://materials/PotionFill.shader" type="Shader" id=20]
@@ -262,7 +263,7 @@ __meta__ = {
 }
 
 [node name="LevelGenerator" parent="." instance=ExtResource( 5 )]
-possibleEnemies = [ ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 11 ), ExtResource( 10 ), ExtResource( 24 ) ]
+possibleEnemies = [ ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 11 ), ExtResource( 10 ), ExtResource( 24 ), ExtResource( 17 ) ]
 _wallTileMapPath = NodePath("../WallTiles")
 _floorTileMapPath = NodePath("../Navigation2D/FloorTiles")
 _navigationPath = NodePath("../Navigation2D")

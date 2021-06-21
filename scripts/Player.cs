@@ -35,7 +35,7 @@ namespace Oubliette
         public float BloodTrailAmount { get; set; } = 0.0f;
         public Color BloodTrailColour { get; set; } = Colors.Transparent;
         public HashSet<BuffTracker> PerRoomBuffs { get; set; } = new HashSet<BuffTracker>();
-        private Color PlayerBloodColour = new Color(0.760784f, 0, 0.101961f);
+        public static Color PlayerBloodColour = new Color(0.760784f, 0, 0.101961f);
 
         // Nodes
         public Camera2D Camera { get; set; }
@@ -54,6 +54,7 @@ namespace Oubliette
         private AudioStreamPlayer spellSoundPlayer;
         private AudioStreamPlayer potionSoundPlayer;
         private GridContainer buffTrackerContainer;
+        private Particles2D gsTest;
 
         // Input
         private bool inputMoveUp = false;
@@ -90,6 +91,8 @@ namespace Oubliette
         public override void _Ready()
         {
             base._Ready();
+
+            gsTest = GetNode<Particles2D>("CharSprite/staff/StaffLight/gstest");
 
             debugPoint = GD.Load<Texture>("res://textures/2x2_white.png");
             projectileScene = GD.Load<PackedScene>("res://scenes/Projectile.tscn");
@@ -365,6 +368,8 @@ namespace Oubliette
             (staff.Material as ShaderMaterial).SetShaderParam("intensity", Mathf.Lerp(6.0f, 0.0f, primarySpellCooldown / maxPrimarySpellCooldown));
 
             Update();
+
+            UpdateGSTest();
         }
 
         public override void _Draw()
@@ -923,6 +928,31 @@ namespace Oubliette
             {
                 RecalcStats();
             }
+        }
+
+        private void UpdateGSTest()
+        {
+            ParticlesMaterial pMat = (ParticlesMaterial)gsTest.ProcessMaterial;
+
+            Vector3 pDir = new Vector3(facingDir.x, facingDir.y, 0f);
+
+            pMat.InitialVelocity = 40.57f;
+            pMat.Spread = 17.21f;
+
+            if (DirectionExt.FromVector(facingDir) == DirectionExt.FromVector(MovementVelocity))
+            {
+                pDir.x += MovementVelocity.x;
+                pDir.y += MovementVelocity.y;
+
+                pMat.InitialVelocity += (MovementVelocity.Length() * 2f);
+
+                pMat.Spread *= 0.5f;
+            }
+
+            pMat.Direction = pDir;
+            pMat.Gravity = new Vector3(0f, 49f * Mathf.Abs(facingDir.x), 0f);
+
+            gsTest.GlobalRotation = 0.0f;
         }
     }
 }

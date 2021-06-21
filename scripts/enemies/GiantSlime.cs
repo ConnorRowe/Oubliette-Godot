@@ -20,39 +20,39 @@ namespace Oubliette.AI
             behaviors.Add("idle", new NoBehaviour(AIManager, new Func<AIBehaviour.TransitionTestResult>[] {
             // idle -> wait_to_attack
             () => {
-                return new AIBehaviour.TransitionTestResult(hasTarget, "wait_to_attack");
+                return new AIBehaviour.TransitionTestResult(HasTarget, "wait_to_attack");
             }
         }));
 
             behaviors.Add("wait_to_attack", new TimerBehaviour(AIManager, 2.5f, new Func<AIBehaviour.TransitionTestResult>[] {
             // wait_to_attack -> attack_anim
             () => {
-                return new AIBehaviour.TransitionTestResult(hasTarget, "attack_anim");
+                return new AIBehaviour.TransitionTestResult(HasTarget, "attack_anim");
             }
         }));
 
             behaviors.Add("attack_anim", new PlayAnimationBehaviour(AIManager, GetNode<AnimationPlayer>("BossAnimations"), "Jump", new Func<AIBehaviour.TransitionTestResult>[] {
             // attack_anim -> shoot_once
             () => {
-                return new AIBehaviour.TransitionTestResult(hasTarget && !attackSwitch, "shoot_once");
+                return new AIBehaviour.TransitionTestResult(HasTarget && !attackSwitch, "shoot_once");
             },
             // attack_anim -> shoot_triple
             () => {
-                return new AIBehaviour.TransitionTestResult(hasTarget && attackSwitch, "shoot_triple");
+                return new AIBehaviour.TransitionTestResult(HasTarget && attackSwitch, "shoot_triple");
             }
         }));
 
             behaviors.Add("shoot_once", new CastSpellOnceBehaviour(AIManager, slimeBallSpell, new Func<AIBehaviour.TransitionTestResult>[] {
             // shoot_once -> wait_to_attack
             () => {
-                return new AIBehaviour.TransitionTestResult(hasTarget, "wait_to_attack");
+                return new AIBehaviour.TransitionTestResult(HasTarget, "wait_to_attack");
             }
         }));
 
             behaviors.Add("shoot_triple", new CastSpellOnceBehaviour(AIManager, tripleSlimeBallSpell, new Func<AIBehaviour.TransitionTestResult>[] {
             // shoot_triple -> wait_to_attack
             () => {
-                return new AIBehaviour.TransitionTestResult(hasTarget, "wait_to_attack");
+                return new AIBehaviour.TransitionTestResult(HasTarget, "wait_to_attack");
             }
         }));
 

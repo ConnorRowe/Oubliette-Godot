@@ -68,6 +68,10 @@ vnen.tiled_tileset_importer={
 "save_tiled_properties": false,
 "tile_metadata": false
 }
+ogg_vorbis={
+"loop": false,
+"loop_offset": 0
+}
 
 [input]
 

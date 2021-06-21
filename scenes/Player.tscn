@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=2]
+[gd_scene load_steps=42 format=2]
 
 [ext_resource path="res://scripts/Player.cs" type="Script" id=1]
 [ext_resource path="res://textures/Player_run_right.png" type="Texture" id=2]
@@ -14,6 +14,7 @@
 [ext_resource path="res://materials/M_ColourOverride_Vertex.tres" type="Material" id=12]
 [ext_resource path="res://materials/EmissiveOverlay.shader" type="Shader" id=13]
 [ext_resource path="res://textures/staff_emmision.png" type="Texture" id=14]
+[ext_resource path="res://particle/Tester.tscn" type="PackedScene" id=15]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 2, 9 )
@@ -123,11 +124,28 @@ shader_param/emission_tint = Color( 0.901961, 0.282353, 0.968627, 1 )
 shader_param/intensity = 6.0
 shader_param/emission_texture = ExtResource( 14 )
 
-[sub_resource type="CapsuleShape2D" id=23]
+[sub_resource type="CanvasItemMaterial" id=23]
+particles_animation = true
+particles_anim_h_frames = 4
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="ParticlesMaterial" id=24]
+flag_disable_z = true
+direction = Vector3( 1, -1, 0 )
+spread = 17.21
+gravity = Vector3( 0, 49, 0 )
+initial_velocity = 40.57
+initial_velocity_random = 0.24
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+anim_speed = 1.0
+
+[sub_resource type="CapsuleShape2D" id=25]
 radius = 2.0
 height = 0.0
 
-[sub_resource type="RectangleShape2D" id=24]
+[sub_resource type="RectangleShape2D" id=26]
 extents = Vector2( 2, 0.5 )
 
 [node name="Player" type="KinematicBody2D"]
@@ -188,6 +206,14 @@ shadow_enabled = true
 shadow_filter = 1
 shadow_filter_smooth = 16.0
 
+[node name="gstest" parent="CharSprite/staff/StaffLight" instance=ExtResource( 15 )]
+visible = false
+modulate = Color( 3, 3, 0, 1 )
+material = SubResource( 23 )
+position = Vector2( 0, 0 )
+local_coords = false
+process_material = SubResource( 24 )
+
 [node name="SpellSpawnPoint" type="Node2D" parent="CharSprite/staff"]
 position = Vector2( 10, -3.62396e-05 )
 
@@ -209,7 +235,7 @@ begin_cap_mode = 1
 end_cap_mode = 1
 
 [node name="Collision" type="CollisionShape2D" parent="."]
-shape = SubResource( 23 )
+shape = SubResource( 25 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
@@ -237,7 +263,7 @@ collision_mask = 16
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="FeetArea"]
 position = Vector2( 0, 0.5 )
-shape = SubResource( 24 )
+shape = SubResource( 26 )
 
 [node name="HitSoundPlayer" type="AudioStreamPlayer" parent="."]
 bus = "Sound Effects"

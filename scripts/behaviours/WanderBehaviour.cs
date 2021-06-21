@@ -5,23 +5,30 @@ namespace Oubliette.AI
 {
     public class WanderBehaviour : MovementBehaviour
     {
-        protected Godot.Collections.Array<Vector2> path = new Godot.Collections.Array<Vector2>() { };
+        private Godot.Collections.Array<Vector2> path = new Godot.Collections.Array<Vector2>() { };
         private SceneTreeTimer timer;
+        private float wanderSpeed;
+        private Vector2 timerRange;
 
-        public WanderBehaviour(AIManager manager, Func<TransitionTestResult>[] transitions) : base(manager, transitions) { }
+        public WanderBehaviour(float wanderSpeed, Vector2 timerRange, AIManager manager, Func<TransitionTestResult>[] transitions) : base(manager, transitions)
+        {
+            this.wanderSpeed = wanderSpeed;
+            this.timerRange = timerRange;
+        }
 
         public override void OnBehaviourStart()
         {
             timer = mgr.Owner.GetTree().CreateTimer(0.5f);
             timer.Connect("timeout", this, nameof(PickRandomPoint));
 
-            mgr.Owner.MaxSpeed = 8.0f;
+            mgr.Owner.MaxSpeed = wanderSpeed;
         }
 
         public override void Process(float delta) { }
         public override void OnBehaviourEnd()
         {
-            timer.Disconnect("timeout", this, nameof(PickRandomPoint));
+            if (timer != null && timer.IsConnected("timeout", this, nameof(PickRandomPoint)))
+                timer.Disconnect("timeout", this, nameof(PickRandomPoint));
 
             mgr.Owner.MaxSpeed = (mgr.Owner as AICharacter).OgMaxSpeed;
             (mgr.Owner as AICharacter).DetectionAlert();
@@ -46,13 +53,20 @@ namespace Oubliette.AI
         {
             int tries = 4;
             Vector2[] newPath = { };
+            Navigation2D nav = (mgr.Owner as AICharacter).NavProvider.GetNavigation();
 
             do
             {
-                newPath = (mgr.Owner as AICharacter).World.GetNavPath(mgr.Owner.GlobalPosition, mgr.Owner.GlobalPosition + new Vector2(mgr.rng.RandfRange(-20, 20), mgr.rng.RandfRange(-20, 20)));
+                Vector2 roomPos = mgr.World.LevelGenerator.CurrentRoom.GlobalPosition;
+                Vector2 endPos = nav.GetClosestPoint(nav.ToLocal(roomPos + new Vector2(mgr.rng.RandfRange(32f, 320f), mgr.rng.RandfRange(32f, 255f))));
+
+                newPath = AIManager.GetNavPathGlobal(mgr.Owner.GlobalPosition, endPos, nav);
+
+                if (newPath.Length > 0)
+                    tries = 0;
 
                 --tries;
-            } while (tries > 0 && newPath.Length > 0);
+            } while (tries > 0);
 
             if (newPath.Length > 0)
             {
@@ -62,12 +76,5 @@ namespace Oubliette.AI
             timer = mgr.Owner.GetTree().CreateTimer(mgr.rng.RandfRange(1.5f, 4.0f));
             timer.Connect("timeout", this, nameof(PickRandomPoint));
         }
-
-        // public void IsPlayerInRange()
-        // {
-        //     Player player = CheckForPlayer((mgr.owner as NewAITest).shapeQuery, mgr.owner.GetWorld2d().DirectSpaceState);
-
-        //     mgr.owner.GetTree().CreateTimer(0.5f).Connect("timeout", this, nameof(IsPlayerInRange));
-        // }
     }
 }

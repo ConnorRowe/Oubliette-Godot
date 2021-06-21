@@ -11,5 +11,5 @@ dest_files=[ "res://.import/piano song Mixdown 1.ogg-c0e402974e8cf9634cc136787e6
 
 [params]
 
-loop=true
+loop=false
 loop_offset=0

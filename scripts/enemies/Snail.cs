@@ -22,7 +22,7 @@ namespace Oubliette
             snailBehaviors.Add("idle", new NoBehaviour(AIManager, new Func<AIBehaviour.TransitionTestResult>[] {
             // idle -> wander
             () => {
-                return new AIBehaviour.TransitionTestResult(hasTarget, "wander");
+                return new AIBehaviour.TransitionTestResult(HasTarget, "wander");
             }
         }));
 
@@ -30,7 +30,7 @@ namespace Oubliette
             // wander -> charge
             () => {
                 // If has target, charge cooldown <= 0, target is visible, and positions are lined up
-                return new AIBehaviour.TransitionTestResult(hasTarget && chargeCD <= 0.0f && AIManager.TraceToTarget(GlobalPosition, AIManager.LastTarget, GetWorld2d().DirectSpaceState, AIManager.VisibilityLayer, new Godot.Collections.Array() {this}) && DoPositionsLineUp(GlobalPosition, AIManager.LastTarget.GlobalPosition), "charge");
+                return new AIBehaviour.TransitionTestResult(HasTarget && chargeCD <= 0.0f && AIManager.TraceToTarget(GlobalPosition, AIManager.LastTarget, GetWorld2d().DirectSpaceState, AIManager.VisibilityLayer, new Godot.Collections.Array() {this}) && DoPositionsLineUp(GlobalPosition, AIManager.LastTarget.GlobalPosition), "charge");
             }
         }));
 
@@ -38,7 +38,7 @@ namespace Oubliette
             // charge -> wander
             () => {
                 // if has target, and is not charging
-                return new AIBehaviour.TransitionTestResult(hasTarget && !IsCharging, "wander");
+                return new AIBehaviour.TransitionTestResult(HasTarget && !IsCharging, "wander");
             }
          }));
 

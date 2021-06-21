@@ -439,7 +439,7 @@ namespace Oubliette
 
         public virtual void OnFeetAreaEntered(Area2D area)
         {
-            if (tracksSpillages && area is SpillageHazard spillage && spillage.EnemyOwned != IsOnEnemyTeam && spillage.Active)
+            if (tracksSpillages && area is SpillageHazard spillage && spillage.EnemyOwned != IsOnEnemyTeam)
             {
                 spillageCount++;
 
@@ -457,7 +457,7 @@ namespace Oubliette
 
         public virtual void OnFeetAreaExited(Area2D area)
         {
-            if (tracksSpillages && area is SpillageHazard spillage && spillage.EnemyOwned != IsOnEnemyTeam && spillage.Active)
+            if (tracksSpillages && area is SpillageHazard spillage && spillage.EnemyOwned != IsOnEnemyTeam)
             {
                 spillageCount--;
             }

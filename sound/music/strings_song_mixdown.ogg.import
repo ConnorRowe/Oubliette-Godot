@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/strings_song_mixdown.ogg-1c11ae92a054c249e8f9b14221e79b03.oggstr"
+
+[deps]
+
+source_file="res://sound/music/strings_song_mixdown.ogg"
+dest_files=[ "res://.import/strings_song_mixdown.ogg-1c11ae92a054c249e8f9b14221e79b03.oggstr" ]
+
+[params]
+
+loop=false
+loop_offset=0

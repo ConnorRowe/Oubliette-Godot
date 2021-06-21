@@ -1,0 +1,189 @@
+[gd_scene load_steps=30 format=2]
+
+[ext_resource path="res://scenes/AICharacter.tscn" type="PackedScene" id=1]
+[ext_resource path="res://textures/goblin_walk_right.png" type="Texture" id=2]
+[ext_resource path="res://textures/goblin_walk_up.png" type="Texture" id=3]
+[ext_resource path="res://textures/goblin_walk_down.png" type="Texture" id=4]
+[ext_resource path="res://textures/med_shadow.png" type="Texture" id=5]
+[ext_resource path="res://scripts/enemies/GoblinWBearTrap.cs" type="Script" id=6]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+uniform vec4 colour_override : hint_color;
+uniform float override_lerp: hint_range(0, 1) = 0f;
+uniform vec4 outline_colour : hint_color = vec4(1.0);
+uniform float outline_width : hint_range(0, 1) = 0f;
+
+void fragment()
+{
+	vec4 tex = texture(TEXTURE, UV);
+	vec4 base_colour = mix(tex, vec4(colour_override.rgb, tex.a * colour_override.a), override_lerp);
+	
+	float w = outline_width * 1.0 / float(textureSize(TEXTURE, 0).x);
+	float h = outline_width * 1.0 / float(textureSize(TEXTURE, 0).y);
+	
+	float alpha = -4.0 * base_colour.a;
+	alpha += texture(TEXTURE, UV + vec2(w, 0.0)).a;
+	alpha += texture(TEXTURE, UV + vec2(-w, 0.0)).a;
+	alpha += texture(TEXTURE, UV + vec2(0.0, h)).a;
+	alpha += texture(TEXTURE, UV + vec2(0.0, -h)).a;
+	
+	vec4 finalColour = mix(base_colour, outline_colour, clamp(alpha, 0.0, 1.0));
+	COLOR = vec4(finalColour.rgb, clamp(abs(alpha) + base_colour.a, 0.0, 1.0));
+}"
+
+[sub_resource type="ShaderMaterial" id=2]
+resource_local_to_scene = true
+shader = SubResource( 1 )
+shader_param/colour_override = Color( 1, 1, 1, 1 )
+shader_param/override_lerp = 0.0
+shader_param/outline_colour = Color( 1, 1, 1, 1 )
+shader_param/outline_width = 0.0
+
+[sub_resource type="AtlasTexture" id=3]
+atlas = ExtResource( 3 )
+region = Rect2( 0, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=4]
+atlas = ExtResource( 3 )
+region = Rect2( 8, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=5]
+atlas = ExtResource( 3 )
+region = Rect2( 16, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=6]
+atlas = ExtResource( 3 )
+region = Rect2( 24, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=7]
+atlas = ExtResource( 3 )
+region = Rect2( 32, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=8]
+atlas = ExtResource( 3 )
+region = Rect2( 40, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=9]
+atlas = ExtResource( 2 )
+region = Rect2( 0, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=10]
+atlas = ExtResource( 2 )
+region = Rect2( 8, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=11]
+atlas = ExtResource( 2 )
+region = Rect2( 16, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=12]
+atlas = ExtResource( 2 )
+region = Rect2( 24, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=13]
+atlas = ExtResource( 2 )
+region = Rect2( 32, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=14]
+atlas = ExtResource( 2 )
+region = Rect2( 40, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=15]
+atlas = ExtResource( 4 )
+region = Rect2( 0, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=16]
+atlas = ExtResource( 4 )
+region = Rect2( 8, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=17]
+atlas = ExtResource( 4 )
+region = Rect2( 16, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=18]
+atlas = ExtResource( 4 )
+region = Rect2( 24, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=19]
+atlas = ExtResource( 4 )
+region = Rect2( 32, 0, 8, 10 )
+
+[sub_resource type="AtlasTexture" id=20]
+atlas = ExtResource( 4 )
+region = Rect2( 40, 0, 8, 10 )
+
+[sub_resource type="SpriteFrames" id=21]
+animations = [ {
+"frames": [ SubResource( 3 ), SubResource( 4 ), SubResource( 5 ), SubResource( 6 ), SubResource( 7 ), SubResource( 8 ) ],
+"loop": true,
+"name": "move_up",
+"speed": 10.0
+}, {
+"frames": [ SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ), SubResource( 14 ) ],
+"loop": true,
+"name": "move_right",
+"speed": 10.0
+}, {
+"frames": [ SubResource( 15 ), SubResource( 16 ), SubResource( 17 ), SubResource( 18 ), SubResource( 19 ), SubResource( 20 ) ],
+"loop": true,
+"name": "move_down",
+"speed": 10.0
+} ]
+
+[sub_resource type="CapsuleShape2D" id=22]
+radius = 1.0
+height = 2.0
+
+[sub_resource type="RectangleShape2D" id=23]
+extents = Vector2( 2, 1 )
+
+[node name="GoblinWBearTrap" instance=ExtResource( 1 )]
+script = ExtResource( 6 )
+MaxHealth = 2
+_animDown = "move_down"
+_animLeftRight = "move_right"
+_animUp = "move_up"
+_animDeath = ""
+maxMovementSpeed = 40.0
+attackRange = 64.0
+minMaxBloodSplats = Vector2( 1, 3 )
+spawnBloodPoolOnDeath = true
+
+[node name="DeathParticles" parent="." index="0"]
+texture = null
+
+[node name="shadow" parent="." index="1"]
+modulate = Color( 1, 1, 1, 0.611765 )
+texture = ExtResource( 5 )
+offset = Vector2( 0, -1 )
+
+[node name="CharSprite" parent="." index="2"]
+material = SubResource( 2 )
+frames = SubResource( 21 )
+animation = "move_down"
+frame = 4
+playing = true
+offset = Vector2( 0, -5 )
+
+[node name="CollisionShape2D" parent="." index="3"]
+position = Vector2( 0, -1 )
+shape = SubResource( 22 )
+
+[node name="debugLabel" parent="." index="5"]
+visible = true
+
+[node name="Hitbox" parent="." index="6"]
+visible = true
+
+[node name="UpDown" parent="Hitbox" index="0"]
+visible = false
+polygon = PoolVector2Array( -2, 0, -3, -2, -3, -5, -2, -9, 2, -9, 3, -5, 3, -2, 2, 0 )
+
+[node name="LeftRight" parent="Hitbox" index="1"]
+visible = false
+polygon = PoolVector2Array( -1, -9, 2, -9, 3, -6.5, 2, -4, 2, -2, 1, -2, 1, 0, -1, 0, -2, -2, -2, -6, -3, -7.5 )
+
+[node name="CollisionShape2D" parent="FeetArea" index="0"]
+position = Vector2( 0, -1 )
+shape = SubResource( 23 )

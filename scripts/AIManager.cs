@@ -86,12 +86,13 @@ namespace Oubliette.AI
             }
 
             CurrentBehaviour = behaviour;
+
+            EmitSignal(nameof(BehaviourChanged), CurrentBehaviour);
+
             if (!CurrentBehaviour.Empty())
             {
                 Behaviours[CurrentBehaviour].OnBehaviourStart();
             }
-
-            EmitSignal(nameof(BehaviourChanged), CurrentBehaviour);
         }
 
         public void Process(float delta)

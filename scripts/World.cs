@@ -46,6 +46,7 @@ namespace Oubliette
         //Assets
         private Texture debugPoint;
         private PackedScene bloodPoolScene;
+        private PackedScene bloodSplatScene;
 
         //Other
         public List<Vector2[]> debugLines { get; set; } = new List<Vector2[]>();
@@ -53,11 +54,13 @@ namespace Oubliette
         public bool DrawPlayerBloodTrail { get; set; } = true;
         public RandomNumberGenerator rng { get; set; } = new RandomNumberGenerator();
         private bool displayedDeathGUI = false;
+        public LevelGenerator @LevelGenerator { get { return levelGenerator; } }
 
         public override void _Ready()
         {
             debugPoint = GD.Load<Texture>("res://textures/2x2_white.png");
             bloodPoolScene = GD.Load<PackedScene>("res://scenes/BloodPool.tscn");
+            bloodSplatScene = GD.Load<PackedScene>("res://scenes/BloodSplat.tscn");
             camera = GetNode<Player>("Player").GetNode<Camera2D>("Camera2D");
             levelGenerator = GetNodeOrNull<LevelGenerator>(_levelPath);
             debugOverlay = GetNode<DebugOverlay>(_debugOverlayPath);
@@ -194,7 +197,7 @@ namespace Oubliette
                         }
                         else
                         {
-                            TestSpawnEnemyAtMouse<AI.AICharacterWithWeaponRanged>("res://scenes/enemies/SkeletonMage.tscn");
+                            TestSpawnEnemyAtMouse<AI.GoblinWBearTrap>("res://scenes/enemies/GoblinWBearTrap.tscn");
                         }
                     }
                 }
@@ -207,7 +210,6 @@ namespace Oubliette
                 }
             }
         }
-
 
         public override void _Draw()
         {
@@ -236,12 +238,6 @@ namespace Oubliette
             GetParent().AddChild(pnt);
         }
 
-        public Vector2[] GetNavPath(Vector2 pointA, Vector2 pointB)
-        {
-            // return navigation.GetSimplePath(pointA, pointB, optimize: true);
-            return null;
-        }
-
         private void UpdateHealthUI(int currentHealth, int maxHealth)
         {
             healthContainer.SetHealth(currentHealth, maxHealth);
@@ -257,7 +253,7 @@ namespace Oubliette
             // Stop enemy AI
             foreach (AI.AICharacter enemy in levelGenerator.CurrentRoom.Enemies)
             {
-                enemy.hasTarget = false;
+                enemy.HasTarget = false;
                 enemy.AIManager.SetCurrentBehaviour("idle");
                 enemy.AIManager.StopTryTransitionLoop();
             }
@@ -307,12 +303,25 @@ namespace Oubliette
             QueueFree();
         }
 
-        public void SpawnBloodPool(Vector2 position)
+        public BloodPool SpawnBloodPool(Vector2 position, Color bloodColour)
         {
-            BloodPool newPool = bloodPoolScene.Instance<BloodPool>();
-            newPool.Position = position;
-            AddChild(newPool);
-            newPool.Start(BloodTexture);
+            BloodPool bloodPool = bloodPoolScene.Instance<BloodPool>();
+            AddChild(bloodPool);
+            bloodPool.Position = position;
+            bloodPool.BloodColour = bloodColour;
+            bloodPool.Start(BloodTexture);
+
+            return bloodPool;
+        }
+
+        public BloodSplat SpawnBloodSplat(Vector2 position, Color bloodColour)
+        {
+            BloodSplat bloodSplat = bloodSplatScene.Instance<BloodSplat>();
+            AddChild(bloodSplat);
+            bloodSplat.Position = position;
+            bloodSplat.Init(BloodTexture, new Vector2(rng.RandfRange(-2.0f, 2.0f), rng.RandfRange(-1.0f, 1.0f)), bloodColour);
+
+            return bloodSplat;
         }
 
         // For testing purposes only. vvv
@@ -330,8 +339,8 @@ namespace Oubliette
             T enemy = GD.Load<PackedScene>(scenePath).Instance<T>();
             AddChild(enemy);
             enemy.Position = camera.GetGlobalMousePosition();
-            enemy.TargetPlayer(player);
             enemy.NavProvider = GetNode<LevelGenerator>("LevelGenerator");
+            enemy.TargetPlayer(player);
 
             return enemy;
         }
