@@ -33,5 +33,7 @@ namespace Oubliette.Spells
         }
 
         public virtual void BuffExpired() { }
+
+        public override void Release(ICastsSpells source) { }
     }
 }

@@ -10,10 +10,10 @@ namespace Oubliette.Spells
         public Curve CurveY { get; set; }
         public float CurveInterpSpeed { get; set; }
         public float CurveMoveSpeed { get; set; }
-
+        public Vector2 Gravity { get; set; }
         public ProjectileSpell() { }
 
-        public ProjectileSpell(string name, int damage, float range, float knockback, float speed, float majykaCost, Color baseColour, Texture icon, Action<Character> hitCharEvt, PackedScene projectileScene) : base(name, damage, range, knockback, speed, majykaCost, baseColour, icon, hitCharEvt)
+        public ProjectileSpell(string name, float damage, float range, float knockback, float speed, float majykaCost, Color baseColour, Texture icon, Action<Character> hitCharEvt, PackedScene projectileScene) : base(name, damage, range, knockback, speed, majykaCost, baseColour, icon, hitCharEvt)
         {
             ProjectileScene = projectileScene;
         }
@@ -25,10 +25,16 @@ namespace Oubliette.Spells
 
         public virtual Projectile CastAndReturn(ICastsSpells source)
         {
+            Vector2 dir = source.GetSpellDirection();
+            if (DirectionVarianceRange != Vector2.Zero)
+            {
+                dir = dir.Rotated(World.rng.RandfRange(DirectionVarianceRange.x, DirectionVarianceRange.y));
+            }
+
             Projectile proj = ProjectileScene.Instance<Projectile>();
             ((Node)source).GetParent().AddChild(proj);
             proj.GlobalPosition = source.GetSpellSpawnPos();
-            proj.SetDirection(source.GetSpellDirection());
+            proj.SetDirection(dir);
             proj.Source = (Character)source;
             proj.SetProjectileColour(source.GetSpellColour(BaseColour));
             proj.CurveX = CurveX;
@@ -37,8 +43,16 @@ namespace Oubliette.Spells
             proj.CurveMoveSpeed = CurveMoveSpeed;
             proj.SetSpellStats(source.GetSpellDamage(Damage), source.GetSpellRange(Range), source.GetSpellKnockback(Knockback), source.GetSpellSpeed(Speed), $"{(source as Character).DamageSourceName}'s {Name}");
             proj.SetHitCharEvent(HitCharEvent);
+            proj.Gravity = Gravity;
+
+            if (source is Character c)
+            {
+                proj.Speed += c.MovementVelocity.Length();
+            }
 
             return proj;
         }
+
+        public override void Release(ICastsSpells source) { }
     }
 }

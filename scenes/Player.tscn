@@ -207,15 +207,18 @@ shadow_filter = 1
 shadow_filter_smooth = 16.0
 
 [node name="gstest" parent="CharSprite/staff/StaffLight" instance=ExtResource( 15 )]
-visible = false
 modulate = Color( 3, 3, 0, 1 )
 material = SubResource( 23 )
 position = Vector2( 0, 0 )
+emitting = false
 local_coords = false
 process_material = SubResource( 24 )
 
 [node name="SpellSpawnPoint" type="Node2D" parent="CharSprite/staff"]
 position = Vector2( 10, -3.62396e-05 )
+
+[node name="SpellEffectsNode" type="Node2D" parent="CharSprite/staff"]
+position = Vector2( 6, -2.16961e-05 )
 
 [node name="ArmOutline" type="Line2D" parent="CharSprite"]
 visible = false

@@ -247,6 +247,7 @@ namespace Oubliette
             RegisterSpell(Spells.Spells.MagicMissile, 1.0f, new LootPool[] { LootPool.GENERAL });
             RegisterSpell(Spells.Spells.Shadowbolt, 0.5f, new LootPool[] { LootPool.GENERAL });
             RegisterSpell(Spells.Spells.IceSpike, 1.0f, new LootPool[] { LootPool.GENERAL });
+            RegisterSpell(Spells.Spells.GoldenShower, 0.25f, new LootPool[] { LootPool.GENERAL });
         }
 
         public void ResetItemPools()

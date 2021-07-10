@@ -1,7 +1,7 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://scenes/Projectile.tscn" type="PackedScene" id=1]
-[ext_resource path="res://textures/magic_projectile_small.png" type="Texture" id=2]
+[ext_resource path="res://textures/tiny_particles.png" type="Texture" id=2]
 
 [sub_resource type="Curve" id=1]
 _data = [ Vector2( 0, 0 ), 0.0, 1.0, 0, 1, Vector2( 1, 1 ), 1.10158, 0.0, 0, 0 ]
@@ -33,6 +33,12 @@ radial_accel_random = 0.25
 color_ramp = SubResource( 4 )
 anim_offset_curve = SubResource( 2 )
 
+[sub_resource type="CanvasItemMaterial" id=9]
+particles_animation = true
+particles_anim_h_frames = 4
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
 [sub_resource type="Curve" id=6]
 _data = [ Vector2( 0, 0 ), 0.0, 1.0, 0, 1, Vector2( 1, 1 ), 1.10158, 0.0, 0, 0 ]
 
@@ -56,5 +62,6 @@ anim_offset_curve = SubResource( 7 )
 explodeParticleMaterial = SubResource( 5 )
 
 [node name="Particles2D" parent="." index="1"]
+material = SubResource( 9 )
 process_material = SubResource( 8 )
 texture = ExtResource( 2 )

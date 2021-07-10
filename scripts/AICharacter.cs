@@ -266,12 +266,12 @@ namespace Oubliette.AI
             return GlobalPosition;
         }
 
-        int Spells.ICastsSpells.GetSpellDamage(int baseDamge)
+        float Spells.ICastsSpells.GetSpellDamage(float baseDamge)
         {
             return GetSpellDamage(baseDamge);
         }
 
-        public virtual int GetSpellDamage(int baseDamge)
+        public virtual float GetSpellDamage(float baseDamge)
         {
             return baseDamge;
         }
@@ -314,6 +314,18 @@ namespace Oubliette.AI
         public virtual Color GetSpellColour(Color baseColour)
         {
             return baseColour;
+        }
+
+        NodePath Spells.ICastsSpells.AddSpellEffectNode(Node2D node)
+        {
+            return AddSpellEffectsNode(node);
+        }
+
+        public virtual NodePath AddSpellEffectsNode(Node2D node)
+        {
+            charSprite.AddChild(node);
+
+            return node.GetPath();
         }
 
         void IIntersectsPlayerHitArea.PlayerHit(Player player)

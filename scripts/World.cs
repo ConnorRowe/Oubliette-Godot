@@ -52,9 +52,14 @@ namespace Oubliette
         public List<Vector2[]> debugLines { get; set; } = new List<Vector2[]>();
         private string defaultKilledByText = "";
         public bool DrawPlayerBloodTrail { get; set; } = true;
-        public RandomNumberGenerator rng { get; set; } = new RandomNumberGenerator();
         private bool displayedDeathGUI = false;
         public LevelGenerator @LevelGenerator { get { return levelGenerator; } }
+
+        public static RandomNumberGenerator rng = new RandomNumberGenerator();
+        static World()
+        {
+            rng.Randomize();
+        }
 
         public override void _Ready()
         {
@@ -77,7 +82,6 @@ namespace Oubliette
             overlayLight = GetNode<Light2D>("Player/OverlayLight");
             sfxPlayer = GetNode<AudioStreamPlayer>("SFXPlayer");
 
-            rng.Randomize();
             respawnBtn.Active = false;
             respawnBtn.Connect(nameof(MainMenuButton.Clicked), this, nameof(GoToMainMenu));
 
@@ -197,7 +201,9 @@ namespace Oubliette
                         }
                         else
                         {
-                            TestSpawnEnemyAtMouse<AI.GoblinWBearTrap>("res://scenes/enemies/GoblinWBearTrap.tscn");
+                            // TestSpawnEnemyAtMouse<AI.GoblinWBearTrap>("res://scenes/enemies/GoblinWBearTrap.tscn");
+
+                            player.PickUpPrimarySpell(Spells.Spells.GoldenShower);
                         }
                     }
                 }
@@ -238,9 +244,9 @@ namespace Oubliette
             GetParent().AddChild(pnt);
         }
 
-        private void UpdateHealthUI(int currentHealth, int maxHealth)
+        private void UpdateHealthUI(float currentHealth, float maxHealth)
         {
-            healthContainer.SetHealth(currentHealth, maxHealth);
+            healthContainer.SetHealth(Mathf.RoundToInt(currentHealth), Mathf.RoundToInt(maxHealth));
         }
 
         private void PlayerDied(Player player)

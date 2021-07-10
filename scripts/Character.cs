@@ -164,7 +164,7 @@ namespace Oubliette
         protected float friction = 8f;
         protected float elevation = 0f;
         protected float jumpVelocity = 0f;
-        public int CurrentHealth { get; set; } = 0;
+        public float CurrentHealth { get; set; } = 0f;
         public bool IsDead { get; set; } = false;
         public bool CheckSlideCollisions { get; set; } = false;
         private float CheckSlideMaxCD = 0.15f;
@@ -221,7 +221,7 @@ namespace Oubliette
         [Export]
         private NodePath _feetAreaPath;
         [Export]
-        public int MaxHealth { get; set; } = 12;
+        public float MaxHealth { get; set; } = 12f;
         [Export]
         private bool renderElevation = false;
         [Export]
@@ -243,7 +243,7 @@ namespace Oubliette
 
         // Signals
         [Signal]
-        public delegate void HealthChanged(int currentHealth, int maxHealth);
+        public delegate void HealthChanged(float currentHealth, float maxHealth);
         [Signal]
         public delegate void SlideCollision(KinematicCollision2D collision);
 
@@ -587,7 +587,7 @@ namespace Oubliette
                 charSprite.Playing = true;
         }
 
-        public virtual void TakeDamage(int damage = 1, Character source = null, string sourceName = "")
+        public virtual void TakeDamage(float damage = 1f, Character source = null, string sourceName = "")
         {
             if (IsDead)
                 return;
@@ -599,7 +599,7 @@ namespace Oubliette
 
             // Reflect damage
             if (source != null && source != this && currentStats[Stat.ReflectDamageFlat] > 0.0f)
-                source.TakeDamage(Mathf.RoundToInt(currentStats[Stat.ReflectDamageFlat]), null);
+                source.TakeDamage(currentStats[Stat.ReflectDamageFlat], null);
 
             CurrentHealth -= damage;
             CurrentHealth = Mathf.Clamp(CurrentHealth, 0, MaxHealth);
@@ -617,13 +617,13 @@ namespace Oubliette
 
             if (damage > 0) { EmitSignal(nameof(HealthChanged), CurrentHealth, MaxHealth); }
 
-            if (CurrentHealth <= 0)
+            if (CurrentHealth <= 0f)
             {
                 Die();
             }
         }
 
-        public virtual void Heal(int healing)
+        public virtual void Heal(float healing)
         {
             CurrentHealth += healing;
             CurrentHealth = Mathf.Clamp(CurrentHealth, 0, MaxHealth);
@@ -631,7 +631,7 @@ namespace Oubliette
             EmitSignal(nameof(HealthChanged), CurrentHealth, MaxHealth);
         }
 
-        public void AdjustMaxHealth(int adjustment, bool affectCurrentHealth)
+        public void AdjustMaxHealth(float adjustment, bool affectCurrentHealth)
         {
             MaxHealth += adjustment;
 

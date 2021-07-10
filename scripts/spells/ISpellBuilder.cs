@@ -4,11 +4,10 @@ using System;
 namespace Oubliette.Spells
 {
     public interface ISpellBuilder<out R, out U>
-        where R : ProjectileSpellBuilder
         where U : BaseSpell
     {
         R SetName(string name);
-        R SetDamage(int damage);
+        R SetDamage(float damage);
         R SetRange(float range);
         R SetKnockback(float knockback);
         R SetSpeed(float speed);

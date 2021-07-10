@@ -6,7 +6,7 @@ namespace Oubliette.Spells
     public class ProjectileSpellBuilder : Reference, ISpellBuilder<ProjectileSpellBuilder, ProjectileSpell>
     {
         private string name;
-        private int damage;
+        private float damage;
         private float range;
         private float knockback;
         private float speed;
@@ -14,11 +14,15 @@ namespace Oubliette.Spells
         private Color baseColour;
         private Texture icon;
         private Action<Character> hitCharEvent;
+        private Action<Character> onPickupEvent;
+        private Action<Character> onDropEvent;
         private Curve curveX;
         private Curve curveY;
         private float curveInterpSpeed;
         private float curveMoveSpeed;
         private PackedScene projectileScene;
+        private Vector2 gravity = Vector2.Zero;
+        private Vector2 directionVarianceRange = Vector2.Zero;
 
         public ProjectileSpellBuilder SetName(string name)
         {
@@ -27,7 +31,7 @@ namespace Oubliette.Spells
             return this;
         }
 
-        public ProjectileSpellBuilder SetDamage(int damage)
+        public ProjectileSpellBuilder SetDamage(float damage)
         {
             this.damage = damage;
 
@@ -83,6 +87,20 @@ namespace Oubliette.Spells
             return this;
         }
 
+        public ProjectileSpellBuilder SetOnPickupEvent(Action<Character> onPickupEvent)
+        {
+            this.onPickupEvent = onPickupEvent;
+
+            return this;
+        }
+
+        public ProjectileSpellBuilder SetOnDropEvent(Action<Character> onDropEvent)
+        {
+            this.onDropEvent = onDropEvent;
+
+            return this;
+        }
+
         public ProjectileSpellBuilder SetProjectileScene(PackedScene projectileScene)
         {
             this.projectileScene = projectileScene;
@@ -100,6 +118,20 @@ namespace Oubliette.Spells
             return this;
         }
 
+        public ProjectileSpellBuilder SetGravity(Vector2 gravity)
+        {
+            this.gravity = gravity;
+
+            return this;
+        }
+
+        public ProjectileSpellBuilder SetDirectionVarianceRange(Vector2 directionVarianceRange)
+        {
+            this.directionVarianceRange = directionVarianceRange;
+
+            return this;
+        }
+
         public ProjectileSpell Build()
         {
             ProjectileSpell build = new ProjectileSpell();
@@ -109,6 +141,10 @@ namespace Oubliette.Spells
             build.CurveInterpSpeed = curveInterpSpeed;
             build.CurveMoveSpeed = curveMoveSpeed;
             build.ProjectileScene = projectileScene;
+            build.OnPickupEvent = onPickupEvent;
+            build.OnDropEvent = onDropEvent;
+            build.Gravity = gravity;
+            build.DirectionVarianceRange = directionVarianceRange;
 
             return build;
         }

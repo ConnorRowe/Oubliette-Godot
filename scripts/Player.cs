@@ -55,6 +55,7 @@ namespace Oubliette
         private AudioStreamPlayer potionSoundPlayer;
         private GridContainer buffTrackerContainer;
         private Particles2D gsTest;
+        private Node2D spellFXNode;
 
         // Input
         private bool inputMoveUp = false;
@@ -139,6 +140,7 @@ namespace Oubliette
             spellSoundPlayer = GetNode<AudioStreamPlayer>("SpellSoundPlayer");
             potionSoundPlayer = GetNode<AudioStreamPlayer>("PotionSoundPlayer");
             buffTrackerContainer = World.GetNode<GridContainer>("CanvasLayer/BuffTrackerContainer");
+            spellFXNode = GetNode<Node2D>("CharSprite/staff/SpellEffectsNode");
 
             Items items = GetNode<Items>("/root/Items");
             var magicMissile = items.FindSpellPoolEntry(Spells.Spells.MagicMissile, Items.LootPool.GENERAL);
@@ -289,6 +291,9 @@ namespace Oubliette
         {
             base._Process(delta);
 
+            primarySpell?.Process(this, delta);
+            secondarySpell.Process(this, delta);
+
             if (Input.IsActionPressed("g_cast_primary_spell"))
             {
                 if (currentMajyka >= GetSpellCost(primarySpell.MajykaCost) && primarySpellCooldown == 0.0f)
@@ -309,6 +314,15 @@ namespace Oubliette
             if (Input.IsActionPressed("g_cast_secondary_spell"))
             {
                 CastSecondarySpell();
+            }
+
+            if (Input.IsActionJustReleased("g_cast_primary_spell"))
+            {
+                primarySpell.Release(this);
+            }
+            if (Input.IsActionJustReleased("g_cast_secondary_spell"))
+            {
+                secondarySpell.Release(this);
             }
 
             // Follow head gib
@@ -368,8 +382,6 @@ namespace Oubliette
             (staff.Material as ShaderMaterial).SetShaderParam("intensity", Mathf.Lerp(6.0f, 0.0f, primarySpellCooldown / maxPrimarySpellCooldown));
 
             Update();
-
-            UpdateGSTest();
         }
 
         public override void _Draw()
@@ -613,10 +625,12 @@ namespace Oubliette
             canTakeDamage = true;
         }
 
-        public override void TakeDamage(int damage = 1, Character source = null, string sourceName = "")
+        public override void TakeDamage(float damage = 1, Character source = null, string sourceName = "")
         {
             if (canTakeDamage)
             {
+                damage = Mathf.Round(damage);
+
                 BloodTrailAmount += damage;
                 BloodTrailColour = PlayerBloodColour;
 
@@ -682,9 +696,9 @@ namespace Oubliette
             return primarySpellColourCache;
         }
 
-        public int GetSpellDamage(int baseDamage)
+        public float GetSpellDamage(float baseDamage)
         {
-            return Mathf.RoundToInt((baseDamage + currentStats[Stat.DamageFlat]) * currentStats[Stat.DamageMultiplier]);
+            return (baseDamage + currentStats[Stat.DamageFlat]) * currentStats[Stat.DamageMultiplier];
         }
 
         public float GetSpellRange(float baseRange)
@@ -700,6 +714,13 @@ namespace Oubliette
         public float GetSpellSpeed(float baseSpeed)
         {
             return baseSpeed * currentStats[Stat.SpellSpeedMultiplier];
+        }
+
+        public NodePath AddSpellEffectNode(Node2D node)
+        {
+            spellFXNode.AddChild(node);
+
+            return node.GetPath();
         }
 
         private float GetMaxPrimarySpellCooldown()
@@ -928,31 +949,6 @@ namespace Oubliette
             {
                 RecalcStats();
             }
-        }
-
-        private void UpdateGSTest()
-        {
-            ParticlesMaterial pMat = (ParticlesMaterial)gsTest.ProcessMaterial;
-
-            Vector3 pDir = new Vector3(facingDir.x, facingDir.y, 0f);
-
-            pMat.InitialVelocity = 40.57f;
-            pMat.Spread = 17.21f;
-
-            if (DirectionExt.FromVector(facingDir) == DirectionExt.FromVector(MovementVelocity))
-            {
-                pDir.x += MovementVelocity.x;
-                pDir.y += MovementVelocity.y;
-
-                pMat.InitialVelocity += (MovementVelocity.Length() * 2f);
-
-                pMat.Spread *= 0.5f;
-            }
-
-            pMat.Direction = pDir;
-            pMat.Gravity = new Vector3(0f, 49f * Mathf.Abs(facingDir.x), 0f);
-
-            gsTest.GlobalRotation = 0.0f;
         }
     }
 }

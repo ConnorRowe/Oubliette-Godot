@@ -40,7 +40,7 @@ namespace Oubliette
             if (world != null)
             {
                 world.SpawnBloodPool(GlobalPosition, Player.PlayerBloodColour).SpeedScale = 2.0f;
-                for (int i = 0; i < world.rng.RandiRange(2, 3); ++i)
+                for (int i = 0; i < World.rng.RandiRange(2, 3); ++i)
                 {
                     world.SpawnBloodSplat(GlobalPosition, Player.PlayerBloodColour);
                 }

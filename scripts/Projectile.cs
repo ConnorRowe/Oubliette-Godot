@@ -5,7 +5,7 @@ namespace Oubliette
 {
     public class Projectile : KinematicBody2D
     {
-        private int damage = 0;
+        private float damage = 0;
         private float range = 0;
         private float knockback = 0;
         private float speed = 0;
@@ -24,7 +24,8 @@ namespace Oubliette
         public Curve CurveY { get; set; }
         public float CurveInterpSpeed { get; set; }
         public float CurveMoveSpeed { get; set; }
-
+        public Vector2 Gravity { get; set; } = Vector2.Zero;
+        public float Speed { get { return speed; } set { speed = value; } }
 
         private Tween tween;
         private AudioStreamPlayer2D explodePlayer;
@@ -37,7 +38,6 @@ namespace Oubliette
         public string dmgSourceName = "projectile";
         [Export]
         private AudioStreamSample baseExplodeSound;
-
 
         public override void _Ready()
         {
@@ -78,7 +78,9 @@ namespace Oubliette
                     projCurveCount -= 1.0f;
             }
 
-            Vector2 move = ((direction * speed) + curveAdjust) * delta;
+            Vector2 gravity = Gravity * Mathf.Abs(direction.x);
+
+            Vector2 move = ((direction * speed) + curveAdjust + gravity) * delta;
 
             KinematicCollision2D collide = MoveAndCollide(move);
 
@@ -142,7 +144,7 @@ namespace Oubliette
             QueueFree();
         }
 
-        public void SetSpellStats(int damage, float range, float knockback, float speed, string baseDmgSourceName)
+        public void SetSpellStats(float damage, float range, float knockback, float speed, string baseDmgSourceName)
         {
             this.damage = damage;
             this.range = range;
