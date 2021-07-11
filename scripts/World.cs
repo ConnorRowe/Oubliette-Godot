@@ -179,10 +179,23 @@ namespace Oubliette
                     if (emb.ButtonIndex == (int)ButtonList.WheelUp)
                     {
                         // healthContainer.ChangeHealth(1);
+                        if (emb.Shift)
+                        {
+                        }
+                        else
+                        {
+                        }
                     }
                     if (emb.ButtonIndex == (int)ButtonList.WheelDown)
                     {
                         // healthContainer.ChangeHealth(-1);
+                        if (emb.Shift)
+                        {
+                        }
+                        else
+                        {
+                        }
+
                     }
                     if (emb.ButtonIndex == (int)ButtonList.Middle)
                     {

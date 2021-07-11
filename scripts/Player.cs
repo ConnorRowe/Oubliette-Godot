@@ -54,8 +54,9 @@ namespace Oubliette
         private AudioStreamPlayer spellSoundPlayer;
         private AudioStreamPlayer potionSoundPlayer;
         private GridContainer buffTrackerContainer;
-        private Particles2D gsTest;
         private Node2D spellFXNode;
+        private ClothSim cloakUpDown;
+        private ClothSim cloakRightLeft;
 
         // Input
         private bool inputMoveUp = false;
@@ -92,8 +93,6 @@ namespace Oubliette
         public override void _Ready()
         {
             base._Ready();
-
-            gsTest = GetNode<Particles2D>("CharSprite/staff/StaffLight/gstest");
 
             debugPoint = GD.Load<Texture>("res://textures/2x2_white.png");
             projectileScene = GD.Load<PackedScene>("res://scenes/Projectile.tscn");
@@ -141,6 +140,8 @@ namespace Oubliette
             potionSoundPlayer = GetNode<AudioStreamPlayer>("PotionSoundPlayer");
             buffTrackerContainer = World.GetNode<GridContainer>("CanvasLayer/BuffTrackerContainer");
             spellFXNode = GetNode<Node2D>("CharSprite/staff/SpellEffectsNode");
+            cloakUpDown = GetNode<ClothSim>("CapeUpDown");
+            cloakRightLeft = GetNode<ClothSim>("CapeLeftRight");
 
             Items items = GetNode<Items>("/root/Items");
             var magicMissile = items.FindSpellPoolEntry(Spells.Spells.MagicMissile, Items.LootPool.GENERAL);
@@ -167,6 +168,18 @@ namespace Oubliette
             CheckSlideCollisions = true;
 
             UpdatePotionSlot();
+
+            // Set up cloak
+            Color[] cloakColour = new Color[1] { Colors.DarkRed };
+
+            cloakUpDown.ClothColours = cloakColour;
+            cloakUpDown.SetUp();
+
+            // add cape right/left quads
+            cloakRightLeft.QuadIndices.AddRange(new int[4][] { new int[4] { 0, 1, 3, 2 }, new int[4] { 2, 3, 5, 4 }, new int[4] { 4, 5, 7, 6 }, new int[4] { 6, 7, 9, 8 } });
+            cloakRightLeft.MaxStaticPoint = 2;
+            cloakRightLeft.ClothColours = cloakColour;
+            cloakRightLeft.SetUp();
         }
 
         public override void _UnhandledInput(InputEvent evt)
@@ -291,6 +304,10 @@ namespace Oubliette
         {
             base._Process(delta);
 
+            var clothVel = -(MovementVelocity + ExternalVelocity);
+            cloakUpDown.SystemMovementVelocity = clothVel;
+            cloakRightLeft.SystemMovementVelocity = clothVel;
+
             primarySpell?.Process(this, delta);
             secondarySpell.Process(this, delta);
 
@@ -380,6 +397,48 @@ namespace Oubliette
 
             // Update staff glow intensity
             (staff.Material as ShaderMaterial).SetShaderParam("intensity", Mathf.Lerp(6.0f, 0.0f, primarySpellCooldown / maxPrimarySpellCooldown));
+
+            Vector2 cloakOffset = (charSprite.Frame % 3 == 0 ? new Vector2(0, -1) : Vector2.Zero);
+            // Update cloak
+            switch (GetFacingDirection())
+            {
+                case Direction.Up:
+                    {
+                        cloakUpDown.Visible = true;
+                        cloakUpDown.ZIndex = 0;
+                        cloakUpDown.StaticPointsOffset = cloakOffset;
+
+                        cloakRightLeft.Visible = false;
+                        break;
+                    }
+                case Direction.Right:
+                    {
+                        cloakRightLeft.Visible = true;
+                        cloakRightLeft.StaticPointsOffset = cloakOffset;
+                        cloakRightLeft.Position = new Vector2(-3, -12);
+
+                        cloakUpDown.Visible = false;
+                        break;
+                    }
+                case Direction.Down:
+                    {
+                        cloakUpDown.Visible = true;
+                        cloakUpDown.ZIndex = -2;
+                        cloakUpDown.StaticPointsOffset = cloakOffset;
+
+                        cloakRightLeft.Visible = false;
+                        break;
+                    }
+                case Direction.Left:
+                    {
+                        cloakRightLeft.Visible = true;
+                        cloakRightLeft.StaticPointsOffset = cloakOffset;
+                        cloakRightLeft.Position = new Vector2(0, -12);
+
+                        cloakUpDown.Visible = false;
+                        break;
+                    }
+            }
 
             Update();
         }
