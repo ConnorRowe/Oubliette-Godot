@@ -252,61 +252,60 @@ bus = "Sound Effects"
 [node name="PotionSoundPlayer" type="AudioStreamPlayer" parent="."]
 bus = "Sound Effects"
 
-[node name="CapeUpDown" parent="." instance=ExtResource( 15 )]
-visible = false
-position = Vector2( -4, -13 )
+[node name="CloakUpDown" parent="." instance=ExtResource( 15 )]
+position = Vector2( -4, -12 )
 KeepDefaultPoints = true
 
-[node name="CapeLeftRight" parent="." instance=ExtResource( 15 )]
+[node name="CloakLeftRight" parent="." instance=ExtResource( 15 )]
 position = Vector2( -4, -12 )
 PointsParentPath = NodePath("RightLeftPoints")
 
-[node name="RightLeftPoints" type="Node2D" parent="CapeLeftRight"]
+[node name="RightLeftPoints" type="Node2D" parent="CloakLeftRight"]
 
-[node name="0" type="Node2D" parent="CapeLeftRight/RightLeftPoints"]
+[node name="0" type="Node2D" parent="CloakLeftRight/RightLeftPoints"]
 position = Vector2( 1, 0 )
 script = ExtResource( 16 )
 
-[node name="1" type="Node2D" parent="CapeLeftRight/RightLeftPoints"]
+[node name="1" type="Node2D" parent="CloakLeftRight/RightLeftPoints"]
 position = Vector2( 2, 0 )
 script = ExtResource( 16 )
 
-[node name="2" type="Node2D" parent="CapeLeftRight/RightLeftPoints"]
+[node name="2" type="Node2D" parent="CloakLeftRight/RightLeftPoints"]
 position = Vector2( 1, 2 )
 script = ExtResource( 16 )
 bound_points = [ NodePath("../0"), NodePath("../3") ]
 
-[node name="3" type="Node2D" parent="CapeLeftRight/RightLeftPoints"]
+[node name="3" type="Node2D" parent="CloakLeftRight/RightLeftPoints"]
 position = Vector2( 2, 2 )
 script = ExtResource( 16 )
 bound_points = [ NodePath("../1"), NodePath("../2") ]
 
-[node name="4" type="Node2D" parent="CapeLeftRight/RightLeftPoints"]
+[node name="4" type="Node2D" parent="CloakLeftRight/RightLeftPoints"]
 position = Vector2( 1, 4 )
 script = ExtResource( 16 )
 bound_points = [ NodePath("../2"), NodePath("../5") ]
 
-[node name="5" type="Node2D" parent="CapeLeftRight/RightLeftPoints"]
+[node name="5" type="Node2D" parent="CloakLeftRight/RightLeftPoints"]
 position = Vector2( 2, 4 )
 script = ExtResource( 16 )
 bound_points = [ NodePath("../3"), NodePath("../4") ]
 
-[node name="6" type="Node2D" parent="CapeLeftRight/RightLeftPoints"]
+[node name="6" type="Node2D" parent="CloakLeftRight/RightLeftPoints"]
 position = Vector2( 1, 6 )
 script = ExtResource( 16 )
 bound_points = [ NodePath("../4"), NodePath("../7") ]
 
-[node name="7" type="Node2D" parent="CapeLeftRight/RightLeftPoints"]
+[node name="7" type="Node2D" parent="CloakLeftRight/RightLeftPoints"]
 position = Vector2( 2, 6 )
 script = ExtResource( 16 )
 bound_points = [ NodePath("../5"), NodePath("../6") ]
 
-[node name="8" type="Node2D" parent="CapeLeftRight/RightLeftPoints"]
+[node name="8" type="Node2D" parent="CloakLeftRight/RightLeftPoints"]
 position = Vector2( 1, 8 )
 script = ExtResource( 16 )
 bound_points = [ NodePath("../6"), NodePath("../9") ]
 
-[node name="9" type="Node2D" parent="CapeLeftRight/RightLeftPoints"]
+[node name="9" type="Node2D" parent="CloakLeftRight/RightLeftPoints"]
 position = Vector2( 2, 8 )
 script = ExtResource( 16 )
 bound_points = [ NodePath("../7"), NodePath("../8") ]

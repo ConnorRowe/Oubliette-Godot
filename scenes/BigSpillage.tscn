@@ -65,14 +65,12 @@ script = ExtResource( 5 )
 visible = false
 texture = null
 
-[node name="AnimatedSprite" type="AnimatedSprite" parent="." index="1"]
+[node name="CollisionPolygon2D" parent="." index="1"]
+polygon = PoolVector2Array( -17, -18, -26, -19, -27, -21, -15, -24, -3, -26, 18, -21, 27, -15, 28, -11, 22, -10, 31, 2, 5, 3, -18, 3, -29, -4, -31, -12 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="." index="2"]
 material = SubResource( 1 )
 frames = SubResource( 6 )
-frame = 3
-playing = true
-
-[node name="CollisionPolygon2D" parent="." index="2"]
-polygon = PoolVector2Array( -17, -18, -26, -19, -27, -21, -15, -24, -3, -26, 18, -21, 27, -15, 28, -11, 22, -10, 31, 2, 5, 3, -18, 3, -29, -4, -31, -12 )
 
 [node name="Bubbles" parent="." index="3"]
 position = Vector2( -1, 0 )

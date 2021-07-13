@@ -140,8 +140,8 @@ namespace Oubliette
             potionSoundPlayer = GetNode<AudioStreamPlayer>("PotionSoundPlayer");
             buffTrackerContainer = World.GetNode<GridContainer>("CanvasLayer/BuffTrackerContainer");
             spellFXNode = GetNode<Node2D>("CharSprite/staff/SpellEffectsNode");
-            cloakUpDown = GetNode<ClothSim>("CapeUpDown");
-            cloakRightLeft = GetNode<ClothSim>("CapeLeftRight");
+            cloakUpDown = GetNode<ClothSim>("CloakUpDown");
+            cloakRightLeft = GetNode<ClothSim>("CloakLeftRight");
 
             Items items = GetNode<Items>("/root/Items");
             var magicMissile = items.FindSpellPoolEntry(Spells.Spells.MagicMissile, Items.LootPool.GENERAL);

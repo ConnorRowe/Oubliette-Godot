@@ -74,7 +74,8 @@ namespace Oubliette
 
             player.PickedUpArtefact(this);
 
-            player.Connect(nameof(Player.PlayerDamaged), this, nameof(PlayerDamaged));
+            if (!player.IsConnected(nameof(Player.PlayerDamaged), this, nameof(PlayerDamaged)))
+                player.Connect(nameof(Player.PlayerDamaged), this, nameof(PlayerDamaged));
         }
 
         private void PlayerDamaged(int damage)

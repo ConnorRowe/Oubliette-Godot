@@ -27,22 +27,7 @@ namespace Oubliette
         {
             base._Ready();
 
-            GetTree().CreateTimer(0.1f).Connect("timeout", this, nameof(CheckOverlap));
-
             Monitoring = true;
-        }
-
-        private void CheckOverlap()
-        {
-            foreach (Area2D area in GetOverlappingAreas())
-            {
-                if (area.GetParent() is Character)
-                {
-                    area.EmitSignal("area_entered", this);
-                }
-            }
-
-            SetDeferred("monitoring", false);
         }
 
         public override void _Process(float delta)

@@ -216,7 +216,10 @@ namespace Oubliette
                         {
                             // TestSpawnEnemyAtMouse<AI.GoblinWBearTrap>("res://scenes/enemies/GoblinWBearTrap.tscn");
 
-                            player.PickUpPrimarySpell(Spells.Spells.GoldenShower);
+                            // player.PickUpPrimarySpell(Spells.Spells.GoldenShower);
+
+                            var spill = TestSpawnNodeAtMouse<SpillageHazard>("res://scenes/BigSpillage.tscn");
+                            spill.LifeTime = 99999f;
                         }
                     }
                 }

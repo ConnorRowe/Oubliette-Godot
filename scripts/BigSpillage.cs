@@ -8,16 +8,16 @@ namespace Oubliette
         {
             base._Ready();
 
-            GetNode<AnimatedSprite>("AnimatedSprite").Connect("animation_finished", this, nameof(AnimationFinished));
+            var animSprite = GetNode<AnimatedSprite>("AnimatedSprite");
 
-            Active = false;
+            animSprite.Connect("animation_finished", this, nameof(AnimationFinished));
+            animSprite.Play();
 
             Bubbles.Emitting = false;
         }
 
         public void AnimationFinished()
         {
-            Active = true;
             Bubbles.Emitting = true;
         }
 
