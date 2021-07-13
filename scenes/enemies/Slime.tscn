@@ -1,9 +1,10 @@
-[gd_scene load_steps=28 format=2]
+[gd_scene load_steps=29 format=2]
 
 [ext_resource path="res://scenes/AICharacter.tscn" type="PackedScene" id=1]
 [ext_resource path="res://textures/slime_death.png" type="Texture" id=2]
 [ext_resource path="res://scripts/enemies/Slime.cs" type="Script" id=3]
 [ext_resource path="res://textures/slime.png" type="Texture" id=4]
+[ext_resource path="res://textures/health_potion.png" type="Texture" id=5]
 
 [sub_resource type="Shader" id=1]
 code = "shader_type canvas_item;
@@ -134,7 +135,7 @@ extents = Vector2( 5, 1 )
 [node name="Slime" instance=ExtResource( 1 )]
 script = ExtResource( 3 )
 DamageSourceName = "a Slime"
-MaxHealth = 1
+MaxHealth = 1.0
 _animDeath = "die"
 maxMovementSpeed = 12.0
 bloodColour = Color( 0.286275, 0.74902, 0, 1 )
@@ -145,19 +146,30 @@ spawnBloodPoolOnDeath = true
 modulate = Color( 0.286275, 0.74902, 0, 0.623529 )
 process_material = null
 
-[node name="CharSprite" parent="." index="2"]
+[node name="InnerItemSprite" type="Sprite" parent="." index="2"]
+position = Vector2( 0, -3 )
+z_index = -1
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 0, 2, 8, 6 )
+region_filter_clip = true
+
+[node name="CharSprite" parent="." index="3"]
+modulate = Color( 1, 1, 1, 0.780392 )
 material = SubResource( 2 )
 frames = SubResource( 22 )
-animation = "die"
 
-[node name="Hitbox" parent="." index="6"]
-visible = true
+[node name="CollisionShape2D" parent="." index="4"]
+visible = false
 
 [node name="UpDown" parent="Hitbox" index="0"]
 polygon = PoolVector2Array( -6, 0, -6, -3, -3, -7, 0, -8, 3, -7, 6, -3, 6, 0 )
 
 [node name="LeftRight" parent="Hitbox" index="1"]
 polygon = PoolVector2Array( -6, 0, -6, -3, -3, -7, 0, -8, 3, -7, 6, -3, 6, 0 )
+
+[node name="FeetArea" parent="." index="10"]
+visible = false
 
 [node name="CollisionShape2D" parent="FeetArea" index="0"]
 position = Vector2( 0, -1 )

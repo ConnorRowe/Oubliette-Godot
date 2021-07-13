@@ -150,7 +150,7 @@ extents = Vector2( 6, 1 )
 [node name="Snail" instance=ExtResource( 1 )]
 script = ExtResource( 4 )
 DamageSourceName = "a Snail"
-MaxHealth = 3
+MaxHealth = 3.0
 _animDown = "down"
 _animLeftRight = "leftright"
 _animUp = "up"
