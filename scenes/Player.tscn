@@ -187,7 +187,6 @@ texture_scale = 4.0
 color = Color( 0.529412, 1, 1, 1 )
 energy = 0.66
 shadow_enabled = true
-shadow_filter = 1
 shadow_filter_smooth = 16.0
 
 [node name="SpellSpawnPoint" type="Node2D" parent="CharSprite/staff"]

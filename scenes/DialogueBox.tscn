@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://default_theme.tres" type="Theme" id=1]
 [ext_resource path="res://textures/dialogue_nineslice.png" type="Texture" id=2]
 [ext_resource path="res://scripts/DialogueBox.cs" type="Script" id=3]
+[ext_resource path="res://textures/SPACE_icon.png" type="Texture" id=4]
 
 [sub_resource type="StyleBoxEmpty" id=1]
 
@@ -67,14 +68,14 @@ text = "Character Name:"
 [node name="Text" type="PanelContainer" parent="."]
 margin_top = 14.0
 margin_right = 647.0
-margin_bottom = 79.0
+margin_bottom = 55.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_styles/panel = SubResource( 1 )
 
 [node name="NinePatchRect" type="NinePatchRect" parent="Text"]
 margin_right = 647.0
-margin_bottom = 65.0
+margin_bottom = 41.0
 texture = ExtResource( 2 )
 patch_margin_left = 7
 patch_margin_top = 7
@@ -86,7 +87,7 @@ __meta__ = {
 
 [node name="MarginContainer" type="MarginContainer" parent="Text"]
 margin_right = 647.0
-margin_bottom = 65.0
+margin_bottom = 41.0
 custom_constants/margin_right = 8
 custom_constants/margin_top = 4
 custom_constants/margin_left = 5
@@ -99,12 +100,28 @@ __meta__ = {
 margin_left = 5.0
 margin_top = 4.0
 margin_right = 639.0
-margin_bottom = 60.0
+margin_bottom = 36.0
 theme = ExtResource( 1 )
 bbcode_enabled = true
 bbcode_text = " Lorem ipsum dolor sit amet, [shake rate=10 level=8]consectetur adipiscing elit.[/shake] Vivamus tincidunt leo id dapibus sagittis. Donec cursus convallis varius. Pellentesque consectetur, libero at tempus vestibulum, orci neque condimentum purus, sed ullamcorper nisl lectus sed purus."
 text = " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tincidunt leo id dapibus sagittis. Donec cursus convallis varius. Pellentesque consectetur, libero at tempus vestibulum, orci neque condimentum purus, sed ullamcorper nisl lectus sed purus."
 scroll_active = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="Text/MarginContainer/Dialogue"]
+modulate = Color( 0.94, 0.94, 0.94, 1 )
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -43.0
+margin_top = -9.0
+grow_horizontal = 0
+grow_vertical = 0
+texture = ExtResource( 4 )
+stretch_mode = 3
 __meta__ = {
 "_edit_use_anchors_": false
 }

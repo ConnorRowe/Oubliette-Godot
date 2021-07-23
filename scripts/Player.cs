@@ -248,7 +248,7 @@ namespace Oubliette
                 {
                     if (elevation == 0)
                     {
-                        jumpVelocity = jumpPower;
+                        // jumpVelocity = jumpPower;
                     }
                 }
             }

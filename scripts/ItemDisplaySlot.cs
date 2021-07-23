@@ -5,14 +5,26 @@ namespace Oubliette
     public class ItemDisplaySlot : Sprite
     {
         private Label nameLabel;
+        private PanelContainer namePanel;
         private string _itemName = "";
+
+        public PanelContainer NamePanel
+        {
+            get
+            {
+                if (namePanel == null)
+                    namePanel = GetNode<PanelContainer>("NamePanel");
+
+                return namePanel;
+            }
+        }
 
         public Label NameLabel
         {
             get
             {
                 if (nameLabel == null)
-                    nameLabel = GetNode<Label>("Label");
+                    nameLabel = GetNode<Label>("NamePanel/MarginContainer/Label");
 
                 return nameLabel;
             }
@@ -60,11 +72,11 @@ namespace Oubliette
         {
             if (isVisible)
             {
-                NameLabel.Show();
+                NamePanel.Show();
             }
             else
             {
-                NameLabel.Hide();
+                NamePanel.Hide();
             }
         }
     }

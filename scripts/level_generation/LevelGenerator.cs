@@ -108,7 +108,7 @@ namespace Oubliette.LevelGen
                         // GenerateLevel();
                     }
 
-                    if (ek.Scancode == (uint)KeyList.Enter)
+                    if (false && ek.Scancode == (uint)KeyList.Enter)
                     {
                         if (player.Camera.Current)
                         {

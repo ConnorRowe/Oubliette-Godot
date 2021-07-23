@@ -82,6 +82,9 @@ namespace Oubliette
 
             List<(string name, string dialogue)> testConvo = new List<(string name, string dialogue)> {
         ("???", "[shake rate=10 level=8]*a voice booms from beneath*[/shake]"),
+        ("???", "Greetings mortal, welcome to my oubliette."),
+        ("???", "In these depths, the doors will only unlock once my minions are dead."),
+        ("???", "I doubt you will make it very far."),
         ("???", "Good luck mortal, you'll need it.")
         };
 
