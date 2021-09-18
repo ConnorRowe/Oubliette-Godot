@@ -170,12 +170,12 @@ namespace Oubliette
             UpdatePotionSlot();
 
             // Set up cloak
-            Color[] cloakColour = new Color[1] { Colors.DarkRed };
+            Color[] cloakColour = new Color[1] { Color.Color8(173, 47, 69) };
 
             cloakUpDown.ClothColours = cloakColour;
             cloakUpDown.SetUp();
 
-            // add cape right/left quads
+            // add cloak cloth-sim right/left quads
             cloakRightLeft.QuadIndices.AddRange(new int[4][] { new int[4] { 0, 1, 3, 2 }, new int[4] { 2, 3, 5, 4 }, new int[4] { 4, 5, 7, 6 }, new int[4] { 6, 7, 9, 8 } });
             cloakRightLeft.MaxStaticPoint = 2;
             cloakRightLeft.ClothColours = cloakColour;
@@ -383,7 +383,9 @@ namespace Oubliette
             arm.Points = new Vector2[] { armOrigins[fDir] + (charSprite.Frame % 3 == 0 ? new Vector2(0, -1) : Vector2.Zero), staff.Position };
             armOutline.Points = arm.Points;
 
-            staff.ShowBehindParent = fDir == Direction.Up;
+            staff.ShowBehindParent = fDir == Direction.Up || fDir == Direction.Left;
+            arm.ShowBehindParent = staff.ShowBehindParent;
+            armOutline.ShowBehindParent = staff.ShowBehindParent;
 
             if (currentMajyka < maxMajyka)
                 RegenMajyka(delta);

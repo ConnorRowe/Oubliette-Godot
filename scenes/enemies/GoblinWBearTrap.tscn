@@ -66,51 +66,51 @@ atlas = ExtResource( 3 )
 region = Rect2( 40, 0, 8, 10 )
 
 [sub_resource type="AtlasTexture" id=9]
-atlas = ExtResource( 2 )
+atlas = ExtResource( 4 )
 region = Rect2( 0, 0, 8, 10 )
 
 [sub_resource type="AtlasTexture" id=10]
-atlas = ExtResource( 2 )
+atlas = ExtResource( 4 )
 region = Rect2( 8, 0, 8, 10 )
 
 [sub_resource type="AtlasTexture" id=11]
-atlas = ExtResource( 2 )
+atlas = ExtResource( 4 )
 region = Rect2( 16, 0, 8, 10 )
 
 [sub_resource type="AtlasTexture" id=12]
-atlas = ExtResource( 2 )
+atlas = ExtResource( 4 )
 region = Rect2( 24, 0, 8, 10 )
 
 [sub_resource type="AtlasTexture" id=13]
-atlas = ExtResource( 2 )
+atlas = ExtResource( 4 )
 region = Rect2( 32, 0, 8, 10 )
 
 [sub_resource type="AtlasTexture" id=14]
-atlas = ExtResource( 2 )
+atlas = ExtResource( 4 )
 region = Rect2( 40, 0, 8, 10 )
 
 [sub_resource type="AtlasTexture" id=15]
-atlas = ExtResource( 4 )
+atlas = ExtResource( 2 )
 region = Rect2( 0, 0, 8, 10 )
 
 [sub_resource type="AtlasTexture" id=16]
-atlas = ExtResource( 4 )
+atlas = ExtResource( 2 )
 region = Rect2( 8, 0, 8, 10 )
 
 [sub_resource type="AtlasTexture" id=17]
-atlas = ExtResource( 4 )
+atlas = ExtResource( 2 )
 region = Rect2( 16, 0, 8, 10 )
 
 [sub_resource type="AtlasTexture" id=18]
-atlas = ExtResource( 4 )
+atlas = ExtResource( 2 )
 region = Rect2( 24, 0, 8, 10 )
 
 [sub_resource type="AtlasTexture" id=19]
-atlas = ExtResource( 4 )
+atlas = ExtResource( 2 )
 region = Rect2( 32, 0, 8, 10 )
 
 [sub_resource type="AtlasTexture" id=20]
-atlas = ExtResource( 4 )
+atlas = ExtResource( 2 )
 region = Rect2( 40, 0, 8, 10 )
 
 [sub_resource type="SpriteFrames" id=21]
@@ -122,12 +122,12 @@ animations = [ {
 }, {
 "frames": [ SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ), SubResource( 14 ) ],
 "loop": true,
-"name": "move_right",
+"name": "move_down",
 "speed": 10.0
 }, {
 "frames": [ SubResource( 15 ), SubResource( 16 ), SubResource( 17 ), SubResource( 18 ), SubResource( 19 ), SubResource( 20 ) ],
 "loop": true,
-"name": "move_down",
+"name": "move_leftright",
 "speed": 10.0
 } ]
 
@@ -142,7 +142,8 @@ extents = Vector2( 2, 1 )
 script = ExtResource( 6 )
 MaxHealth = 2
 _animDown = "move_down"
-_animLeftRight = "move_right"
+_animLeft = "move_leftright"
+_animRight = "move_leftright"
 _animUp = "move_up"
 _animDeath = ""
 maxMovementSpeed = 40.0
@@ -161,8 +162,8 @@ offset = Vector2( 0, -1 )
 [node name="CharSprite" parent="." index="2"]
 material = SubResource( 2 )
 frames = SubResource( 21 )
-animation = "move_down"
-frame = 4
+animation = "move_leftright"
+frame = 3
 playing = true
 offset = Vector2( 0, -5 )
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=2]
+[gd_scene load_steps=48 format=2]
 
 [ext_resource path="res://scripts/Player.cs" type="Script" id=1]
 [ext_resource path="res://textures/Player_run_right.png" type="Texture" id=2]
@@ -16,32 +16,33 @@
 [ext_resource path="res://textures/staff_emmision.png" type="Texture" id=14]
 [ext_resource path="res://scenes/ClothSim.tscn" type="PackedScene" id=15]
 [ext_resource path="res://scripts/ClothSimPoints.cs" type="Script" id=16]
+[ext_resource path="res://textures/Player_run_left.png" type="Texture" id=17]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 2, 9 )
 
-[sub_resource type="AtlasTexture" id=2]
-atlas = ExtResource( 4 )
+[sub_resource type="AtlasTexture" id=25]
+atlas = ExtResource( 17 )
 region = Rect2( 0, 0, 16, 20 )
 
-[sub_resource type="AtlasTexture" id=3]
-atlas = ExtResource( 4 )
+[sub_resource type="AtlasTexture" id=26]
+atlas = ExtResource( 17 )
 region = Rect2( 16, 0, 16, 20 )
 
-[sub_resource type="AtlasTexture" id=4]
-atlas = ExtResource( 4 )
+[sub_resource type="AtlasTexture" id=27]
+atlas = ExtResource( 17 )
 region = Rect2( 32, 0, 16, 20 )
 
-[sub_resource type="AtlasTexture" id=5]
-atlas = ExtResource( 4 )
+[sub_resource type="AtlasTexture" id=28]
+atlas = ExtResource( 17 )
 region = Rect2( 48, 0, 16, 20 )
 
-[sub_resource type="AtlasTexture" id=6]
-atlas = ExtResource( 4 )
+[sub_resource type="AtlasTexture" id=29]
+atlas = ExtResource( 17 )
 region = Rect2( 64, 0, 16, 20 )
 
-[sub_resource type="AtlasTexture" id=7]
-atlas = ExtResource( 4 )
+[sub_resource type="AtlasTexture" id=30]
+atlas = ExtResource( 17 )
 region = Rect2( 80, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=8]
@@ -66,6 +67,30 @@ region = Rect2( 64, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=13]
 atlas = ExtResource( 2 )
+region = Rect2( 80, 0, 16, 20 )
+
+[sub_resource type="AtlasTexture" id=2]
+atlas = ExtResource( 4 )
+region = Rect2( 0, 0, 16, 20 )
+
+[sub_resource type="AtlasTexture" id=3]
+atlas = ExtResource( 4 )
+region = Rect2( 16, 0, 16, 20 )
+
+[sub_resource type="AtlasTexture" id=4]
+atlas = ExtResource( 4 )
+region = Rect2( 32, 0, 16, 20 )
+
+[sub_resource type="AtlasTexture" id=5]
+atlas = ExtResource( 4 )
+region = Rect2( 48, 0, 16, 20 )
+
+[sub_resource type="AtlasTexture" id=6]
+atlas = ExtResource( 4 )
+region = Rect2( 64, 0, 16, 20 )
+
+[sub_resource type="AtlasTexture" id=7]
+atlas = ExtResource( 4 )
 region = Rect2( 80, 0, 16, 20 )
 
 [sub_resource type="AtlasTexture" id=14]
@@ -94,14 +119,19 @@ region = Rect2( 80, 0, 16, 20 )
 
 [sub_resource type="SpriteFrames" id=20]
 animations = [ {
-"frames": [ SubResource( 2 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ), SubResource( 6 ), SubResource( 7 ) ],
+"frames": [ SubResource( 25 ), SubResource( 26 ), SubResource( 27 ), SubResource( 28 ), SubResource( 29 ), SubResource( 30 ) ],
 "loop": true,
-"name": "up",
-"speed": 8.0
+"name": "left",
+"speed": 5.0
 }, {
 "frames": [ SubResource( 8 ), SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ) ],
 "loop": true,
-"name": "leftright",
+"name": "right",
+"speed": 8.0
+}, {
+"frames": [ SubResource( 2 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ), SubResource( 6 ), SubResource( 7 ) ],
+"loop": true,
+"name": "up",
 "speed": 8.0
 }, {
 "frames": [ SubResource( 14 ), SubResource( 15 ), SubResource( 16 ), SubResource( 17 ), SubResource( 18 ), SubResource( 19 ) ],
@@ -146,7 +176,9 @@ _shadowSpritePath = NodePath("ShadowSprite")
 _animationPlayerPath = NodePath("AnimationPlayer")
 _feetAreaPath = NodePath("FeetArea")
 renderElevation = true
+_animRight = "right"
 _animDeath = ""
+_flipHorAnimWhenLeft = false
 _cameraPath = NodePath("Camera2D")
 hitBoxTraceShape = SubResource( 1 )
 
@@ -208,7 +240,7 @@ end_cap_mode = 1
 material = ExtResource( 12 )
 points = PoolVector2Array( -2.5, -11, -4, -6 )
 width = 1.25
-default_color = Color( 0.45098, 0.454902, 0.258824, 1 )
+default_color = Color( 0.184314, 0.341176, 0.32549, 1 )
 begin_cap_mode = 1
 end_cap_mode = 1
 

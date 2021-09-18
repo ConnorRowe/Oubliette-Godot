@@ -1,5 +1,4 @@
 using Godot;
-using System.Drawing;
 using System.Collections.Generic;
 using Oubliette.Stats;
 
@@ -233,13 +232,17 @@ namespace Oubliette
         [Export]
         protected string _animDown = "down";
         [Export]
-        protected string _animLeftRight = "leftright";
+        protected string _animLeft = "left";
+        [Export]
+        protected string _animRight = "left";
         [Export]
         protected string _animUp = "up";
         [Export]
         protected string _animTakeDmg = "DamageFlash";
         [Export]
         protected string _animDeath = "death";
+        [Export]
+        protected bool _flipHorAnimWhenLeft = true;
 
         // Signals
         [Signal]
@@ -545,7 +548,7 @@ namespace Oubliette
                     }
                 case Direction.Right:
                     {
-                        anim.name = _animLeftRight;
+                        anim.name = _animRight;
                         anim.flipH = false;
                         break;
                     }
@@ -557,8 +560,8 @@ namespace Oubliette
                     }
                 case Direction.Left:
                     {
-                        anim.name = _animLeftRight;
-                        anim.flipH = true;
+                        anim.name = _animLeft;
+                        anim.flipH = _flipHorAnimWhenLeft;
                         break;
                     }
             }
