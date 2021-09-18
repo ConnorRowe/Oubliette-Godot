@@ -37,6 +37,9 @@ namespace Oubliette
 
         private void RenderToBloodTexture()
         {
+            if(!IsInstanceValid(bloodTexture))
+                return;
+
             Image frameImg = new Image();
 
             frameImg.CreateFromData(baseTex.GetWidth(), baseTex.GetHeight(), false, Image.Format.La8, baseTex.GetData().GetData());

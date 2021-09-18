@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<template>
- <object name="hut door" type="door">
-  <properties>
-   <property name="rotation" type="int" value="90"/>
-  </properties>
-  <point/>
- </object>
-</template>

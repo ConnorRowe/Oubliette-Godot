@@ -217,7 +217,7 @@ namespace Oubliette
                     p.BloodTrailAmount += 1f;
 
                     // Spawn big blood spillage
-                    if (Rng.Randf() <= 0.2f)
+                    if (Rng.Randf() <= 0.7f)
                     {
                         BigSpillage spillage = bigSpillageScene.Instance<BigSpillage>();
                         p.World.CallDeferred("add_child", spillage);
