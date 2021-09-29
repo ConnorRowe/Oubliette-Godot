@@ -195,7 +195,7 @@ __meta__ = {
 
 [node name="Particles2D" type="Particles2D" parent="CanvasLayer/DeadControl/Dead"]
 position = Vector2( 71.5, 61 )
-lifetime = 4.0
+lifetime = 1.5
 process_material = SubResource( 4 )
 texture = ExtResource( 28 )
 
