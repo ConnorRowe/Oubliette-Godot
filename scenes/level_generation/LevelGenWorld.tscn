@@ -87,12 +87,16 @@ defaultGlobalLighting = Color( 0.14902, 0.141176, 0.141176, 1 )
 _artefactNamePopupPath = NodePath("CanvasLayer/ArtefactNamePopup")
 
 [node name="CharOverlayViewport" type="Viewport" parent="."]
-size = Vector2( 1024, 576 )
+size = Vector2( 480, 270 )
 transparent_bg = true
 hdr = false
 usage = 0
 render_target_v_flip = true
 render_target_update_mode = 3
+shadow_atlas_quad_0 = 0
+shadow_atlas_quad_1 = 0
+shadow_atlas_quad_2 = 0
+shadow_atlas_quad_3 = 0
 
 [node name="OverlayRender" parent="CharOverlayViewport" instance=ExtResource( 36 )]
 
@@ -129,8 +133,6 @@ __meta__ = {
 }
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
-scale = Vector2( 2, 2 )
-transform = Transform2D( 2, 0, 0, 2, 0, 0 )
 
 [node name="Vignette" type="TextureRect" parent="CanvasLayer" groups=[
 "death_gui",
@@ -207,10 +209,9 @@ position = Vector2( 98.5, 209.5 )
 mouseOverText = ExtResource( 32 )
 normalText = ExtResource( 31 )
 borderOverride = ExtResource( 30 )
-_cameraPath = NodePath("../../Camera2D")
 
 [node name="DebugOverlay" type="Node2D" parent="CanvasLayer"]
-position = Vector2( 508, 70 )
+position = Vector2( 474, 70 )
 script = ExtResource( 3 )
 _debugFont = ExtResource( 1 )
 ShowMemory = false
@@ -224,17 +225,17 @@ position = Vector2( 4, 4 )
 
 [node name="DialogueBox" parent="CanvasLayer" instance=ExtResource( 7 )]
 margin_left = 14.0
-margin_top = 217.0
-margin_right = -525.0
-margin_bottom = -292.0
+margin_top = 180.0
+margin_right = -5.0
+margin_bottom = -4.0
 
 [node name="Minimap" parent="CanvasLayer" instance=ExtResource( 9 )]
-position = Vector2( 218, 0 )
+position = Vector2( 201, 0 )
 backgroundColour = Color( 0, 0, 0, 0.74902 )
 
 [node name="PrimarySpellSlot" parent="CanvasLayer" instance=ExtResource( 18 )]
 material = null
-position = Vector2( 87.5, 4.5 )
+position = Vector2( 87, 4 )
 texture = ExtResource( 23 )
 
 [node name="PotionSlot" parent="CanvasLayer" instance=ExtResource( 18 )]
@@ -249,9 +250,9 @@ anchor_left = 0.53
 anchor_top = 0.004
 anchor_right = 0.53
 anchor_bottom = 0.004
-margin_left = -194.22
+margin_left = 54.6
 margin_top = -0.4
-margin_right = -104.22
+margin_right = 144.6
 margin_bottom = 49.6
 grow_horizontal = 0
 rect_min_size = Vector2( 90, 50 )

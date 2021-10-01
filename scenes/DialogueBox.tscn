@@ -10,9 +10,11 @@
 [node name="DialogueBox" type="VBoxContainer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_right = -377.0
-margin_bottom = -521.0
+margin_top = 1.0
+margin_right = -343.0
+margin_bottom = -241.0
 rect_pivot_offset = Vector2( 0.5, 0.5 )
+mouse_filter = 2
 custom_constants/separation = 0
 script = ExtResource( 3 )
 __meta__ = {
@@ -26,12 +28,14 @@ _tweenPath = NodePath("Tween")
 [node name="PanelContainer" type="PanelContainer" parent="."]
 margin_right = 137.0
 margin_bottom = 14.0
+mouse_filter = 2
 size_flags_horizontal = 0
 custom_styles/panel = SubResource( 1 )
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
 margin_right = 137.0
 margin_bottom = 14.0
+mouse_filter = 2
 custom_constants/margin_top = 0
 custom_constants/margin_left = 13
 
@@ -49,6 +53,7 @@ patch_margin_right = 7
 margin_left = 13.0
 margin_right = 137.0
 margin_bottom = 14.0
+mouse_filter = 2
 custom_constants/margin_right = 4
 custom_constants/margin_top = -2
 custom_constants/margin_left = 4
@@ -67,15 +72,16 @@ text = "Character Name:"
 
 [node name="Text" type="PanelContainer" parent="."]
 margin_top = 14.0
-margin_right = 647.0
-margin_bottom = 55.0
+margin_right = 137.0
+margin_bottom = 28.0
+mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_styles/panel = SubResource( 1 )
 
 [node name="NinePatchRect" type="NinePatchRect" parent="Text"]
-margin_right = 647.0
-margin_bottom = 41.0
+margin_right = 137.0
+margin_bottom = 14.0
 texture = ExtResource( 2 )
 patch_margin_left = 7
 patch_margin_top = 7
@@ -86,8 +92,9 @@ __meta__ = {
 }
 
 [node name="MarginContainer" type="MarginContainer" parent="Text"]
-margin_right = 647.0
-margin_bottom = 41.0
+margin_right = 137.0
+margin_bottom = 14.0
+mouse_filter = 2
 custom_constants/margin_right = 8
 custom_constants/margin_top = 4
 custom_constants/margin_left = 5
@@ -99,8 +106,9 @@ __meta__ = {
 [node name="Dialogue" type="RichTextLabel" parent="Text/MarginContainer"]
 margin_left = 5.0
 margin_top = 4.0
-margin_right = 639.0
-margin_bottom = 36.0
+margin_right = 129.0
+margin_bottom = 9.0
+mouse_filter = 2
 theme = ExtResource( 1 )
 bbcode_enabled = true
 bbcode_text = " Lorem ipsum dolor sit amet, [shake rate=10 level=8]consectetur adipiscing elit.[/shake] Vivamus tincidunt leo id dapibus sagittis. Donec cursus convallis varius. Pellentesque consectetur, libero at tempus vestibulum, orci neque condimentum purus, sed ullamcorper nisl lectus sed purus."
@@ -120,6 +128,7 @@ margin_left = -43.0
 margin_top = -9.0
 grow_horizontal = 0
 grow_vertical = 0
+mouse_filter = 2
 texture = ExtResource( 4 )
 stretch_mode = 3
 __meta__ = {

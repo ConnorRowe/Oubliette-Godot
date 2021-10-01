@@ -8,7 +8,7 @@ namespace Oubliette
         {
             base._Input(evt);
 
-            if (evt.IsActionReleased("toggle_fullscreen"))
+            if (evt is InputEventKey ek && !ek.Pressed && (ek.Scancode == (uint)KeyList.F11 || (ek.Scancode == (uint)KeyList.Enter && ek.Alt)))
             {
                 OS.WindowFullscreen = !OS.WindowFullscreen;
             }

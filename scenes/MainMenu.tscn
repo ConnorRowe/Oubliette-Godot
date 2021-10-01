@@ -59,8 +59,8 @@ nextScene = ExtResource( 4 )
 modulate = Color( 0.28192, 0.2752, 0.32, 1 )
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_right = 341.0
-margin_bottom = 192.0
+margin_right = 480.0
+margin_bottom = 270.0
 mouse_filter = 2
 input_pass_on_modal_close_click = false
 size_flags_horizontal = 3
@@ -73,7 +73,7 @@ __meta__ = {
 
 [node name="Particles2D" type="Particles2D" parent="."]
 modulate = Color( 2.32, 0.2, 0.2, 1 )
-position = Vector2( 171, 67 )
+position = Vector2( 240, 75.5 )
 z_index = 1
 lifetime = 1.5
 process_material = SubResource( 1 )
@@ -82,35 +82,30 @@ texture = ExtResource( 8 )
 [node name="brick_logo_crop" type="Sprite" parent="."]
 modulate = Color( 1.73, 1, 1, 1 )
 material = SubResource( 4 )
-position = Vector2( 170.667, 47 )
+position = Vector2( 240, 55.5 )
 texture = ExtResource( 7 )
 
 [node name="PlayButton" parent="." instance=ExtResource( 1 )]
-position = Vector2( 170.667, 104 )
-_cameraPath = NodePath("../Camera2D")
+position = Vector2( 240, 141 )
 
 [node name="QuitButton" parent="." instance=ExtResource( 1 )]
 modulate = Color( 0.61, 0.61, 0.61, 1 )
-position = Vector2( 170.667, 164 )
+position = Vector2( 240, 211 )
 mouseOverText = ExtResource( 5 )
 normalText = ExtResource( 6 )
-_cameraPath = NodePath("../Camera2D")
-
-[node name="Camera2D" type="Camera2D" parent="."]
-anchor_mode = 0
-current = true
-zoom = Vector2( 0.333, 0.333 )
-limit_smoothed = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource( 5 )
 
 [node name="Label" type="Label" parent="."]
-margin_left = 226.0
-margin_top = 71.0
-margin_right = 366.0
-margin_bottom = 87.0
+margin_left = 295.0
+margin_top = 80.0
+margin_right = 435.0
+margin_bottom = 96.0
 rect_scale = Vector2( 0.5, 0.5 )
 custom_fonts/font = ExtResource( 11 )
 custom_colors/font_color = Color( 0.486275, 0.290196, 0.290196, 1 )
 text = "InDev - Connor Magson"
+__meta__ = {
+"_edit_use_anchors_": false
+}

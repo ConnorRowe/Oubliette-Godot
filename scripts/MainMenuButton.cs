@@ -13,13 +13,9 @@ namespace Oubliette
         private Texture normalText;
         [Export]
         private Texture borderOverride;
-        [Export]
-        private NodePath _cameraPath;
-
 
         private Sprite bgAndText;
         private Sprite border;
-        private Camera2D camera;
 
         private ShaderMaterial bgAndTextMat;
         private bool isMouseOver = false;
@@ -40,7 +36,6 @@ namespace Oubliette
         {
             bgAndText = GetNode<Sprite>("BgAndText");
             border = GetNode<Sprite>("Border");
-            camera = GetNode<Camera2D>(_cameraPath);
 
             bgAndTextMat = bgAndText.Material as ShaderMaterial;
             defaultBgClipMin = (Vector2)bgAndTextMat.GetShaderParam("clip_rect_min");

@@ -281,7 +281,7 @@ namespace Oubliette
             }
 
             // Zoom in on player
-            tween.InterpolateProperty(player.Camera, "zoom", new Vector2(0.333f, 0.333f), new Vector2(0.1f, 0.1f), 0.25f, Tween.TransitionType.Cubic, Tween.EaseType.InOut);
+            tween.InterpolateProperty(player.Camera, "zoom", new Vector2(1f, 1f), new Vector2(0.333f, 0.333f), 0.25f, Tween.TransitionType.Cubic, Tween.EaseType.InOut);
             tween.InterpolateProperty(player.Camera, "offset", Vector2.Zero, new Vector2(0, -16), 0.25f);
 
             // Hide GUI
